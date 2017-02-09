@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Example</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+  </head>
+  <body>
+    <input type="file" id="input" name="file" />
+    <div id="output">
+
+      <div id="methods" style="display: none;">
+        <h3>Methods</h3>
+        <ul>
+        </ul>
+      </div>
+      
+      <div id="fields" style="display: none;">
+        <h3>Fields</h3>
+        <ul>
+        </ul>
+      </div>
+    </div>
+
+    <div id="classFileAsJson" style="display: none;">
+      <button>Class file as JSON (Show)</button>
+      <pre class="prettyprint" style="display: none;"></pre>
+    </div>
+
+    <script src="../dist/java-class-tools.min.js"></script>
+    <script>
+      function handleFileSelect(e) {
+        var file = e.target.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+          var jreader = new JavaClassTools.JavaClassFileReader();
+          var data = e.target.result;
+
+          console.time('read class');
+          var classFile = jreader.read(data);
+          console.timeEnd('read class');
+
+          var methodList = document.querySelectorAll('#methods > ul')[0];
+          var fieldList = document.querySelectorAll('#fields > ul')[0];
+
+          // Clear lists
+          while (methodList.firstChild)
+              methodList.removeChild(methodList.firstChild);
+          while (fieldList.firstChild)
+              fieldList.removeChild(fieldList.firstChild);
+
+          document.querySelectorAll('#classFileAsJson > pre')[0].innerText = '';
+
+          // I will not duplicate code
+          function appendMethodOrFieldToList(methodOrFieldList, listElement) {
+            methodOrFieldList.forEach(function(entry) {
+              // Get method name & descriptor from constant_pool
+              var nameCpEntry = classFile.constant_pool[entry.name_index];
+              var descriptorCpEntry = classFile.constant_pool[entry.descriptor_index];
+              
+              // Convert to string
+              var name = String.fromCharCode.apply(null, nameCpEntry.bytes);
+              var descriptor = String.fromCharCode.apply(null, descriptorCpEntry.bytes);
+
+              var listEntry = document.createElement('li');
+              listEntry.innerText = name + " " + descriptor;
+              listElement.appendChild(listEntry);
+            });
+          };
+
+          appendMethodOrFieldToList(classFile.methods, methodList);
+          appendMethodOrFieldToList(classFile.fields, fieldList);
+
+          document.getElementById('methods').style.display = 'block';
+          document.getElementById('fields').style.display = 'block';
+          document.getElementById('classFileAsJson').style.display = 'block';
+
+          document.querySelectorAll('#classFileAsJson > pre')[0].innerText = JSON.stringify(classFile, undefined, 2);
+
+          document.querySelectorAll('#classFileAsJson > button')[0].addEventListener('click', function (ev) {
+            document.querySelectorAll('#classFileAsJson > pre')[0].style.display = 'block';
+          });
+        };
+
+        reader.readAsArrayBuffer(file);
+      }
+
+      document.getElementById('input').addEventListener('change', handleFileSelect, false);
+    </script>
+  </body>
+</html>
