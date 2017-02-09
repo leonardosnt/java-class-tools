@@ -1429,7 +1429,15 @@ gulp-rename@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/gulp-rename/-/gulp-rename-1.2.2.tgz#3ad4428763f05e2764dec1c67d868db275687817"
 
-"gulp-util@>=3.0.0 <3.1.0-0", gulp-util@^3.0.0:
+gulp-uglifyjs@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/gulp-uglifyjs/-/gulp-uglifyjs-0.6.2.tgz#793185503fcf0f301255ddddb5dae7f7d8746862"
+  dependencies:
+    gulp-util "^3.0.4"
+    through "^2.3.4"
+    uglify-js "^2.4.13"
+
+"gulp-util@>=3.0.0 <3.1.0-0", gulp-util@^3.0.0, gulp-util@^3.0.4:
   version "3.0.8"
   resolved "https://registry.yarnpkg.com/gulp-util/-/gulp-util-3.0.8.tgz#0054e1e744502e27c04c187c3ecc505dd54bbb4f"
   dependencies:
@@ -2912,7 +2920,7 @@ through2@^2.0.0:
     readable-stream "^2.1.5"
     xtend "~4.0.1"
 
-"through@>=2.3.4 <2.4.0-0":
+"through@>=2.3.4 <2.4.0-0", through@^2.3.4:
   version "2.3.8"
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
 
@@ -2974,7 +2982,7 @@ tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
 
-uglify-js@^2.7.5, uglify-js@~2.7.3:
+uglify-js@^2.4.13, uglify-js@^2.7.5, uglify-js@~2.7.3:
   version "2.7.5"
   resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.7.5.tgz#4612c0c7baaee2ba7c487de4904ae122079f2ca8"
   dependencies:
