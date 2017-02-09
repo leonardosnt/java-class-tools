@@ -1,6 +1,5 @@
 node_modules/
 cls/
-dist/
 coverage/
 .vscode/
 lib/
