@@ -1,10 +1,3 @@
-# java-class-tools
-
-## Examples:
-[Live example](https://rawgit.com/leonardosnt/java-class-tools/master/examples/browser.html)
-
-Print all methods names
-```javascript
 'use strict';
 
 const { JavaClassFileReader } = require('../');
@@ -22,9 +15,6 @@ classFile.methods.forEach(md => {
 
   // To utf-8 string
   const name = String.fromCharCode.apply(null, nameCpEntry.bytes);
-
+  
   console.log(name);
 });
-```
-
-
