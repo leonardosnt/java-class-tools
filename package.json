@@ -1,6 +1,6 @@
 {
   "name": "java-class-tools",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Read and write java class files in node or browser.",
   "main": "lib/index.js",
   "directories": {
