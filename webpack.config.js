@@ -2,7 +2,7 @@ var path = require('path');
 
 module.exports = {
   entry: {
-    'index': "./index.js"
+    'index': "./src/index.js"
   },
   output: {
     path: path.join(__dirname, './dist/'),
@@ -10,7 +10,8 @@ module.exports = {
     library: ['JavaClassTools']
   },
   node: {
-    fs: "empty"
+    fs: "empty",
+    process: false
   },
   module: {
     loaders: [

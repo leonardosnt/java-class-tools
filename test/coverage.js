@@ -2,7 +2,7 @@
 const fs = require('fs-extra');
 const ByteBuffer = require('bytebuffer');
 const deepEquals = require('deep-equal');
-const { JavaClassFileReader, JavaClassFileWriter } = require('../index');
+const { JavaClassFileReader, JavaClassFileWriter } = require('../');
 
 const walk = function(dir) {
     var results = []

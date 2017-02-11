@@ -47,94 +47,107 @@ var JavaClassTools =
 
 	'use strict';
 
-	var JavaClassFileReader = __webpack_require__(1);
-	var JavaClassFileWriter = __webpack_require__(11);
-	var ConstantType = __webpack_require__(7);
-	var Opcode = __webpack_require__(8);
-	var Modifier = __webpack_require__(9);
+	var _javaClassReader = __webpack_require__(1);
 
-	var _require = __webpack_require__(12),
-	    InstructionParser = _require.InstructionParser,
-	    Instruction = _require.Instruction;
+	var _javaClassReader2 = _interopRequireDefault(_javaClassReader);
+
+	var _javaClassWriter = __webpack_require__(10);
+
+	var _javaClassWriter2 = _interopRequireDefault(_javaClassWriter);
+
+	var _constantType = __webpack_require__(6);
+
+	var _constantType2 = _interopRequireDefault(_constantType);
+
+	var _opcode = __webpack_require__(7);
+
+	var _opcode2 = _interopRequireDefault(_opcode);
+
+	var _modifier = __webpack_require__(8);
+
+	var _modifier2 = _interopRequireDefault(_modifier);
+
+	var _instructionParser = __webpack_require__(11);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	/*
+	 *  Copyright (C) 2017 leonardosnt
+	 *
+	 *  This program is free software; you can redistribute it and/or modify
+	 *  it under the terms of the GNU General Public License as published by
+	 *  the Free Software Foundation; either version 2 of the License, or
+	 *  (at your option) any later version.
+	 *
+	 *  This program is distributed in the hope that it will be useful,
+	 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+	 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	 *  GNU General Public License for more details.
+	 *
+	 *  You should have received a copy of the GNU General Public License along
+	 *  with this program; if not, write to the Free Software Foundation, Inc.,
+	 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+	*/
 
 	module.exports = {
-	  JavaClassFileReader: JavaClassFileReader,
-	  JavaClassFileWriter: JavaClassFileWriter,
-	  Opcode: Opcode,
-	  ConstantType: ConstantType,
-	  Modifier: Modifier,
-	  Instruction: Instruction,
-	  InstructionParser: InstructionParser
+	  JavaClassFileReader: _javaClassReader2.default,
+	  JavaClassFileWriter: _javaClassWriter2.default,
+	  Opcode: _opcode2.default,
+	  ConstantType: _constantType2.default,
+	  Modifier: _modifier2.default,
+	  Instruction: _instructionParser.Instruction,
+	  InstructionParser: _instructionParser.InstructionParser
 	};
 
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+	'use strict';
 
-	var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-	var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-	  return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-	} : function (obj) {
-	  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-	};
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  Copyright (C) 2017 leonardosnt
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  This program is free software; you can redistribute it and/or modify
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  it under the terms of the GNU General Public License as published by
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  the Free Software Foundation; either version 2 of the License, or
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  (at your option) any later version.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  This program is distributed in the hope that it will be useful,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  GNU General Public License for more details.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  You should have received a copy of the GNU General Public License along
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  with this program; if not, write to the Free Software Foundation, Inc.,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
 
-	var _createClass = function () {
-	  function defineProperties(target, props) {
-	    for (var i = 0; i < props.length; i++) {
-	      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-	    }
-	  }return function (Constructor, protoProps, staticProps) {
-	    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	  };
-	}(); /*
-	      *  Copyright (C) 2017 leonardosnt
-	      *
-	      *  This program is free software; you can redistribute it and/or modify
-	      *  it under the terms of the GNU General Public License as published by
-	      *  the Free Software Foundation; either version 2 of the License, or
-	      *  (at your option) any later version.
-	      *
-	      *  This program is distributed in the hope that it will be useful,
-	      *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-	      *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	      *  GNU General Public License for more details.
-	      *
-	      *  You should have received a copy of the GNU General Public License along
-	      *  with this program; if not, write to the Free Software Foundation, Inc.,
-	      *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-	     */
-
-	var _bytebuffer = __webpack_require__(3);
+	var _bytebuffer = __webpack_require__(2);
 
 	var _bytebuffer2 = _interopRequireDefault(_bytebuffer);
 
-	var _constantType = __webpack_require__(7);
+	var _constantType = __webpack_require__(6);
 
 	var _constantType2 = _interopRequireDefault(_constantType);
 
-	var _opcode = __webpack_require__(8);
+	var _opcode = __webpack_require__(7);
 
 	var _opcode2 = _interopRequireDefault(_opcode);
 
-	var _modifier = __webpack_require__(9);
+	var _modifier = __webpack_require__(8);
 
 	var _modifier2 = _interopRequireDefault(_modifier);
 
-	function _interopRequireDefault(obj) {
-	  return obj && obj.__esModule ? obj : { default: obj };
-	}
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _classCallCheck(instance, Constructor) {
-	  if (!(instance instanceof Constructor)) {
-	    throw new TypeError("Cannot call a class as a function");
-	  }
-	}
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	/**
-	 * All objects follow Jvm8 specification.
+	 * All objects (structure) follow Jvm8 specification.
+	 * 
 	 * @see https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html
 	 */
 	var JavaClassFileReader = function () {
@@ -144,6 +157,7 @@ var JavaClassTools =
 
 	  _createClass(JavaClassFileReader, [{
 	    key: 'read',
+
 
 	    /**
 	     * Read and parse class file contents.
@@ -196,7 +210,7 @@ var JavaClassTools =
 	    value: function readFromFile(path) {
 	      if ((typeof process === 'undefined' ? 'undefined' : _typeof(process)) !== undefined) {
 	        // node
-	        var fs = __webpack_require__(10);
+	        var fs = __webpack_require__(9);
 	        return this.read(fs.readFileSync(path));
 	      } else {
 	        throw 'not supported in browser.';
@@ -922,196 +936,9 @@ var JavaClassTools =
 	}();
 
 	module.exports = JavaClassFileReader;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ },
 /* 2 */
-/***/ function(module, exports) {
-
-	// shim for using process in browser
-	var process = module.exports = {};
-
-	// cached from whatever global is present so that test runners that stub it
-	// don't break things.  But we need to wrap it in a try catch in case it is
-	// wrapped in strict mode code which doesn't define any globals.  It's inside a
-	// function because try/catches deoptimize in certain engines.
-
-	var cachedSetTimeout;
-	var cachedClearTimeout;
-
-	function defaultSetTimout() {
-	    throw new Error('setTimeout has not been defined');
-	}
-	function defaultClearTimeout () {
-	    throw new Error('clearTimeout has not been defined');
-	}
-	(function () {
-	    try {
-	        if (typeof setTimeout === 'function') {
-	            cachedSetTimeout = setTimeout;
-	        } else {
-	            cachedSetTimeout = defaultSetTimout;
-	        }
-	    } catch (e) {
-	        cachedSetTimeout = defaultSetTimout;
-	    }
-	    try {
-	        if (typeof clearTimeout === 'function') {
-	            cachedClearTimeout = clearTimeout;
-	        } else {
-	            cachedClearTimeout = defaultClearTimeout;
-	        }
-	    } catch (e) {
-	        cachedClearTimeout = defaultClearTimeout;
-	    }
-	} ())
-	function runTimeout(fun) {
-	    if (cachedSetTimeout === setTimeout) {
-	        //normal enviroments in sane situations
-	        return setTimeout(fun, 0);
-	    }
-	    // if setTimeout wasn't available but was latter defined
-	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-	        cachedSetTimeout = setTimeout;
-	        return setTimeout(fun, 0);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedSetTimeout(fun, 0);
-	    } catch(e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-	            return cachedSetTimeout.call(null, fun, 0);
-	        } catch(e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-	            return cachedSetTimeout.call(this, fun, 0);
-	        }
-	    }
-
-
-	}
-	function runClearTimeout(marker) {
-	    if (cachedClearTimeout === clearTimeout) {
-	        //normal enviroments in sane situations
-	        return clearTimeout(marker);
-	    }
-	    // if clearTimeout wasn't available but was latter defined
-	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-	        cachedClearTimeout = clearTimeout;
-	        return clearTimeout(marker);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedClearTimeout(marker);
-	    } catch (e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-	            return cachedClearTimeout.call(null, marker);
-	        } catch (e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-	            return cachedClearTimeout.call(this, marker);
-	        }
-	    }
-
-
-
-	}
-	var queue = [];
-	var draining = false;
-	var currentQueue;
-	var queueIndex = -1;
-
-	function cleanUpNextTick() {
-	    if (!draining || !currentQueue) {
-	        return;
-	    }
-	    draining = false;
-	    if (currentQueue.length) {
-	        queue = currentQueue.concat(queue);
-	    } else {
-	        queueIndex = -1;
-	    }
-	    if (queue.length) {
-	        drainQueue();
-	    }
-	}
-
-	function drainQueue() {
-	    if (draining) {
-	        return;
-	    }
-	    var timeout = runTimeout(cleanUpNextTick);
-	    draining = true;
-
-	    var len = queue.length;
-	    while(len) {
-	        currentQueue = queue;
-	        queue = [];
-	        while (++queueIndex < len) {
-	            if (currentQueue) {
-	                currentQueue[queueIndex].run();
-	            }
-	        }
-	        queueIndex = -1;
-	        len = queue.length;
-	    }
-	    currentQueue = null;
-	    draining = false;
-	    runClearTimeout(timeout);
-	}
-
-	process.nextTick = function (fun) {
-	    var args = new Array(arguments.length - 1);
-	    if (arguments.length > 1) {
-	        for (var i = 1; i < arguments.length; i++) {
-	            args[i - 1] = arguments[i];
-	        }
-	    }
-	    queue.push(new Item(fun, args));
-	    if (queue.length === 1 && !draining) {
-	        runTimeout(drainQueue);
-	    }
-	};
-
-	// v8 likes predictible objects
-	function Item(fun, array) {
-	    this.fun = fun;
-	    this.array = array;
-	}
-	Item.prototype.run = function () {
-	    this.fun.apply(null, this.array);
-	};
-	process.title = 'browser';
-	process.browser = true;
-	process.env = {};
-	process.argv = [];
-	process.version = ''; // empty string to avoid regexp issues
-	process.versions = {};
-
-	function noop() {}
-
-	process.on = noop;
-	process.addListener = noop;
-	process.once = noop;
-	process.off = noop;
-	process.removeListener = noop;
-	process.removeAllListeners = noop;
-	process.emit = noop;
-
-	process.binding = function (name) {
-	    throw new Error('process.binding is not supported');
-	};
-
-	process.cwd = function () { return '/' };
-	process.chdir = function (dir) {
-	    throw new Error('process.chdir is not supported');
-	};
-	process.umask = function() { return 0; };
-
-
-/***/ },
-/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module) {/*
@@ -1138,11 +965,11 @@ var JavaClassTools =
 	 */
 	(function(global, factory) {
 
-	    /* AMD */ if ("function" === 'function' && __webpack_require__(5)["amd"])
-	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(6)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    /* AMD */ if ("function" === 'function' && __webpack_require__(4)["amd"])
+	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(5)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	    /* CommonJS */ else if ("function" === 'function' && typeof module === "object" && module && module["exports"])
 	        module['exports'] = (function() {
-	            var Long; try { Long = __webpack_require__(6); } catch (e) {}
+	            var Long; try { Long = __webpack_require__(5); } catch (e) {}
 	            return factory(Long);
 	        })();
 	    /* Global */ else
@@ -4861,10 +4688,10 @@ var JavaClassTools =
 	    return ByteBuffer;
 	});
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -4880,14 +4707,14 @@ var JavaClassTools =
 
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports) {
 
 	module.exports = function() { throw new Error("define cannot be used indirect"); };
 
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module) {/*
@@ -4914,7 +4741,7 @@ var JavaClassTools =
 	 */
 	(function(global, factory) {
 
-	    /* AMD */ if ("function" === 'function' && __webpack_require__(5)["amd"])
+	    /* AMD */ if ("function" === 'function' && __webpack_require__(4)["amd"])
 	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	    /* CommonJS */ else if ("function" === 'function' && typeof module === "object" && module && module["exports"])
 	        module["exports"] = factory();
@@ -6100,10 +5927,10 @@ var JavaClassTools =
 	    return Long;
 	});
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -6146,7 +5973,7 @@ var JavaClassTools =
 	module.exports = ConstantType;
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -6380,7 +6207,7 @@ var JavaClassTools =
 	module.exports = Opcode;
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -6425,61 +6252,52 @@ var JavaClassTools =
 	module.exports = Modifier;
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports) {
 
 	
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _createClass = function () {
-	  function defineProperties(target, props) {
-	    for (var i = 0; i < props.length; i++) {
-	      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-	    }
-	  }return function (Constructor, protoProps, staticProps) {
-	    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	  };
-	}(); /*
-	      *  Copyright (C) 2017 leonardosnt
-	      *
-	      *  This program is free software; you can redistribute it and/or modify
-	      *  it under the terms of the GNU General Public License as published by
-	      *  the Free Software Foundation; either version 2 of the License, or
-	      *  (at your option) any later version.
-	      *
-	      *  This program is distributed in the hope that it will be useful,
-	      *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-	      *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	      *  GNU General Public License for more details.
-	      *
-	      *  You should have received a copy of the GNU General Public License along
-	      *  with this program; if not, write to the Free Software Foundation, Inc.,
-	      *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-	     */
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  Copyright (C) 2017 leonardosnt
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  This program is free software; you can redistribute it and/or modify
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  it under the terms of the GNU General Public License as published by
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  the Free Software Foundation; either version 2 of the License, or
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  (at your option) any later version.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  This program is distributed in the hope that it will be useful,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  GNU General Public License for more details.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  You should have received a copy of the GNU General Public License along
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  with this program; if not, write to the Free Software Foundation, Inc.,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
 
-	var _bytebuffer = __webpack_require__(3);
+	var _bytebuffer = __webpack_require__(2);
 
 	var _bytebuffer2 = _interopRequireDefault(_bytebuffer);
 
-	var _constantType = __webpack_require__(7);
+	var _constantType = __webpack_require__(6);
 
 	var _constantType2 = _interopRequireDefault(_constantType);
 
-	function _interopRequireDefault(obj) {
-	  return obj && obj.__esModule ? obj : { default: obj };
-	}
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _classCallCheck(instance, Constructor) {
-	  if (!(instance instanceof Constructor)) {
-	    throw new TypeError("Cannot call a class as a function");
-	  }
-	}
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	/**
+	 * All objects (structure) MUST follow Jvm8 specification.
+	 * 
+	 * @see https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html
+	 */
 	var JavaClassFileWriter = function () {
 	  function JavaClassFileWriter() {
 	    _classCallCheck(this, JavaClassFileWriter);
@@ -6487,6 +6305,7 @@ var JavaClassTools =
 
 	  _createClass(JavaClassFileWriter, [{
 	    key: 'write',
+
 
 	    /**
 	     * Write ClassFile object to a ByteBuffer.
@@ -7039,10 +6858,249 @@ var JavaClassTools =
 	module.exports = JavaClassFileWriter;
 
 /***/ },
-/* 12 */
-/***/ function(module, exports) {
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  Copyright (C) 2017 leonardosnt
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  This program is free software; you can redistribute it and/or modify
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  it under the terms of the GNU General Public License as published by
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  the Free Software Foundation; either version 2 of the License, or
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  (at your option) any later version.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  This program is distributed in the hope that it will be useful,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  GNU General Public License for more details.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  You should have received a copy of the GNU General Public License along
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  with this program; if not, write to the Free Software Foundation, Inc.,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+	var _opcode = __webpack_require__(7);
+
+	var _opcode2 = _interopRequireDefault(_opcode);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var OPERAND_COUNT_MAP = {
+	  0x00: 0, 0x01: 0, 0x02: 0, 0x03: 0, 0x04: 0, 0x05: 0, 0x06: 0, 0x07: 0, 0x08: 0, 0x09: 0,
+	  0x0A: 0, 0x0B: 0, 0x0C: 0, 0x0D: 0, 0x0E: 0, 0x0F: 0, 0x1A: 0, 0x1B: 0, 0x1C: 0, 0x1D: 0,
+	  0x1E: 0, 0x1F: 0, 0x20: 0, 0x21: 0, 0x22: 0, 0x23: 0, 0x24: 0, 0x25: 0, 0x26: 0, 0x27: 0,
+	  0x28: 0, 0x29: 0, 0x2A: 0, 0x2B: 0, 0x2C: 0, 0x2D: 0, 0x2E: 0, 0x2F: 0, 0x30: 0, 0x31: 0,
+	  0x32: 0, 0x33: 0, 0x34: 0, 0x35: 0, 0x3B: 0, 0x3C: 0, 0x3D: 0, 0x3E: 0, 0x3F: 0, 0x40: 0,
+	  0x41: 0, 0x42: 0, 0x43: 0, 0x44: 0, 0x45: 0, 0x46: 0, 0x47: 0, 0x48: 0, 0x49: 0, 0x4A: 0,
+	  0x4B: 0, 0x4C: 0, 0x4D: 0, 0x4E: 0, 0x4F: 0, 0x50: 0, 0x51: 0, 0x52: 0, 0x53: 0, 0x54: 0,
+	  0x55: 0, 0x56: 0, 0x57: 0, 0x58: 0, 0x59: 0, 0x5A: 0, 0x5B: 0, 0x5C: 0, 0x5D: 0, 0x5E: 0,
+	  0x5F: 0, 0x60: 0, 0x61: 0, 0x62: 0, 0x63: 0, 0x64: 0, 0x65: 0, 0x66: 0, 0x67: 0, 0x68: 0,
+	  0x69: 0, 0x6A: 0, 0x6B: 0, 0x6C: 0, 0x6D: 0, 0x6E: 0, 0x6F: 0, 0x70: 0, 0x71: 0, 0x72: 0,
+	  0x73: 0, 0x74: 0, 0x75: 0, 0x76: 0, 0x77: 0, 0x78: 0, 0x79: 0, 0x7A: 0, 0x7B: 0, 0x7C: 0,
+	  0x7D: 0, 0x7E: 0, 0x7F: 0, 0x80: 0, 0x81: 0, 0x82: 0, 0x83: 0, 0x85: 0, 0x86: 0, 0x87: 0,
+	  0x88: 0, 0x89: 0, 0x8A: 0, 0x8B: 0, 0x8C: 0, 0x8D: 0, 0x8E: 0, 0x8F: 0, 0x90: 0, 0x91: 0,
+	  0x92: 0, 0x93: 0, 0x94: 0, 0x95: 0, 0x96: 0, 0x97: 0, 0x98: 0, 0xAC: 0, 0xAD: 0, 0xAE: 0,
+	  0xAF: 0, 0xB0: 0, 0xB1: 0, 0xBE: 0, 0xBF: 0, 0xC2: 0, 0xC3: 0, 0xCA: 0, 0xFE: 0, 0xFF: 0,
+
+	  0x10: 1, 0x12: 1, 0x15: 1, 0x16: 1, 0x17: 1, 0x18: 1, 0x19: 1, 0x36: 1, 0x37: 1, 0x38: 1,
+	  0x39: 1, 0x3A: 1, 0xA9: 1, 0xBC: 1,
+
+	  0x11: 2, 0x13: 2, 0x14: 2, 0x84: 2, 0x99: 2, 0x9A: 2, 0x9B: 2, 0x9C: 2, 0x9D: 2, 0x9E: 2,
+	  0x9F: 2, 0xA0: 2, 0xA1: 2, 0xA2: 2, 0xA3: 2, 0xA4: 2, 0xA5: 2, 0xA6: 2, 0xA7: 2, 0xA8: 2,
+	  0xB2: 2, 0xB3: 2, 0xB4: 2, 0xB5: 2, 0xB6: 2, 0xB7: 2, 0xB8: 2, 0xBB: 2, 0xBD: 2, 0xC0: 2,
+	  0xC1: 2, 0xC6: 2, 0xC7: 2,
+
+	  0xC5: 3,
+
+	  0xB9: 4, 0xBA: 4, 0xC8: 4, 0xC9: 4
+	};
+
+	var Instruction = function () {
+	  function Instruction(opcode, operands) {
+	    _classCallCheck(this, Instruction);
+
+	    if (typeof opcode !== 'number') throw 'opcode must be a number';
+	    if (!Array.isArray(operands)) throw 'operands must be an array';
+
+	    this.opcode = opcode;
+	    this.operands = operands;
+	  }
+
+	  _createClass(Instruction, [{
+	    key: 'toString',
+	    value: function toString() {
+	      return 'Instruction { opcode: ' + opcodeToString(this.opcode) + ', operands: [' + this.operands + '] }';
+	    }
+	  }]);
+
+	  return Instruction;
+	}();
+
+	var InstructionParser = function () {
+	  function InstructionParser() {
+	    _classCallCheck(this, InstructionParser);
+	  }
+
+	  _createClass(InstructionParser, null, [{
+	    key: 'fromBytecode',
+
+	    /**
+	     * Converts raw bytecode into instruction objects.
+	     *
+	     * @param {number[]} bytecode - An array of bytes containing the jvm bytecode.
+	     * @see {@link https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5}
+	     */
+	    value: function fromBytecode(bytecode) {
+	      if (!Array.isArray(bytecode)) {
+	        throw 'bytecode must be an array of bytes.';
+	      }
+
+	      var parsed = [];
+	      var offset = 0;
+
+	      while (offset < bytecode.length) {
+	        var current = bytecode[offset++];
+	        var instruction = new Instruction(current, []);
+
+	        switch (current) {
+	          // https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.lookupswitch
+	          case _opcode2.default.LOOKUPSWITCH:
+	            {
+	              var padding = offset % 4 ? 4 - offset % 4 : 0;
+	              offset += padding; // Skip padding
+
+	              // the "default" case offset
+	              var defaultOffset = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
+	              instruction.operands.push(defaultOffset + 1);
+
+	              // number of "cases"
+	              var npairs = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
+	              while (npairs--) {
+	                var npair = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
+	                var matchOffset = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
+	                instruction.operands.push(npair);
+	                instruction.operands.push(matchOffset + 1);
+	              }
+	              break;
+	            }
+
+	          // https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.tableswitch
+	          case _opcode2.default.TABLESWITCH:
+	            {
+	              var _padding = offset % 4 ? 4 - offset % 4 : 0;
+	              offset += _padding; // Skip padding
+
+	              // the "default" case offset
+	              var _defaultOffset = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
+	              instruction.operands.push(_defaultOffset + 1);
+
+	              var low = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
+	              var high = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
+
+	              var jumpOffsets = high - low + 1;
+	              while (jumpOffsets--) {
+	                var jumpOffset = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
+	                instruction.operands.push(jumpOffset + 1);
+	              }
+	              break;
+	            }
+
+	          // https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.wide
+	          case _opcode2.default.WIDE:
+	            {
+	              var targetOpcode = bytecode[offset];
+	              switch (targetOpcode) {
+	                case _opcode2.default.ILOAD:
+	                case _opcode2.default.FLOAD:
+	                case _opcode2.default.ALOAD:
+	                case _opcode2.default.LLOAD:
+	                case _opcode2.default.DLOAD:
+	                case _opcode2.default.ISTORE:
+	                case _opcode2.default.FSTORE:
+	                case _opcode2.default.ASTORE:
+	                case _opcode2.default.LSTORE:
+	                case _opcode2.default.DSTORE:
+	                case _opcode2.default.RET:
+	                  instruction.operands.push(bytecode[offset++], bytecode[offset++], bytecode[offset++]);
+	                  break;
+
+	                case _opcode2.default.IINC:
+	                  instruction.operands.push(bytecode[offset++], bytecode[offset++], bytecode[offset++], bytecode[offset++], bytecode[offset++]);
+	                  break;
+
+	                default:
+	                  throw 'Unexpected wide opcode: ' + targetOpcode;
+	              }
+	              break;
+	            }
+
+	          default:
+	            {
+	              var operandCount = OPERAND_COUNT_MAP[current];
+
+	              if (operandCount === undefined) {
+	                throw 'Unexpected opcode: ' + current;
+	              }
+
+	              while (operandCount--) {
+	                instruction.operands.push(bytecode[offset++]);
+	              }
+	              break;
+	            }
+	        }
+
+	        parsed.push(instruction);
+	      }
+	      return parsed;
+	    }
+	  }]);
+
+	  return InstructionParser;
+	}();
+
+	var opcodeToString = function opcodeToString(opcode) {
+	  return {
+	    0x0: 'nop', 0x1: 'aconst_null', 0x2: 'iconst_m1', 0x3: 'iconst_0', 0x4: 'iconst_1', 0x5: 'iconst_2',
+	    0x6: 'iconst_3', 0x7: 'iconst_4', 0x8: 'iconst_5', 0x9: 'lconst_0', 0xa: 'lconst_1', 0xb: 'fconst_0', 0xc: 'fconst_1',
+	    0xd: 'fconst_2', 0xe: 'dconst_0', 0xf: 'dconst_1', 0x10: 'bipush', 0x11: 'sipush', 0x12: 'ldc', 0x13: 'ldc_w',
+	    0x14: 'ldc2_w', 0x15: 'iload', 0x16: 'lload', 0x17: 'fload', 0x18: 'dload', 0x19: 'aload', 0x1a: 'iload_0',
+	    0x1b: 'iload_1', 0x1c: 'iload_2', 0x1d: 'iload_3', 0x1e: 'lload_0', 0x1f: 'lload_1', 0x20: 'lload_2', 0x21: 'lload_3',
+	    0x22: 'fload_0', 0x23: 'fload_1', 0x24: 'fload_2', 0x25: 'fload_3', 0x26: 'dload_0', 0x27: 'dload_1', 0x28: 'dload_2',
+	    0x29: 'dload_3', 0x2a: 'aload_0', 0x2b: 'aload_1', 0x2c: 'aload_2', 0x2d: 'aload_3', 0x2e: 'iaload', 0x2f: 'laload',
+	    0x30: 'faload', 0x31: 'daload', 0x32: 'aaload', 0x33: 'baload', 0x34: 'caload', 0x35: 'saload', 0x36: 'istore',
+	    0x37: 'lstore', 0x38: 'fstore', 0x39: 'dstore', 0x3a: 'astore', 0x3b: 'istore_0', 0x3c: 'istore_1', 0x3d: 'istore_2',
+	    0x3e: 'istore_3', 0x3f: 'lstore_0', 0x40: 'lstore_1', 0x41: 'lstore_2', 0x42: 'lstore_3', 0x43: 'fstore_0', 0x44: 'fstore_1',
+	    0x45: 'fstore_2', 0x46: 'fstore_3', 0x47: 'dstore_0', 0x48: 'dstore_1', 0x49: 'dstore_2', 0x4a: 'dstore_3', 0x4b: 'astore_0',
+	    0x4c: 'astore_1', 0x4d: 'astore_2', 0x4e: 'astore_3', 0x4f: 'iastore', 0x50: 'lastore', 0x51: 'fastore', 0x52: 'dastore',
+	    0x53: 'aastore', 0x54: 'bastore', 0x55: 'castore', 0x56: 'sastore', 0x57: 'pop', 0x58: 'pop2', 0x59: 'dup',
+	    0x5a: 'dup_x1', 0x5b: 'dup_x2', 0x5c: 'dup2', 0x5d: 'dup2_x1', 0x5e: 'dup2_x2', 0x5f: 'swap', 0x60: 'iadd',
+	    0x61: 'ladd', 0x62: 'fadd', 0x63: 'dadd', 0x64: 'isub', 0x65: 'lsub', 0x66: 'fsub', 0x67: 'dsub',
+	    0x68: 'imul', 0x69: 'lmul', 0x6a: 'fmul', 0x6b: 'dmul', 0x6c: 'idiv', 0x6d: 'ldiv', 0x6e: 'fdiv',
+	    0x6f: 'ddiv', 0x70: 'irem', 0x71: 'lrem', 0x72: 'frem', 0x73: 'drem', 0x74: 'ineg', 0x75: 'lneg',
+	    0x76: 'fneg', 0x77: 'dneg', 0x78: 'ishl', 0x79: 'lshl', 0x7a: 'ishr', 0x7b: 'lshr', 0x7c: 'iushr',
+	    0x7d: 'lushr', 0x7e: 'iand', 0x7f: 'land', 0x80: 'ior', 0x81: 'lor', 0x82: 'ixor', 0x83: 'lxor',
+	    0x84: 'iinc', 0x85: 'i2l', 0x86: 'i2f', 0x87: 'i2d', 0x88: 'l2i', 0x89: 'l2f', 0x8a: 'l2d',
+	    0x8b: 'f2i', 0x8c: 'f2l', 0x8d: 'f2d', 0x8e: 'd2i', 0x8f: 'd2l', 0x90: 'd2f', 0x91: 'i2b',
+	    0x92: 'i2c', 0x93: 'i2s', 0x94: 'lcmp', 0x95: 'fcmpl', 0x96: 'fcmpg', 0x97: 'dcmpl', 0x98: 'dcmpg',
+	    0x99: 'ifeq', 0x9a: 'ifne', 0x9b: 'iflt', 0x9c: 'ifge', 0x9d: 'ifgt', 0x9e: 'ifle', 0x9f: 'if_icmpeq',
+	    0xa0: 'if_icmpne', 0xa1: 'if_icmplt', 0xa2: 'if_icmpge', 0xa3: 'if_icmpgt', 0xa4: 'if_icmple', 0xa5: 'if_acmpeq', 0xa6: 'if_acmpne',
+	    0xa7: 'goto', 0xa8: 'jsr', 0xa9: 'ret', 0xaa: 'tableswitch', 0xab: 'lookupswitch', 0xac: 'ireturn', 0xad: 'lreturn',
+	    0xae: 'freturn', 0xaf: 'dreturn', 0xb0: 'areturn', 0xb1: 'return', 0xb2: 'getstatic', 0xb3: 'putstatic', 0xb4: 'getfield',
+	    0xb5: 'putfield', 0xb6: 'invokevirtual', 0xb7: 'invokespecial', 0xb8: 'invokestatic', 0xb9: 'invokeinterface',
+	    0xba: 'invokedynamic', 0xbb: 'new', 0xbc: 'newarray', 0xbd: 'anewarray', 0xbe: 'arraylength', 0xbf: 'athrow', 0xc0: 'checkcast',
+	    0xc1: 'instanceof', 0xc2: 'monitorenter', 0xc3: 'monitorexit', 0xc4: 'wide', 0xc5: 'multianewarray', 0xc6: 'ifnull',
+	    0xc7: 'ifnonnull', 0xc8: 'goto_w', 0xc9: 'jsr_w', 0xca: 'breakpoint', 0xfe: 'impdep1', 0xff: 'impdep2'
+	  }[opcode];
+	};
+
+	module.exports = {
+	  Instruction: Instruction,
+	  InstructionParser: InstructionParser
+	};
 
 /***/ }
 /******/ ]);
