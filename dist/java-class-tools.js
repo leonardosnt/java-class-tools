@@ -168,7 +168,7 @@ var JavaClassTools =
 	     */
 	    value: function read(source) {
 	      if (typeof source === 'undefined') {
-	        throw 'source cannot be undefined';
+	        throw TypeError('source cannot be undefined');
 	      } else if (typeof source === 'string') {
 	        return this.readFromFile(source);
 	      }
@@ -178,7 +178,7 @@ var JavaClassTools =
 
 	      // Read magic
 	      if (this.buf.readUInt8() != 0xCA || this.buf.readUInt8() != 0xFE || this.buf.readUInt8() != 0xBA || this.buf.readUInt8() != 0xBE) {
-	        throw 'Invalid MAGIC value';
+	        throw Error('Invalid MAGIC value');
 	      }
 
 	      this.classFile.minor_version = this.buf.readUint16();
@@ -213,7 +213,7 @@ var JavaClassTools =
 	        var fs = __webpack_require__(10);
 	        return this.read(fs.readFileSync(path));
 	      } else {
-	        throw 'not supported in browser.';
+	        throw Error('not supported in browser.');
 	      }
 	    }
 
@@ -352,7 +352,7 @@ var JavaClassTools =
 	          break;
 
 	        default:
-	          throw 'Unexpected target_type: ' + type_annotation.target_type;
+	          throw Error('Unexpected target_type: ' + type_annotation.target_type);
 	      }
 
 	      // Reads "type_path" structure
@@ -715,7 +715,7 @@ var JavaClassTools =
 	          }
 
 	        default:
-	          throw 'Unexpected attributeName: ' + attributeName;
+	          throw Error('Unexpected attributeName: ' + attributeName);
 	      }
 
 	      return attribute;
@@ -809,7 +809,7 @@ var JavaClassTools =
 	          break;
 
 	        default:
-	          throw 'Unexpected tag: ' + element_value.tag;
+	          throw Error('Unexpected tag: ' + element_value.tag);
 	      }
 
 	      return element_value;
@@ -926,7 +926,7 @@ var JavaClassTools =
 	          break;
 
 	        default:
-	          throw 'Unexpected tag: ' + cp_info.tag;
+	          throw Error('Unexpected tag: ' + cp_info.tag);
 	      }
 	      return cp_info;
 	    }
@@ -6614,7 +6614,7 @@ var JavaClassTools =
 	          break;
 
 	        default:
-	          throw 'Unexpected tag: ' + element_value.tag;
+	          throw Error('Unexpected tag: ' + element_value.tag);
 	      }
 	    }
 	  }, {
@@ -6683,7 +6683,7 @@ var JavaClassTools =
 	          break;
 
 	        default:
-	          throw 'Unexpected target_type: ' + type_annotation.target_type;
+	          throw Error('Unexpected target_type: ' + type_annotation.target_type);
 	      }
 
 	      this.buf.writeUint8(type_annotation.type_path.path_length);
@@ -6941,7 +6941,7 @@ var JavaClassTools =
 	          break;
 
 	        default:
-	          throw 'Unexpected attributeName: ' + attributeName;
+	          throw Error('Unexpected attributeName: ' + attributeName);
 	      }
 	    }
 	  }, {
@@ -7034,7 +7034,7 @@ var JavaClassTools =
 	          break;
 
 	        default:
-	          throw 'Unexpected tag: ' + cp_info.tag;
+	          throw Error('Unexpected tag: ' + cp_info.tag);
 	      }
 	    }
 	  }]);
@@ -7110,8 +7110,8 @@ var JavaClassTools =
 	  function Instruction(opcode, operands) {
 	    _classCallCheck(this, Instruction);
 
-	    if (typeof opcode !== 'number') throw 'opcode must be a number';
-	    if (!Array.isArray(operands)) throw 'operands must be an array';
+	    if (typeof opcode !== 'number') throw TypeError('opcode must be a number');
+	    if (!Array.isArray(operands)) throw TypeError('operands must be an array');
 
 	    this.opcode = opcode;
 	    this.operands = operands;
@@ -7143,7 +7143,7 @@ var JavaClassTools =
 	     */
 	    value: function fromBytecode(bytecode) {
 	      if (!Array.isArray(bytecode)) {
-	        throw 'bytecode must be an array of bytes.';
+	        throw TypeError('bytecode must be an array of bytes.');
 	      }
 
 	      var parsed = [];
@@ -7230,7 +7230,7 @@ var JavaClassTools =
 	              var operandCount = OPERAND_COUNT_MAP[current];
 
 	              if (operandCount === undefined) {
-	                throw 'Unexpected opcode: ' + current;
+	                throw Error('Unexpected opcode: ' + current);
 	              }
 
 	              while (operandCount--) {

@@ -50,8 +50,8 @@ const OPERAND_COUNT_MAP = {
 
 class Instruction {
   constructor(opcode, operands) {
-    if (typeof opcode !== 'number') throw 'opcode must be a number';
-    if (!Array.isArray(operands)) throw 'operands must be an array';
+    if (typeof opcode !== 'number') throw TypeError('opcode must be a number');
+    if (!Array.isArray(operands)) throw TypeError('operands must be an array');
 
     this.opcode = opcode;
     this.operands = operands;
@@ -71,7 +71,7 @@ class InstructionParser {
    */
   static fromBytecode(bytecode) {
     if (!Array.isArray(bytecode)) {
-      throw 'bytecode must be an array of bytes.'
+      throw TypeError('bytecode must be an array of bytes.');
     }
 
     const parsed = [];
@@ -154,7 +154,7 @@ class InstructionParser {
           let operandCount = OPERAND_COUNT_MAP[current];
 
           if (operandCount === undefined) {
-            throw `Unexpected opcode: ${current}`;
+            throw Error(`Unexpected opcode: ${current}`);
           }
 
           while (operandCount--) {

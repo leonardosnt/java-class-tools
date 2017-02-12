@@ -138,7 +138,7 @@ class JavaClassFileWriter {
         break;
 
       default:
-        throw `Unexpected tag: ${element_value.tag}`;
+        throw Error(`Unexpected tag: ${element_value.tag}`);
     }
   }
 
@@ -206,7 +206,7 @@ class JavaClassFileWriter {
         break;
 
       default:
-        throw `Unexpected target_type: ${type_annotation.target_type}`;
+        throw Error(`Unexpected target_type: ${type_annotation.target_type}`);
     }
 
     this.buf.writeUint8(type_annotation.type_path.path_length);
@@ -462,7 +462,7 @@ class JavaClassFileWriter {
         break;
 
       default:
-        throw `Unexpected attributeName: ${attributeName}`;
+        throw Error(`Unexpected attributeName: ${attributeName}`);
     }
   }
 
@@ -550,7 +550,7 @@ class JavaClassFileWriter {
         break;
 
       default:
-        throw 'Unexpected tag: ' + cp_info.tag;
+        throw Error(`Unexpected tag: ${cp_info.tag}`);
     }
 
   }

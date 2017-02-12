@@ -37,7 +37,7 @@ class JavaClassFileReader {
    */
   read(source) {
     if (typeof source === 'undefined') {
-      throw 'source cannot be undefined';
+      throw TypeError('source cannot be undefined');
     } else if (typeof source === 'string') {
       return this.readFromFile(source);
     }
@@ -50,7 +50,7 @@ class JavaClassFileReader {
         this.buf.readUInt8() != 0xFE ||
         this.buf.readUInt8() != 0xBA ||
         this.buf.readUInt8() != 0xBE) {
-      throw 'Invalid MAGIC value';
+      throw Error('Invalid MAGIC value');
     }
 
     this.classFile.minor_version = this.buf.readUint16();
@@ -83,7 +83,7 @@ class JavaClassFileReader {
       const fs = require('fs');
       return this.read(fs.readFileSync(path));
     } else {
-      throw 'not supported in browser.';
+      throw Error('not supported in browser.');
     }
   }
 
@@ -211,7 +211,7 @@ class JavaClassFileReader {
         break;
 
       default:
-        throw `Unexpected target_type: ${type_annotation.target_type}`;
+        throw Error(`Unexpected target_type: ${type_annotation.target_type}`);
     }
 
     // Reads "type_path" structure
@@ -558,7 +558,7 @@ class JavaClassFileReader {
       }
 
       default:
-        throw `Unexpected attributeName: ${attributeName}`;
+        throw Error(`Unexpected attributeName: ${attributeName}`);
     }
 
     return attribute;
@@ -640,7 +640,7 @@ class JavaClassFileReader {
         break;
 
       default:
-        throw `Unexpected tag: ${element_value.tag}`;
+        throw Error(`Unexpected tag: ${element_value.tag}`);
     }
 
     return element_value;
@@ -750,7 +750,7 @@ class JavaClassFileReader {
         break;
 
       default:
-        throw 'Unexpected tag: ' + cp_info.tag;
+        throw Error(`Unexpected tag: ${cp_info.tag}`);
     }
     return cp_info;
   }
