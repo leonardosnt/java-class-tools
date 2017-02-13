@@ -28,3 +28,15 @@ gulp.task('build:browser', () => {
     .pipe(uglifyjs())
     .pipe(gulp.dest('./dist'));
 });
+
+gulp.task('watch', () => {
+  return gulp.watch('src/*.js', e => {
+    if (e.type === 'changed') {
+      console.log(`${e.path} changed, building...`);
+      
+      gulp.src(e.path)
+        .pipe(babel({ presets: ['es2015'] }))
+        .pipe(gulp.dest('lib'));
+    }
+  });
+})
