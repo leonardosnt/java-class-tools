@@ -203,7 +203,13 @@ var JavaClassTools =
 	      this.classFile.attributes_count = this.buf.readUint16();
 	      this.classFile.attributes = this._readAttributeInfoArray(this.classFile.attributes_count);
 
-	      return this.classFile;
+	      var classFile = this.classFile;
+
+	      // Dispose
+	      delete this.buf;
+	      delete this.classFile;
+
+	      return classFile;
 	    }
 	  }, {
 	    key: 'readFromFile',

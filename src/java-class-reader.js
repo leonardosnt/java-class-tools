@@ -75,7 +75,13 @@ class JavaClassFileReader {
     this.classFile.attributes_count = this.buf.readUint16();
     this.classFile.attributes = this._readAttributeInfoArray(this.classFile.attributes_count);
 
-    return this.classFile;
+    const classFile = this.classFile;
+
+    // Dispose
+    delete this.buf;
+    delete this.classFile;
+
+    return classFile;
   }
 
   readFromFile(path) {
