@@ -1,4 +1,5 @@
 'use strict';
+
 const fs = require('fs-extra');
 const ByteBuffer = require('bytebuffer');
 const deepEquals = require('deep-equal');
@@ -35,12 +36,11 @@ function testReadWrite(cls) {
   let reader = new JavaClassFileReader();
   try {
     let classFile = reader.read(cls);
-    let readbuf = reader.buf.buffer;
 
     let writer = new JavaClassFileWriter();
     let outbuf = writer.write(classFile);
 
-    if (!readbuf.equals(outbuf.buffer)) {
+    if (!fs.readFileSync(cls).equals(outbuf.buffer)) {
       throw 'not equals: ' + cls;
     }
   } catch (ex) {
