@@ -27,8 +27,8 @@
   },
   "homepage": "https://github.com/leonardosnt/java-class-tools#readme",
   "scripts": {
-    "test": "./node_modules/.bin/mocha test/tests.js",
-    "build": "./node_modules/.bin/gulp"
+    "test": "\"./node_modules/.bin/mocha\" test/tests.js",
+    "build": "\"./node_modules/.bin/gulp\""
   },
   "devDependencies": {
     "babel-cli": "^6.22.2",
