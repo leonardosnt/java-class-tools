@@ -598,19 +598,60 @@ var JavaClassTools =
 	          attribute.signature_index = this.buf.readUint16();
 	          break;
 
-	        case 'StackMapTable':
+	        /**
+	         * http://download.oracle.com/otndocs/jcp/7247-j2me_cldc-1.1-fr-spec-oth-JSpec/
+	         * 
+	         * Appendix1-verifier.pdf at "2.1 Stack map format"
+	         * 
+	         * "According to the CLDC specification, the sizes of some fields are not 16bit
+	         * but 32bit if the code size is more than 64K or the number of the local variables
+	         * is more than 64K.  However, for the J2ME CLDC technology, they are always 16bit.
+	         * The implementation of the StackMap class assumes they are 16bit." - javaassist
+	         */
+	        case 'StackMap':
 	          {
-	            attribute.number_of_entries = this.buf.readUint16();
+	            attribute.number_of_entries = this.buf.readUInt16();
 	            attribute.entries = [];
 
 	            var number_of_entries = attribute.number_of_entries;
 	            while (number_of_entries--) {
 	              var stack_map_frame = {
+	                offset: this.buf.readUint16(),
+	                number_of_locals: this.buf.readUint16(),
+	                locals: [],
+	                stack: []
+	              };
+
+	              var number_of_locals = stack_map_frame.number_of_locals;
+	              while (number_of_locals--) {
+	                stack_map_frame.locals.push(this._readVerificationTypeInfo());
+	              }
+
+	              stack_map_frame.number_of_stack_items = this.buf.readUInt16();
+
+	              var number_of_stack_items = stack_map_frame.number_of_stack_items;
+	              while (number_of_stack_items--) {
+	                stack_map_frame.stack.push(this._readVerificationTypeInfo());
+	              }
+
+	              attribute.entries.push(stack_map_frame);
+	            }
+	            break;
+	          }
+
+	        case 'StackMapTable':
+	          {
+	            attribute.number_of_entries = this.buf.readUint16();
+	            attribute.entries = [];
+
+	            var _number_of_entries = attribute.number_of_entries;
+	            while (_number_of_entries--) {
+	              var _stack_map_frame = {
 	                frame_type: this.buf.readUint8()
 	              };
 
 	              // Shorthand
-	              var frame_type = stack_map_frame.frame_type;
+	              var frame_type = _stack_map_frame.frame_type;
 
 	              /**
 	               * offset_delta's that is "constant" are omited.
@@ -626,47 +667,47 @@ var JavaClassTools =
 
 	              // SAME_LOCALS_1_STACK_ITEM
 	              if (frame_type >= 64 && frame_type <= 127) {
-	                stack_map_frame.stack = [this._readVerificationTypeInfo()];
+	                _stack_map_frame.stack = [this._readVerificationTypeInfo()];
 	              }
 	              // SAME_LOCALS_1_STACK_ITEM_EXTENDED
-	              else if (stack_map_frame.frame_type == 247) {
-	                  stack_map_frame.offset_delta = this.buf.readUint16();
-	                  stack_map_frame.stack = [this._readVerificationTypeInfo()];
+	              else if (_stack_map_frame.frame_type == 247) {
+	                  _stack_map_frame.offset_delta = this.buf.readUint16();
+	                  _stack_map_frame.stack = [this._readVerificationTypeInfo()];
 	                }
 	                // CHOP = 248-250, SAME_FRAME_EXTENDED = 251
 	                else if (frame_type >= 248 && frame_type <= 251) {
-	                    stack_map_frame.offset_delta = this.buf.readUint16();
+	                    _stack_map_frame.offset_delta = this.buf.readUint16();
 	                  }
 	                  // APPEND
 	                  else if (frame_type >= 252 && frame_type <= 254) {
-	                      stack_map_frame.offset_delta = this.buf.readUint16();
-	                      stack_map_frame.locals = [];
+	                      _stack_map_frame.offset_delta = this.buf.readUint16();
+	                      _stack_map_frame.locals = [];
 
-	                      var number_of_locals = frame_type - 251;
-	                      while (number_of_locals--) {
-	                        stack_map_frame.locals.push(this._readVerificationTypeInfo());
+	                      var _number_of_locals = frame_type - 251;
+	                      while (_number_of_locals--) {
+	                        _stack_map_frame.locals.push(this._readVerificationTypeInfo());
 	                      }
 	                    }
 	                    // FULL_FRAME
 	                    else if (frame_type == 255) {
-	                        stack_map_frame.offset_delta = this.buf.readUint16();
-	                        stack_map_frame.number_of_locals = this.buf.readUint16();
-	                        stack_map_frame.locals = [];
+	                        _stack_map_frame.offset_delta = this.buf.readUint16();
+	                        _stack_map_frame.number_of_locals = this.buf.readUint16();
+	                        _stack_map_frame.locals = [];
 
-	                        var _number_of_locals = stack_map_frame.number_of_locals;
-	                        while (_number_of_locals--) {
-	                          stack_map_frame.locals.push(this._readVerificationTypeInfo());
+	                        var _number_of_locals2 = _stack_map_frame.number_of_locals;
+	                        while (_number_of_locals2--) {
+	                          _stack_map_frame.locals.push(this._readVerificationTypeInfo());
 	                        }
 
-	                        stack_map_frame.number_of_stack_items = this.buf.readUint16();
-	                        stack_map_frame.stack = [];
+	                        _stack_map_frame.number_of_stack_items = this.buf.readUint16();
+	                        _stack_map_frame.stack = [];
 
-	                        var number_of_stack_items = stack_map_frame.number_of_stack_items;
-	                        while (number_of_stack_items--) {
-	                          stack_map_frame.stack.push(this._readVerificationTypeInfo());
+	                        var _number_of_stack_items = _stack_map_frame.number_of_stack_items;
+	                        while (_number_of_stack_items--) {
+	                          _stack_map_frame.stack.push(this._readVerificationTypeInfo());
 	                        }
 	                      }
-	              attribute.entries.push(stack_map_frame);
+	              attribute.entries.push(_stack_map_frame);
 	            }
 	            break;
 	          }
