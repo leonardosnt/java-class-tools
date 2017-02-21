@@ -455,7 +455,7 @@ class JavaClassFileReader {
        * The implementation of the StackMap class assumes they are 16bit." - javaassist
        */
       case 'StackMap': {
-        attribute.number_of_entries = this.buf.readUInt16();
+        attribute.number_of_entries = this.buf.readUint16();
         attribute.entries = [];
         
         let number_of_entries = attribute.number_of_entries;
