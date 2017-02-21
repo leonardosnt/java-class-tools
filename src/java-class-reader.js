@@ -444,6 +444,46 @@ class JavaClassFileReader {
         attribute.signature_index = this.buf.readUint16();
         break;
 
+      /**
+       * http://download.oracle.com/otndocs/jcp/7247-j2me_cldc-1.1-fr-spec-oth-JSpec/
+       * 
+       * Appendix1-verifier.pdf at "2.1 Stack map format"
+       * 
+       * "According to the CLDC specification, the sizes of some fields are not 16bit
+       * but 32bit if the code size is more than 64K or the number of the local variables
+       * is more than 64K.  However, for the J2ME CLDC technology, they are always 16bit.
+       * The implementation of the StackMap class assumes they are 16bit." - javaassist
+       */
+      case 'StackMap': {
+        attribute.number_of_entries = this.buf.readUInt16();
+        attribute.entries = [];
+        
+        let number_of_entries = attribute.number_of_entries;
+        while (number_of_entries--) {
+          const stack_map_frame = {
+            offset: this.buf.readUint16(),
+            number_of_locals: this.buf.readUint16(),
+            locals: [],
+            stack: []
+          };
+          
+          let number_of_locals = stack_map_frame.number_of_locals;
+          while (number_of_locals--) {
+            stack_map_frame.locals.push(this._readVerificationTypeInfo());
+          }
+
+          stack_map_frame.number_of_stack_items = this.buf.readUInt16();
+
+          let number_of_stack_items = stack_map_frame.number_of_stack_items;
+          while (number_of_stack_items--) {
+            stack_map_frame.stack.push(this._readVerificationTypeInfo());
+          }
+
+          attribute.entries.push(stack_map_frame);
+        }
+        break;
+      }
+
       case 'StackMapTable': {
         attribute.number_of_entries = this.buf.readUint16();
         attribute.entries = [];
