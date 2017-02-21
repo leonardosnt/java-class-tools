@@ -7,7 +7,7 @@ Print all methods names
 ```javascript
 'use strict';
 
-const { JavaClassFileReader } = require('../');
+const { JavaClassFileReader } = require('java-class-tools');
 
 const reader = new JavaClassFileReader();
 const classFile = reader.read('path/to/file.class');
