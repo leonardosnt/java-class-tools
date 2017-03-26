@@ -7180,14 +7180,144 @@ var JavaClassTools =
 	  }
 
 	  _createClass(InstructionParser, null, [{
-	    key: 'fromBytecode',
+	    key: 'toBytecode',
 
 	    /**
-	     * Converts raw bytecode into instruction objects.
+	     * Converts Instruction objects into raw bytecode.
+	     *
+	     * @param {Instruction[]} instruction - Instructions to convert.
+	     * @see {@link https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5}
+	     */
+	    value: function toBytecode(instructions) {
+	      if (!Array.isArray(instructions)) {
+	        throw TypeError('instructions must be an array.');
+	      }
+
+	      var bytecode = [];
+	      var offset = 0;
+
+	      while (offset < instructions.length) {
+	        var current = instructions[offset];
+	        bytecode.push(current.opcode);
+
+	        switch (current.opcode) {
+	          case _opcode2.default.LOOKUPSWITCH:
+	            {
+	              var padding = bytecode.length % 4 ? 4 - bytecode.length % 4 : 0;
+	              var operandOffset = 0;
+
+	              while (padding--) {
+	                bytecode.push(0);
+	              }
+
+	              var defaultOffset = current.operands[operandOffset++] - 1;
+
+	              bytecode.push(defaultOffset >> 24 & 0xFF, defaultOffset >> 16 & 0xFF, defaultOffset >> 8 & 0xFF, defaultOffset & 0xFF);
+
+	              var npairs = current.operands[operandOffset++];
+
+	              bytecode.push(npairs >> 24 & 0xFF, npairs >> 16 & 0xFF, npairs >> 8 & 0xFF, npairs & 0xFF);
+
+	              while (npairs--) {
+	                var npair = current.operands[operandOffset++];
+	                var matchOffset = current.operands[operandOffset++] - 1;
+
+	                bytecode.push(npair >> 24 & 0xFF, npair >> 16 & 0xFF, npair >> 8 & 0xFF, npair & 0xFF);
+	                bytecode.push(matchOffset >> 24 & 0xFF, matchOffset >> 16 & 0xFF, matchOffset >> 8 & 0xFF, matchOffset & 0xFF);
+	              }
+	              break;
+	            }
+
+	          case _opcode2.default.TABLESWITCH:
+	            {
+	              var _padding = bytecode.length % 4 ? 4 - bytecode.length % 4 : 0;
+	              var _operandOffset = 0;
+
+	              while (_padding--) {
+	                bytecode.push(0);
+	              }
+
+	              var _defaultOffset = current.operands[_operandOffset++] - 1;
+
+	              bytecode.push(_defaultOffset >> 24 & 0xFF, _defaultOffset >> 16 & 0xFF, _defaultOffset >> 8 & 0xFF, _defaultOffset & 0xFF);
+
+	              var low = current.operands[_operandOffset++];
+	              var high = current.operands[_operandOffset++];
+
+	              bytecode.push(low >> 24 & 0xFF, low >> 16 & 0xFF, low >> 8 & 0xFF, low & 0xFF);
+	              bytecode.push(high >> 24 & 0xFF, high >> 16 & 0xFF, high >> 8 & 0xFF, high & 0xFF);
+
+	              var jumpOffsets = high - low + 1;
+	              while (jumpOffsets--) {
+	                var jumpOffset = current.operands[_operandOffset++] - 1;
+	                bytecode.push(jumpOffset >> 24 & 0xFF, jumpOffset >> 16 & 0xFF, jumpOffset >> 8 & 0xFF, jumpOffset & 0xFF);
+	              }
+	              break;
+	            }
+
+	          case _opcode2.default.WIDE:
+	            {
+	              var targetOpcode = current.operands[0];
+
+	              switch (targetOpcode) {
+	                case _opcode2.default.ILOAD:
+	                case _opcode2.default.FLOAD:
+	                case _opcode2.default.ALOAD:
+	                case _opcode2.default.LLOAD:
+	                case _opcode2.default.DLOAD:
+	                case _opcode2.default.ISTORE:
+	                case _opcode2.default.FSTORE:
+	                case _opcode2.default.ASTORE:
+	                case _opcode2.default.LSTORE:
+	                case _opcode2.default.DSTORE:
+	                case _opcode2.default.RET:
+	                  bytecode.push(targetOpcode, current.operands[1], current.operands[2]);
+	                  break;
+
+	                case _opcode2.default.IINC:
+	                  bytecode.push(targetOpcode, current.operands[1], current.operands[2], current.operands[3], current.operands[4]);
+	                  break;
+
+	                default:
+	                  throw 'Unexpected wide opcode: ' + targetOpcode;
+	              }
+	              break;
+	            }
+
+	          default:
+	            {
+	              var operandCount = OPERAND_COUNT_MAP[current.opcode];
+
+	              if (operandCount === undefined) {
+	                throw Error('Unexpected opcode: ' + current);
+	              }
+
+	              if (current.operands.length > operandCount) {
+	                throw Error('The number of operands in instruction: ' + current + ' is greater than the allowed.');
+	              }
+
+	              for (var i = 0; i < operandCount; i++) {
+	                bytecode.push(current.operands[i]);
+	              }
+	              break;
+	            }
+	        }
+
+	        offset++;
+	      }
+
+	      return bytecode;
+	    }
+
+	    /**
+	     * Converts raw bytecode into Instruction objects.
 	     *
 	     * @param {number[]} bytecode - An array of bytes containing the jvm bytecode.
 	     * @see {@link https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5}
 	     */
+
+	  }, {
+	    key: 'fromBytecode',
 	    value: function fromBytecode(bytecode) {
 	      if (!Array.isArray(bytecode)) {
 	        throw TypeError('bytecode must be an array of bytes.');
@@ -7213,6 +7343,8 @@ var JavaClassTools =
 
 	              // number of "cases"
 	              var npairs = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
+	              instruction.operands.push(npairs);
+
 	              while (npairs--) {
 	                var npair = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
 	                var matchOffset = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
@@ -7225,15 +7357,18 @@ var JavaClassTools =
 	          // https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.tableswitch
 	          case _opcode2.default.TABLESWITCH:
 	            {
-	              var _padding = offset % 4 ? 4 - offset % 4 : 0;
-	              offset += _padding; // Skip padding
+	              var _padding2 = offset % 4 ? 4 - offset % 4 : 0;
+	              offset += _padding2; // Skip padding
 
 	              // the "default" case offset
-	              var _defaultOffset = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
-	              instruction.operands.push(_defaultOffset + 1);
+	              var _defaultOffset2 = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
+	              instruction.operands.push(_defaultOffset2 + 1);
 
 	              var low = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
 	              var high = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
+
+	              instruction.operands.push(low);
+	              instruction.operands.push(high);
 
 	              var jumpOffsets = high - low + 1;
 	              while (jumpOffsets--) {
