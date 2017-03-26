@@ -1,5 +1,7 @@
 # java-class-tools
 
+[![Build status](https://ci.appveyor.com/api/projects/status/dwfu9sq51uhofyyv?svg=true)](https://ci.appveyor.com/project/leonardosnt/java-class-tools)
+
 ## Examples:
 - [Live example](https://rawgit.com/leonardosnt/java-class-tools/master/examples/browser.html)  
 - [Try yourself](https://runkit.com/leonardosnt/java-class-tools-example)  
