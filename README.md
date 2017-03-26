@@ -1,7 +1,8 @@
 # java-class-tools
 
 ## Examples:
-[Live example](https://rawgit.com/leonardosnt/java-class-tools/master/examples/browser.html)
+- [Live example](https://rawgit.com/leonardosnt/java-class-tools/master/examples/browser.html)  
+- [Try yourself](https://runkit.com/leonardosnt/java-class-tools-example)  
 
 Print all methods names
 ```javascript
