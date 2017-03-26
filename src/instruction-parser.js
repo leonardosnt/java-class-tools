@@ -64,7 +64,130 @@ class Instruction {
 
 class InstructionParser {
   /**
-   * Converts raw bytecode into instruction objects.
+   * Converts Instruction objects into raw bytecode.
+   *
+   * @param {Instruction[]} instruction - Instructions to convert.
+   * @see {@link https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5}
+   */
+  static toBytecode(instructions) {
+    if (!Array.isArray(instructions)) {
+      throw TypeError('instructions must be an array.');
+    }
+
+    const bytecode = [];
+    let offset = 0;
+    
+    while (offset < instructions.length) {
+      const current = instructions[offset];
+      bytecode.push(current.opcode);
+
+      switch (current.opcode) {
+        case Opcode.LOOKUPSWITCH: {
+          let padding = (bytecode.length % 4) ? 4 - (bytecode.length % 4) : 0;
+          let operandOffset = 0;
+          
+          while (padding--) {
+            bytecode.push(0);
+          }
+          
+          const defaultOffset = current.operands[operandOffset++] - 1;
+
+          bytecode.push((defaultOffset >> 24) & 0xFF, (defaultOffset >> 16) & 0xFF, (defaultOffset >> 8) & 0xFF, defaultOffset & 0xFF);
+
+          let npairs = current.operands[operandOffset++];
+
+          bytecode.push((npairs >> 24) & 0xFF, (npairs >> 16) & 0xFF, (npairs >> 8) & 0xFF, npairs & 0xFF);
+
+          while (npairs--) {
+            const npair = current.operands[operandOffset++];
+            const matchOffset = current.operands[operandOffset++] - 1;
+
+            bytecode.push((npair >> 24) & 0xFF, (npair >> 16) & 0xFF, (npair >> 8) & 0xFF, npair & 0xFF);
+            bytecode.push((matchOffset >> 24) & 0xFF, (matchOffset >> 16) & 0xFF, (matchOffset >> 8) & 0xFF, matchOffset & 0xFF);
+          }
+          break;
+        }
+
+        case Opcode.TABLESWITCH: {
+          let padding = (bytecode.length % 4) ? 4 - (bytecode.length % 4) : 0;
+          let operandOffset = 0;
+          
+          while (padding--) {
+            bytecode.push(0);
+          }
+
+          const defaultOffset = current.operands[operandOffset++] - 1;
+
+          bytecode.push((defaultOffset >> 24) & 0xFF, (defaultOffset >> 16) & 0xFF, (defaultOffset >> 8) & 0xFF, defaultOffset & 0xFF);
+
+          const low = current.operands[operandOffset++];
+          const high = current.operands[operandOffset++];
+
+          bytecode.push((low >> 24) & 0xFF, (low >> 16) & 0xFF, (low >> 8) & 0xFF, low & 0xFF);
+          bytecode.push((high >> 24) & 0xFF, (high >> 16) & 0xFF, (high >> 8) & 0xFF, high & 0xFF);
+
+          let jumpOffsets = (high - low) + 1;
+          while (jumpOffsets--) {
+            const jumpOffset = current.operands[operandOffset++] - 1;
+            bytecode.push((jumpOffset >> 24) & 0xFF, (jumpOffset >> 16) & 0xFF, (jumpOffset >> 8) & 0xFF, jumpOffset & 0xFF);
+          }
+          break;
+        }
+
+        case Opcode.WIDE: {
+          const targetOpcode = current.operands[0];
+
+          switch (targetOpcode) {
+            case Opcode.ILOAD:
+            case Opcode.FLOAD:
+            case Opcode.ALOAD:
+            case Opcode.LLOAD:
+            case Opcode.DLOAD:
+            case Opcode.ISTORE:
+            case Opcode.FSTORE:
+            case Opcode.ASTORE:
+            case Opcode.LSTORE:
+            case Opcode.DSTORE:
+            case Opcode.RET:
+              bytecode.push(targetOpcode, current.operands[1], current.operands[2]);
+              break;
+
+            case Opcode.IINC:
+              bytecode.push(targetOpcode, current.operands[1], current.operands[2], current.operands[3], current.operands[4]);
+              break;
+
+            default:
+              throw `Unexpected wide opcode: ${targetOpcode}`;
+          }
+          break;
+        }
+
+        default: {
+          let operandCount = OPERAND_COUNT_MAP[current.opcode];
+
+          if (operandCount === undefined) {
+            throw Error(`Unexpected opcode: ${current}`);
+          }
+
+          if (current.operands.length > operandCount) {
+            throw Error(`The number of operands in instruction: ${current} is greater than the allowed.`);
+          }
+          
+          for (let i = 0; i < operandCount; i++) {
+            bytecode.push(current.operands[i]);
+          }
+          break;
+        }
+      }
+
+      offset++;
+    }
+
+    return bytecode;
+  }
+
+  /**
+   * Converts raw bytecode into Instruction objects.
    *
    * @param {number[]} bytecode - An array of bytes containing the jvm bytecode.
    * @see {@link https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5}
@@ -93,6 +216,8 @@ class InstructionParser {
 
           // number of "cases"
           let npairs = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
+          instruction.operands.push(npairs);
+
           while (npairs--) {
             const npair = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
             const matchOffset = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
@@ -114,7 +239,10 @@ class InstructionParser {
           const low = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
           const high = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
 
-          let jumpOffsets = high - low + 1;
+          instruction.operands.push(low);
+          instruction.operands.push(high);
+
+          let jumpOffsets = (high - low) + 1;
           while (jumpOffsets--) {
             const jumpOffset = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
             instruction.operands.push(jumpOffset + 1);

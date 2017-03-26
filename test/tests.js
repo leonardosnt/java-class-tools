@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const ByteBuffer = require('bytebuffer');
-const { JavaClassFileReader, ConstantType, Modifier } = require('../');
+const { JavaClassFileReader, ConstantType, Modifier, InstructionParser } = require('../');
 const CPUtil = require('./constant-pool-util');
 const cp = require('child_process');
 const fs = require('fs-extra');
@@ -18,6 +18,59 @@ if (!fs.existsSync(TMP_DIR_PATH)) {
 after(() => {
    fs.removeSync(TMP_DIR_PATH);
 });
+
+describe('instruction parser', () => {
+  const code = `
+  public class Foo {
+
+    public void foo() {
+      int val = 23;
+
+      switch (val) {
+        case 22:
+          break;
+        case 21:
+          break;
+        default:
+          break;
+      }
+
+      int val2 = Integer.MAX_VALUE;
+
+      switch (val2) {
+        case Integer.MAX_VALUE:
+          break;
+        case Integer.MIN_VALUE:
+          break;
+      }
+
+      String x = "asdasdsad";
+
+      switch (x) {
+        case "asdasdsad": return;
+        case "asdasdasd": break;
+      }
+    }
+
+  }
+`;
+
+  const classFile = compileAndRead({
+    fileName: 'Foo',
+    code: code
+  });
+  const method0 = classFile.methods[0];
+
+  it('fromBytecode() == toBytecode()', () => {
+    const codeAttr = getAttribute(method0, 'Code', classFile);
+    const originalBytecode = codeAttr.code;
+
+    const parsedInstructions = InstructionParser.fromBytecode(originalBytecode);
+    const rewrittenBytecode = InstructionParser.toBytecode(parsedInstructions);
+
+    assert.deepEqual(originalBytecode, rewrittenBytecode);
+  })
+})
 
 describe('ReadMethodsTest_0', () => {
   const code = `
@@ -89,10 +142,7 @@ describe('ReadMethodsTest_0', () => {
     });
 
     describe('the Code attribute', () => {
-      const codeAttr = method.attributes.filter(attr => {
-        const attrName = CPUtil.getString(classFile, attr.attribute_name_index);
-        return attrName === "Code";
-      })[0];
+      const codeAttr = getAttribute(method, 'Code', classFile);
 
       it('should exists', () => {
         assert.notEqual(codeAttr, undefined);
@@ -121,10 +171,7 @@ describe('ReadMethodsTest_0', () => {
     });
 
     describe('the Code attribute', () => {
-      const codeAttr = method.attributes.filter(attr => {
-        const attrName = CPUtil.getString(classFile, attr.attribute_name_index);
-        return attrName === "Code";
-      })[0];
+      const codeAttr = getAttribute(method, 'Code', classFile);
 
       it('should exists', () => {
         assert.notEqual(codeAttr, undefined);
@@ -610,6 +657,13 @@ function compileAndRead(options) {
   if (options.printReadTime) console.timeEnd('compileAndRead#readTime: ' + options.fileName);
 
   return classFile;
+}
+
+function getAttribute(source, attrName, classFile) {
+  return source.attributes.filter(attr => {
+    const attrName = CPUtil.getString(classFile, attr.attribute_name_index);
+    return attrName === attrName
+  })[0];
 }
 
 function deepInspect(obj) {
