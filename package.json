@@ -1,6 +1,6 @@
 {
   "name": "java-class-tools",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Read and write java class files in node or browser.",
   "main": "lib/index.js",
   "directories": {
@@ -19,6 +19,10 @@
   "types": "typings.d.ts",
   "keywords": [
     "java",
+    "class",
+    "disassembler",
+    "assembler",
+    "decompíler",
     "class-reader",
     "class-writer"
   ],
