@@ -11,12 +11,10 @@ npm install java-class-tools
 
 ## Examples:
 - [Live example](https://rawgit.com/leonardosnt/java-class-tools/master/examples/browser.html)  
-- [Try yourself](https://runkit.com/leonardosnt/java-class-tools-example)  
+- [Try yourself](https://runkit.com/leonardosnt/java-class-tools-example)  (_RunKit:_ you must login with github to be able to fork it)
 
 Print all methods names
 ```javascript
-'use strict';
-
 const { JavaClassFileReader } = require('java-class-tools');
 
 const reader = new JavaClassFileReader();
@@ -26,12 +24,12 @@ classFile.methods.forEach(md => {
   /**
    * Method name in constant-pool.
    * 
-   * https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.7
+   * Points to a CONSTANT_Utf8_info structure: https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.7
    */
-  const nameCpEntry = classFile.constant_pool[md.name_index];
+  const nameInConstantPool = classFile.constant_pool[md.name_index];
 
-  // To utf-8 string
-  const name = String.fromCharCode.apply(null, nameCpEntry.bytes);
+  // To string (hacky)
+  const name = String.fromCharCode.apply(null, nameInConstantPool.bytes);
 
   console.log(name);
 });
