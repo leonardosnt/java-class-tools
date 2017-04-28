@@ -75,6 +75,7 @@ class InstructionParser {
     }
 
     const bytecode = [];
+    // Offset in the 'instructions' array
     let offset = 0;
     
     while (offset < instructions.length) {
@@ -82,55 +83,15 @@ class InstructionParser {
       bytecode.push(current.opcode);
 
       switch (current.opcode) {
+        case Opcode.TABLESWITCH:
         case Opcode.LOOKUPSWITCH: {
           let padding = (bytecode.length % 4) ? 4 - (bytecode.length % 4) : 0;
-          let operandOffset = 0;
-          
-          while (padding--) {
-            bytecode.push(0);
-          }
-          
-          const defaultOffset = current.operands[operandOffset++] - 1;
-
-          bytecode.push((defaultOffset >> 24) & 0xFF, (defaultOffset >> 16) & 0xFF, (defaultOffset >> 8) & 0xFF, defaultOffset & 0xFF);
-
-          let npairs = current.operands[operandOffset++];
-
-          bytecode.push((npairs >> 24) & 0xFF, (npairs >> 16) & 0xFF, (npairs >> 8) & 0xFF, npairs & 0xFF);
-
-          while (npairs--) {
-            const npair = current.operands[operandOffset++];
-            const matchOffset = current.operands[operandOffset++] - 1;
-
-            bytecode.push((npair >> 24) & 0xFF, (npair >> 16) & 0xFF, (npair >> 8) & 0xFF, npair & 0xFF);
-            bytecode.push((matchOffset >> 24) & 0xFF, (matchOffset >> 16) & 0xFF, (matchOffset >> 8) & 0xFF, matchOffset & 0xFF);
-          }
-          break;
-        }
-
-        case Opcode.TABLESWITCH: {
-          let padding = (bytecode.length % 4) ? 4 - (bytecode.length % 4) : 0;
-          let operandOffset = 0;
           
           while (padding--) {
             bytecode.push(0);
           }
 
-          const defaultOffset = current.operands[operandOffset++] - 1;
-
-          bytecode.push((defaultOffset >> 24) & 0xFF, (defaultOffset >> 16) & 0xFF, (defaultOffset >> 8) & 0xFF, defaultOffset & 0xFF);
-
-          const low = current.operands[operandOffset++];
-          const high = current.operands[operandOffset++];
-
-          bytecode.push((low >> 24) & 0xFF, (low >> 16) & 0xFF, (low >> 8) & 0xFF, low & 0xFF);
-          bytecode.push((high >> 24) & 0xFF, (high >> 16) & 0xFF, (high >> 8) & 0xFF, high & 0xFF);
-
-          let jumpOffsets = (high - low) + 1;
-          while (jumpOffsets--) {
-            const jumpOffset = current.operands[operandOffset++] - 1;
-            bytecode.push((jumpOffset >> 24) & 0xFF, (jumpOffset >> 16) & 0xFF, (jumpOffset >> 8) & 0xFF, jumpOffset & 0xFF);
-          }
+          bytecode.push(...current.operands);
           break;
         }
 
@@ -170,7 +131,7 @@ class InstructionParser {
           }
 
           if (current.operands.length > operandCount) {
-            throw Error(`The number of operands in instruction: ${current} is greater than the allowed.`);
+            throw Error(`The number of operands in instruction ${current} is greater than the allowed.`);
           }
           
           for (let i = 0; i < operandCount; i++) {
@@ -205,48 +166,47 @@ class InstructionParser {
       const instruction = new Instruction(current, []);
 
       switch (current) {
-        // https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.lookupswitch
+        // See https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.lookupswitch
         case Opcode.LOOKUPSWITCH: {
           const padding = (offset % 4) ? 4 - (offset % 4) : 0;
           offset += padding; // Skip padding
 
-          // the "default" case offset
-          const defaultOffset = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
-          instruction.operands.push(defaultOffset + 1);
+          // Read the number of match-offset pairs
+          const numPairs = (bytecode[offset+4] << 24) | (bytecode[offset+5] << 16) | (bytecode[offset+6] << 8) | (bytecode[offset+7]);
 
-          // number of "cases"
-          let npairs = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
-          instruction.operands.push(npairs);
+          // 4 bytes to the "default branch offset"
+          // 4 bytes to the number of pairs
+          // 8 byte to each pair
+          let numBytesToRead = 8 + (numPairs * 8);
 
-          while (npairs--) {
-            const npair = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
-            const matchOffset = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
-            instruction.operands.push(npair);
-            instruction.operands.push(matchOffset + 1);
-          }
+          // Copy operands
+          instruction.operands = bytecode.slice(offset, offset + numBytesToRead);
+
+          // Increment offset by the number of bytes that we read.
+          offset += numBytesToRead;
           break;
         }
 
-        // https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.tableswitch
+        // See https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.tableswitch
         case Opcode.TABLESWITCH: {
           const padding = (offset % 4) ? 4 - (offset % 4) : 0;
           offset += padding; // Skip padding
 
-          // the "default" case offset
-          const defaultOffset = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
-          instruction.operands.push(defaultOffset + 1);
+          // Used to calculate the number of "jump offsets"
+          const low = (bytecode[offset+4] << 24) | (bytecode[offset+5] << 16) | (bytecode[offset+6] << 8) | (bytecode[offset+7]);
+          const high = (bytecode[offset+8] << 24) | (bytecode[offset+9] << 16) | (bytecode[offset+10] << 8) | (bytecode[offset+11]);
 
-          const low = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
-          const high = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
+          // 4 bytes to the "default branch offset"
+          // 4 bytes to the "high"
+          // 4 bytes to the "low"
+          // 4 bytes to each "jump offsets"
+          let numBytesToRead = 12 + ((high - low + 1) * 4);
 
-          instruction.operands.push(low);
-          instruction.operands.push(high);
+          // Copy operands
+          instruction.operands = bytecode.slice(offset, offset + numBytesToRead);
 
-          let jumpOffsets = (high - low) + 1;
-          while (jumpOffsets--) {
-            const jumpOffset = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
-            instruction.operands.push(jumpOffset + 1);
-          }
+          // Increment offset by the number of bytes that we read.
+          offset += numBytesToRead;
           break;
         }
 
