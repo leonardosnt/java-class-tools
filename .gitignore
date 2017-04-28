@@ -3,3 +3,4 @@ cls/
 coverage/
 .vscode/
 lib/
+test/coverage.js
