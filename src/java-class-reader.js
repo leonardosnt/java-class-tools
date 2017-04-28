@@ -36,9 +36,10 @@ class JavaClassFileReader {
    * @see {@link https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.1}
    */
   read(source) {
-    if (typeof source === 'undefined') {
-      throw TypeError('source cannot be undefined');
-    } else if (typeof source === 'string') {
+    if (source == undefined) {
+      throw TypeError('source cannot be null or undefined');
+    }
+    if (typeof source === 'string') {
       return this.readFromFile(source);
     }
 
