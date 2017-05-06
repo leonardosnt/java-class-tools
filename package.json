@@ -37,8 +37,6 @@
     "build": "gulp"
   },
   "devDependencies": {
-    "@types/bytebuffer": "^5.0.1",
-    "@types/node": "latest",
     "babel-cli": "^6.22.2",
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
@@ -56,6 +54,8 @@
     "webpack-stream": "^3.2.0"
   },
   "dependencies": {
-    "bytebuffer": "^5.0.1"
+    "bytebuffer": "^5.0.1",
+    "@types/bytebuffer": "^5.0.1",
+    "@types/node": "^7.0.18"
   }
 }
