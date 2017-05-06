@@ -43,7 +43,7 @@ var JavaClassTools =
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -71,23 +71,12 @@ var JavaClassTools =
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	/*
-	 *  Copyright (C) 2017 leonardosnt
-	 *
-	 *  This program is free software; you can redistribute it and/or modify
-	 *  it under the terms of the GNU General Public License as published by
-	 *  the Free Software Foundation; either version 2 of the License, or
-	 *  (at your option) any later version.
-	 *
-	 *  This program is distributed in the hope that it will be useful,
-	 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-	 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	 *  GNU General Public License for more details.
-	 *
-	 *  You should have received a copy of the GNU General Public License along
-	 *  with this program; if not, write to the Free Software Foundation, Inc.,
-	 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-	*/
+	/*!
+	 * https://github.com/leonardosnt/java-class-tools
+	 * 
+	 * Copyright (C) 2017 leonardosnt
+	 * Licensed under the MIT License. See LICENSE file in the project root for full license information.
+	 */
 
 	module.exports = {
 	  JavaClassFileReader: _javaClassReader2.default,
@@ -99,31 +88,20 @@ var JavaClassTools =
 	  InstructionParser: _instructionParser.InstructionParser
 	};
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  Copyright (C) 2017 leonardosnt
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  This program is free software; you can redistribute it and/or modify
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  it under the terms of the GNU General Public License as published by
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  the Free Software Foundation; either version 2 of the License, or
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  (at your option) any later version.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  This program is distributed in the hope that it will be useful,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  GNU General Public License for more details.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  You should have received a copy of the GNU General Public License along
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  with this program; if not, write to the Free Software Foundation, Inc.,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*!
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * https://github.com/leonardosnt/java-class-tools
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * 
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Copyright (C) 2017 leonardosnt
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Licensed under the MIT License. See LICENSE file in the project root for full license information.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 
 	var _bytebuffer = __webpack_require__(3);
 
@@ -167,9 +145,10 @@ var JavaClassTools =
 	     * @see {@link https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.1}
 	     */
 	    value: function read(source) {
-	      if (typeof source === 'undefined') {
-	        throw TypeError('source cannot be undefined');
-	      } else if (typeof source === 'string') {
+	      if (source == undefined) {
+	        throw TypeError('source cannot be null or undefined');
+	      }
+	      if (typeof source === 'string') {
 	        return this.readFromFile(source);
 	      }
 
@@ -985,9 +964,9 @@ var JavaClassTools =
 	module.exports = JavaClassFileReader;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	// shim for using process in browser
 	var process = module.exports = {};
@@ -1171,9 +1150,9 @@ var JavaClassTools =
 	process.umask = function() { return 0; };
 
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module) {/*
 	 Copyright 2013-2014 Daniel Wirtz <dcode@dcode.io>
@@ -4924,9 +4903,9 @@ var JavaClassTools =
 
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = function(module) {
 		if(!module.webpackPolyfill) {
@@ -4940,16 +4919,16 @@ var JavaClassTools =
 	}
 
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = function() { throw new Error("define cannot be used indirect"); };
 
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module) {/*
 	 Copyright 2013 Daniel Wirtz <dcode@dcode.io>
@@ -6163,29 +6142,18 @@ var JavaClassTools =
 
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 
-	/*
-	 *  Copyright (C) 2017 leonardosnt
-	 *
-	 *  This program is free software; you can redistribute it and/or modify
-	 *  it under the terms of the GNU General Public License as published by
-	 *  the Free Software Foundation; either version 2 of the License, or
-	 *  (at your option) any later version.
-	 *
-	 *  This program is distributed in the hope that it will be useful,
-	 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-	 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	 *  GNU General Public License for more details.
-	 *
-	 *  You should have received a copy of the GNU General Public License along
-	 *  with this program; if not, write to the Free Software Foundation, Inc.,
-	 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-	*/
+	/*!
+	 * https://github.com/leonardosnt/java-class-tools
+	 * 
+	 * Copyright (C) 2017 leonardosnt
+	 * Licensed under the MIT License. See LICENSE file in the project root for full license information.
+	 */
 
 	var ConstantType = {
 	  UTF8: 1,
@@ -6206,29 +6174,18 @@ var JavaClassTools =
 
 	module.exports = ConstantType;
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 
-	/*
-	 *  Copyright (C) 2017 leonardosnt
-	 *
-	 *  This program is free software; you can redistribute it and/or modify
-	 *  it under the terms of the GNU General Public License as published by
-	 *  the Free Software Foundation; either version 2 of the License, or
-	 *  (at your option) any later version.
-	 *
-	 *  This program is distributed in the hope that it will be useful,
-	 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-	 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	 *  GNU General Public License for more details.
-	 *
-	 *  You should have received a copy of the GNU General Public License along
-	 *  with this program; if not, write to the Free Software Foundation, Inc.,
-	 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-	*/
+	/*!
+	 * https://github.com/leonardosnt/java-class-tools
+	 * 
+	 * Copyright (C) 2017 leonardosnt
+	 * Licensed under the MIT License. See LICENSE file in the project root for full license information.
+	 */
 
 	var Opcode = {
 	  NOP: 0x0,
@@ -6440,29 +6397,18 @@ var JavaClassTools =
 
 	module.exports = Opcode;
 
-/***/ },
+/***/ }),
 /* 9 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 
-	/*
-	 *  Copyright (C) 2017 leonardosnt
-	 *
-	 *  This program is free software; you can redistribute it and/or modify
-	 *  it under the terms of the GNU General Public License as published by
-	 *  the Free Software Foundation; either version 2 of the License, or
-	 *  (at your option) any later version.
-	 *
-	 *  This program is distributed in the hope that it will be useful,
-	 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-	 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	 *  GNU General Public License for more details.
-	 *
-	 *  You should have received a copy of the GNU General Public License along
-	 *  with this program; if not, write to the Free Software Foundation, Inc.,
-	 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-	*/
+	/*!
+	 * https://github.com/leonardosnt/java-class-tools
+	 * 
+	 * Copyright (C) 2017 leonardosnt
+	 * Licensed under the MIT License. See LICENSE file in the project root for full license information.
+	 */
 
 	var Modifier = {
 	  PUBLIC: 0x0001,
@@ -6485,35 +6431,24 @@ var JavaClassTools =
 
 	module.exports = Modifier;
 
-/***/ },
+/***/ }),
 /* 10 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	
 
-/***/ },
+/***/ }),
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  Copyright (C) 2017 leonardosnt
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  This program is free software; you can redistribute it and/or modify
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  it under the terms of the GNU General Public License as published by
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  the Free Software Foundation; either version 2 of the License, or
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  (at your option) any later version.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  This program is distributed in the hope that it will be useful,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  GNU General Public License for more details.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  You should have received a copy of the GNU General Public License along
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  with this program; if not, write to the Free Software Foundation, Inc.,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*!
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * https://github.com/leonardosnt/java-class-tools
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * 
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Copyright (C) 2017 leonardosnt
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Licensed under the MIT License. See LICENSE file in the project root for full license information.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 
 	var _bytebuffer = __webpack_require__(3);
 
@@ -7091,29 +7026,18 @@ var JavaClassTools =
 
 	module.exports = JavaClassFileWriter;
 
-/***/ },
+/***/ }),
 /* 12 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  Copyright (C) 2017 leonardosnt
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  This program is free software; you can redistribute it and/or modify
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  it under the terms of the GNU General Public License as published by
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  the Free Software Foundation; either version 2 of the License, or
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  (at your option) any later version.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  This program is distributed in the hope that it will be useful,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  GNU General Public License for more details.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  You should have received a copy of the GNU General Public License along
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  with this program; if not, write to the Free Software Foundation, Inc.,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*!
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * https://github.com/leonardosnt/java-class-tools
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * 
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Copyright (C) 2017 leonardosnt
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Licensed under the MIT License. See LICENSE file in the project root for full license information.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 
 	var _opcode = __webpack_require__(8);
 
@@ -7471,5 +7395,5 @@ var JavaClassTools =
 	  InstructionParser: InstructionParser
 	};
 
-/***/ }
+/***/ })
 /******/ ]);
