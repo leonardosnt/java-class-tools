@@ -23,8 +23,8 @@
     "disassembler",
     "assembler",
     "decompíler",
-    "class-reader",
-    "class-writer"
+    "reader",
+    "writer"
   ],
   "author": "leonardosnt",
   "license": "MIT",
