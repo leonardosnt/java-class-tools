@@ -2,7 +2,7 @@
 
 const gulp = require('gulp');
 const babel = require('gulp-babel');
-const webpack = require('gulp-webpack');
+const webpack = require('webpack-stream');
 const rename = require('gulp-rename');
 const uglifyjs = require('gulp-uglifyjs');
 
