@@ -27,7 +27,7 @@
     "class-writer"
   ],
   "author": "leonardosnt",
-  "license": "GPL-2.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/leonardosnt/java-class-tools/issues"
   },
