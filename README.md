@@ -11,6 +11,7 @@ npm install java-class-tools
 
 ## Examples:
 - [Live example](https://rawgit.com/leonardosnt/java-class-tools/master/examples/browser.html)  
+- [Try yourself](https://esnextb.in/?gist=3ad904c5497aad3d27c333c897374d54&execute=true) (ESNextbin)  
 - [Try yourself](https://runkit.com/leonardosnt/java-class-tools-example)  (_RunKit:_ you must login with github to be able to fork it)
 
 Print all method names (node.js)
