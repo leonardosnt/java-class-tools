@@ -1,13 +1,12 @@
 var path = require('path');
 
 module.exports = {
-  entry: {
-    'index': "./src/index.js"
-  },
+  entry: './src/index.js',
   output: {
     path: path.join(__dirname, './dist/'),
-    filename: "java-class-tools.js",
-    library: ['JavaClassTools']
+    filename: 'java-class-tools.js',
+    libraryTarget: 'umd',
+    library: 'JavaClassTools'
   },
   node: {
     fs: "empty"
