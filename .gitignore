@@ -4,3 +4,4 @@ coverage/
 .vscode/
 lib/
 test/coverage.js
+test/fuzz.js

@@ -3,17 +3,13 @@
   "version": "1.1.4",
   "description": "Read and write java class files in node or browser.",
   "main": "lib/index.js",
-  "directories": {
-    "example": "examples",
-    "test": "test",
-    "dist": "dist"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/leonardosnt/java-class-tools.git"
   },
   "files": [
     "index.js",
+    "dist",
     "lib",
     "typings.d.ts"
   ],
