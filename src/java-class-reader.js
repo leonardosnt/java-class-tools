@@ -91,7 +91,7 @@ class JavaClassFileReader {
    */
   _readCommonFieldMethodArray(count) {
     const values = [];
-    while (count--) {
+    while (count-- > 0) {
       const struct = {
         access_flags: this.buf.readUint16(),
         name_index: this.buf.readUint16(),
@@ -107,7 +107,7 @@ class JavaClassFileReader {
 
   _readAttributeInfoArray(attributes_count) {
     const attributes = [];
-    while (attributes_count--) {
+    while (attributes_count-- > 0) {
       attributes.push(this._readAttributeInfo());
     }
     return attributes;
@@ -179,7 +179,7 @@ class JavaClassFileReader {
         type_annotation.target_info.table = [];
 
         let table_length = type_annotation.target_info.table_length;
-        while (table_length--) {
+        while (table_length-- > 0) {
           const table_entry = {
             start_pc: this.buf.readUint16(),
             length: this.buf.readUint16(),
@@ -217,7 +217,7 @@ class JavaClassFileReader {
     };
 
     let path_length = type_annotation.type_path.path_length;
-    while (path_length--) {
+    while (path_length-- > 0) {
       const path_entry = {
         type_path_kind: this.buf.readUint8(),
         type_argument_index: this.buf.readUint8()
@@ -230,7 +230,7 @@ class JavaClassFileReader {
     type_annotation.element_value_pairs = [];
 
     let num_element_value_pairs = type_annotation.num_element_value_pairs;
-    while (num_element_value_pairs--) {
+    while (num_element_value_pairs-- > 0) {
       const element_value_entry = {
         element_name_index: this.buf.readUint16(),
         element_value: this._readElementValue()
@@ -259,7 +259,7 @@ class JavaClassFileReader {
         attribute.num_annotations = this.buf.readUint16();
         attribute.annotations = [];
         let num_annotations = attribute.num_annotations;
-        while (num_annotations--) {
+        while (num_annotations-- > 0) {
           attribute.annotations.push(this._readAttributeAnnotation())
         }
         break;
@@ -275,7 +275,7 @@ class JavaClassFileReader {
         attribute.classes = [];
 
         let number_of_classes = attribute.number_of_classes;
-        while (number_of_classes--) {
+        while (number_of_classes-- > 0) {
           const inner_class = {
             inner_class_info_index: this.buf.readUint16(),
             outer_class_info_index: this.buf.readUint16(),
@@ -292,7 +292,7 @@ class JavaClassFileReader {
         attribute.local_variable_table = [];
 
         let local_variable_table_length = attribute.local_variable_table_length;
-        while (local_variable_table_length--) {
+        while (local_variable_table_length-- > 0) {
           const local_variable = {
             start_pc: this.buf.readUint16(),
             length: this.buf.readUint16(),
@@ -310,7 +310,7 @@ class JavaClassFileReader {
         attribute.local_variable_type_table = [];
 
         let local_variable_type_table_length = attribute.local_variable_type_table_length;
-        while (local_variable_type_table_length--) {
+        while (local_variable_type_table_length-- > 0) {
           const local_variable_type = {
             start_pc: this.buf.readUint16(),
             length: this.buf.readUint16(),
@@ -329,14 +329,14 @@ class JavaClassFileReader {
         attribute.parameter_annotations = [];
 
         let num_parameters = attribute.num_parameters;
-        while (num_parameters--) {
+        while (num_parameters-- > 0) {
           const parameter_annotation = {
             num_annotations: this.buf.readUint16(),
             annotations: []
           };
 
           let num_annotations = parameter_annotation.num_annotations;
-          while (num_annotations--) {
+          while (num_annotations-- > 0) {
             parameter_annotation.annotations.push(this._readAttributeAnnotation());
           }
           attribute.parameter_annotations.push(parameter_annotation);
@@ -349,7 +349,7 @@ class JavaClassFileReader {
         attribute.bootstrap_methods = [];
 
         let num_bootstrap_methods = attribute.num_bootstrap_methods;
-        while (num_bootstrap_methods--) {
+        while (num_bootstrap_methods-- > 0) {
           const bootstrap_method = {
             bootstrap_method_ref: this.buf.readUint16(),
             num_bootstrap_arguments: this.buf.readUint16(),
@@ -357,7 +357,7 @@ class JavaClassFileReader {
           };
 
           let num_bootstrap_arguments = bootstrap_method.num_bootstrap_arguments;
-          while (num_bootstrap_arguments--) {
+          while (num_bootstrap_arguments-- > 0) {
             bootstrap_method.bootstrap_arguments.push(this.buf.readUint16());
           }
           attribute.bootstrap_methods.push(bootstrap_method);
@@ -371,7 +371,7 @@ class JavaClassFileReader {
         attribute.annotations = [];
 
         let num_annotations = attribute.num_annotations;
-        while (num_annotations--) {
+        while (num_annotations-- > 0) {
           attribute.annotations.push(this._readTypeAnnotation());
         }
         break;
@@ -381,7 +381,7 @@ class JavaClassFileReader {
         attribute.debug_extension = [];
 
         let attribute_length = attribute.attribute_length;
-        while (attribute_length--) {
+        while (attribute_length-- > 0) {
           attribute.debug_extension.push(this.buf.readUint8());
         }
         break;
@@ -405,7 +405,7 @@ class JavaClassFileReader {
         attribute.parameters = [];
 
         let parameters_count = attribute.parameters_count;
-        while (parameters_count--) {
+        while (parameters_count-- > 0) {
           const parameter = {
             name_index: this.buf.readUint16(),
             access_flags: this.buf.readUint16()
@@ -420,7 +420,7 @@ class JavaClassFileReader {
         attribute.exception_index_table = [];
 
         let number_of_exceptions = attribute.number_of_exceptions;
-        while (number_of_exceptions--) {
+        while (number_of_exceptions-- > 0) {
           attribute.exception_index_table.push(this.buf.readUint16());
         }
         break;
@@ -449,7 +449,7 @@ class JavaClassFileReader {
         attribute.entries = [];
         
         let number_of_entries = attribute.number_of_entries;
-        while (number_of_entries--) {
+        while (number_of_entries-- > 0) {
           const stack_map_frame = {
             offset: this.buf.readUint16(),
             number_of_locals: this.buf.readUint16(),
@@ -458,14 +458,14 @@ class JavaClassFileReader {
           };
           
           let number_of_locals = stack_map_frame.number_of_locals;
-          while (number_of_locals--) {
+          while (number_of_locals-- > 0) {
             stack_map_frame.locals.push(this._readVerificationTypeInfo());
           }
 
           stack_map_frame.number_of_stack_items = this.buf.readUInt16();
 
           let number_of_stack_items = stack_map_frame.number_of_stack_items;
-          while (number_of_stack_items--) {
+          while (number_of_stack_items-- > 0) {
             stack_map_frame.stack.push(this._readVerificationTypeInfo());
           }
 
@@ -479,7 +479,7 @@ class JavaClassFileReader {
         attribute.entries = [];
 
         let number_of_entries = attribute.number_of_entries;
-        while (number_of_entries--) {
+        while (number_of_entries-- > 0) {
           const stack_map_frame = {
             frame_type: this.buf.readUint8()
           };
@@ -518,7 +518,7 @@ class JavaClassFileReader {
             stack_map_frame.locals = [];
 
             let number_of_locals = frame_type - 251;
-            while (number_of_locals--) {
+            while (number_of_locals-- > 0) {
               stack_map_frame.locals.push(this._readVerificationTypeInfo());
             }
           }
@@ -529,7 +529,7 @@ class JavaClassFileReader {
             stack_map_frame.locals = [];
 
             let number_of_locals = stack_map_frame.number_of_locals;
-            while (number_of_locals--) {
+            while (number_of_locals-- > 0) {
               stack_map_frame.locals.push(this._readVerificationTypeInfo());
             }
 
@@ -537,7 +537,7 @@ class JavaClassFileReader {
             stack_map_frame.stack = [];
 
             let number_of_stack_items = stack_map_frame.number_of_stack_items;
-            while (number_of_stack_items--) {
+            while (number_of_stack_items-- > 0) {
               stack_map_frame.stack.push(this._readVerificationTypeInfo());
             }
           }
@@ -554,7 +554,7 @@ class JavaClassFileReader {
 
         // Reads "code" array
         let code_length = attribute.code_length;
-        while (code_length--) {
+        while (code_length-- > 0) {
           attribute.code.push(this.buf.readUint8());
         }
 
@@ -563,7 +563,7 @@ class JavaClassFileReader {
 
         // Reads exception_table
         let exception_table_length = attribute.exception_table_length;
-        while (exception_table_length--) {
+        while (exception_table_length-- > 0) {
           const exception_entry = {
             start_pc: this.buf.readUint16(),
             end_pc: this.buf.readUint16(),
@@ -583,7 +583,7 @@ class JavaClassFileReader {
         attribute.line_number_table = [];
 
         let line_number_table_length = attribute.line_number_table_length;
-        while (line_number_table_length--) {
+        while (line_number_table_length-- > 0) {
           const line_number = {
             start_pc: this.buf.readUint16(),
             line_number: this.buf.readUint16()
@@ -611,7 +611,7 @@ class JavaClassFileReader {
       element_value_pairs: []
     };
     let len = annotation.num_element_value_pairs;
-    while (len--) {
+    while (len-- > 0) {
       const element = {
         element_name_index: this.buf.readUint16(),
         element_value: this._readElementValue()
@@ -652,7 +652,7 @@ class JavaClassFileReader {
           values: []
         };
         let num_values = array_value.num_values;
-        while (num_values--) {
+        while (num_values-- > 0) {
           array_value.values.push(this._readElementValue());
         }
         element_value.value.array_value = array_value;
@@ -684,7 +684,7 @@ class JavaClassFileReader {
 
   _readInterfaces(interface_count) {
     const entries = [];
-    while (interface_count--) {
+    while (interface_count-- > 0) {
       entries.push(this.buf.readUint16());
     }
     return entries;
@@ -699,7 +699,7 @@ class JavaClassFileReader {
      * The constant_pool table is indexed from 1 to constant_pool_count-1.
      */
     const pool = [undefined];
-    while (pool_size--) {
+    while (pool_size-- > 0) {
       let entry = this._readConstantPoolEntry();
       pool.push(entry);
 
@@ -730,7 +730,7 @@ class JavaClassFileReader {
         let strLen = this.buf.readUint16();
         cp_info.length = strLen;
         cp_info.bytes = [];
-        while (strLen--) {
+        while (strLen-- > 0) {
           cp_info.bytes.push(this.buf.readUInt8());
         }
         break;
