@@ -1,6 +1,6 @@
 /*!
  * https://github.com/leonardosnt/java-class-tools
- * 
+ *
  * Copyright (C) 2017 leonardosnt
  * Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */

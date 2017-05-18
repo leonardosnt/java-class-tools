@@ -1,6 +1,6 @@
 /*!
  * https://github.com/leonardosnt/java-class-tools
- * 
+ *
  * Copyright (C) 2017 leonardosnt
  * Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */
@@ -12,7 +12,7 @@ import Modifier from './modifier';
 
 /**
  * All objects (structure) follow Jvm8 specification.
- * 
+ *
  * @see https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html
  */
 class JavaClassFileReader {
@@ -436,9 +436,9 @@ class JavaClassFileReader {
 
       /**
        * http://download.oracle.com/otndocs/jcp/7247-j2me_cldc-1.1-fr-spec-oth-JSpec/
-       * 
+       *
        * Appendix1-verifier.pdf at "2.1 Stack map format"
-       * 
+       *
        * "According to the CLDC specification, the sizes of some fields are not 16bit
        * but 32bit if the code size is more than 64K or the number of the local variables
        * is more than 64K.  However, for the J2ME CLDC technology, they are always 16bit.
@@ -447,7 +447,7 @@ class JavaClassFileReader {
       case 'StackMap': {
         attribute.number_of_entries = this.buf.readUint16();
         attribute.entries = [];
-        
+
         let number_of_entries = attribute.number_of_entries;
         while (number_of_entries-- > 0) {
           const stack_map_frame = {
@@ -456,7 +456,7 @@ class JavaClassFileReader {
             locals: [],
             stack: []
           };
-          
+
           let number_of_locals = stack_map_frame.number_of_locals;
           while (number_of_locals-- > 0) {
             stack_map_frame.locals.push(this._readVerificationTypeInfo());

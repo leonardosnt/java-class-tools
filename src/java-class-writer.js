@@ -1,6 +1,6 @@
 /*!
  * https://github.com/leonardosnt/java-class-tools
- * 
+ *
  * Copyright (C) 2017 leonardosnt
  * Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */
@@ -10,7 +10,7 @@ import ConstantType from './constant-type';
 
 /**
  * All objects (structure) MUST follow Jvm8 specification.
- * 
+ *
  * @see https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html
  */
 class JavaClassFileWriter {
