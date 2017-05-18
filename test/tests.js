@@ -61,7 +61,7 @@ describe('instruction parser', () => {
   });
   const method0 = classFile.methods[0];
 
-  it('fromBytecode() == toBytecode()', () => {
+  it('fromBytecode() === toBytecode()', () => {
     const codeAttr = getAttribute(method0, 'Code', classFile);
     const originalBytecode = codeAttr.code;
 
@@ -487,8 +487,8 @@ public class ReadFieldTest_0 {
     let field = classFile.fields[0];
 
     it('should be "protected" and "static"', () => {
-      assert((field.access_flags & Modifier.PROTECTED) == Modifier.PROTECTED);
-      assert((field.access_flags & Modifier.STATIC) == Modifier.STATIC);
+      assert((field.access_flags & Modifier.PROTECTED) === Modifier.PROTECTED);
+      assert((field.access_flags & Modifier.STATIC) === Modifier.STATIC);
     });
 
     it('should have "Deprecated" attribute.', () => {
@@ -674,7 +674,7 @@ function dumpConstantPool(classFile) {
   for (var i = 0; i < classFile.constant_pool.length; i++) {
     let entry = classFile.constant_pool[i];
 
-    if (entry && entry.tag == ConstantType.UTF8) {
+    if (entry && entry.tag === ConstantType.UTF8) {
       entry.str = new Buffer(entry.bytes).toString('utf-8');
     }
     console.log(i + " = " + util.inspect(entry, undefined, 2, true));

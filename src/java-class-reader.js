@@ -7,8 +7,6 @@
 
 import ByteBuffer from 'bytebuffer';
 import ConstantType from './constant-type';
-import Opcode from './opcode';
-import Modifier from './modifier';
 
 /**
  * All objects (structure) follow Jvm8 specification.
@@ -36,10 +34,10 @@ class JavaClassFileReader {
     this.classFile = new (function ClassFile(){});
 
     // Read magic
-    if (this.buf.readUInt8() != 0xCA ||
-        this.buf.readUInt8() != 0xFE ||
-        this.buf.readUInt8() != 0xBA ||
-        this.buf.readUInt8() != 0xBE) {
+    if (this.buf.readUInt8() !== 0xCA ||
+        this.buf.readUInt8() !== 0xFE ||
+        this.buf.readUInt8() !== 0xBA ||
+        this.buf.readUInt8() !== 0xBE) {
       throw Error('Invalid MAGIC value');
     }
 
@@ -121,9 +119,9 @@ class JavaClassFileReader {
     const type_info = {
       tag: this.buf.readUint8()
     };
-    if (type_info.tag == 7) {
+    if (type_info.tag === 7) {
       type_info.cpool_index = this.buf.readUint16();
-    } else if (type_info.tag == 8) {
+    } else if (type_info.tag === 8) {
       type_info.offset = this.buf.readUint16();
     }
     return type_info;
@@ -504,7 +502,7 @@ class JavaClassFileReader {
             stack_map_frame.stack = [this._readVerificationTypeInfo()];
           }
           // SAME_LOCALS_1_STACK_ITEM_EXTENDED
-          else if (stack_map_frame.frame_type == 247) {
+          else if (stack_map_frame.frame_type === 247) {
             stack_map_frame.offset_delta = this.buf.readUint16();
             stack_map_frame.stack = [this._readVerificationTypeInfo()];
           }
@@ -523,7 +521,7 @@ class JavaClassFileReader {
             }
           }
           // FULL_FRAME
-          else if (frame_type == 255) {
+          else if (frame_type === 255) {
             stack_map_frame.offset_delta = this.buf.readUint16();
             stack_map_frame.number_of_locals = this.buf.readUint16();
             stack_map_frame.locals = [];
@@ -711,7 +709,7 @@ class JavaClassFileReader {
        * then the next usable item in the pool is located at index n+2.
        * The constant_pool index n+ must be valid but is considered unusable.
        */
-      if (entry.tag == ConstantType.LONG || entry.tag == ConstantType.DOUBLE) {
+      if (entry.tag === ConstantType.LONG || entry.tag === ConstantType.DOUBLE) {
         pool.push(undefined);
         pool_size--;
       }

@@ -379,7 +379,7 @@ class JavaClassFileWriter {
             this._writeVerificationTypeInfo(stack_map_frame.stack[0]);
           }
           // SAME_LOCALS_1_STACK_ITEM_EXTENDED
-          else if (stack_map_frame.frame_type == 247) {
+          else if (stack_map_frame.frame_type === 247) {
             this.buf.writeUint16(stack_map_frame.offset_delta);
             this._writeVerificationTypeInfo(stack_map_frame.stack[0]);
           }
@@ -397,7 +397,7 @@ class JavaClassFileWriter {
             }
           }
           // FULL_FRAME
-          else if (frame_type == 255) {
+          else if (frame_type === 255) {
             this.buf.writeUint16(stack_map_frame.offset_delta);
             this.buf.writeUint16(stack_map_frame.number_of_locals);
 
@@ -457,9 +457,9 @@ class JavaClassFileWriter {
 
   _writeVerificationTypeInfo(type_info) {
     this.buf.writeUint8(type_info.tag);
-    if (type_info.tag == 7) {
+    if (type_info.tag === 7) {
       this.buf.writeUint16(type_info.cpool_index);
-    } else if (type_info.tag == 8) {
+    } else if (type_info.tag === 8) {
       this.buf.writeUint16(type_info.offset);
     }
   }
