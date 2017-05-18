@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const ByteBuffer = require('bytebuffer');
-const { JavaClassFileReader, ConstantType, Modifier, InstructionParser } = require('../');
+const { JavaClassFileWriter, JavaClassFileReader, ConstantType, Modifier, InstructionParser } = require('../');
 const CPUtil = require('./constant-pool-util');
 const cp = require('child_process');
 const fs = require('fs-extra');
@@ -17,6 +17,66 @@ if (!fs.existsSync(TMP_DIR_PATH)) {
 
 after(() => {
    fs.removeSync(TMP_DIR_PATH);
+});
+
+describe('class writer', () => {
+  it('validate JavaClassWriter#write()', () => {
+    const code = `
+    public class Foo {
+      int bar = 10;
+      Class<?> f;
+
+      private int bar() {
+        return 1;
+      }
+
+      class Inner {
+        String x;
+      }
+
+      public void foo() {
+        int val = 23;
+
+        switch (val) {
+          case 22:
+            break;
+          case 21:
+            break;
+          default:
+            break;
+        }
+
+        int val2 = Integer.MAX_VALUE;
+
+        switch (val2) {
+          case Integer.MAX_VALUE:
+            break;
+          case Integer.MIN_VALUE:
+            break;
+        }
+
+        String x = "asdasdsad";
+
+        switch (x) {
+          case "asdasdsad": return;
+          case "asdasdasd": break;
+        }
+      }
+
+    }
+  `;
+
+    const { classFile, fileData } = compileAndRead({
+      fileName: 'Foo',
+      code: code,
+      returnFileData: true
+    });
+
+    const classWriter = new JavaClassFileWriter();
+    const buff = classWriter.write(classFile);
+
+    assert.deepStrictEqual(buff.buffer, fileData);
+  });
 });
 
 describe('instruction parser', () => {
@@ -479,8 +539,7 @@ public class ReadFieldTest_0 {
 
   let classFile = compileAndRead({
     fileName: 'ReadFieldTest_0',
-    code: code,
-    printReadTime: true
+    code: code
   });
 
   describe('fields[0]', () => {
@@ -630,6 +689,7 @@ function compareFloatBits(f1, f2) {
 function compileAndRead(options) {
   if (typeof options !== 'object')
     throw 'Invalid options';
+
   if (typeof options.fileName !== 'string')
     throw 'Invalid fileName';
 
@@ -655,6 +715,11 @@ function compileAndRead(options) {
   if (options.printReadTime) console.time('compileAndRead#readTime: ' + options.fileName);
   let classFile = reader.read(compiledFile);
   if (options.printReadTime) console.timeEnd('compileAndRead#readTime: ' + options.fileName);
+
+  if (options.returnFileData) {
+    const fileData = fs.readFileSync(compiledFile);
+    return { classFile, fileData };
+  }
 
   return classFile;
 }
