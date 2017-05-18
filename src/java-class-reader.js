@@ -46,7 +46,7 @@ class JavaClassFileReader {
     this.classFile.minor_version = this.buf.readUint16();
     this.classFile.major_version = this.buf.readUint16();
 
-    this.classFile.constant_pool_count = this.buf.readInt16();
+    this.classFile.constant_pool_count = this.buf.readUint16();
     this.classFile.constant_pool = this._readConstantPool(this.classFile.constant_pool_count - 1);
 
     this.classFile.access_flags = this.buf.readUint16();
