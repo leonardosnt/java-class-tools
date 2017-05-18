@@ -1,5 +1,14 @@
-var JavaClassTools =
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["JavaClassTools"] = factory();
+	else
+		root["JavaClassTools"] = factory();
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -73,7 +82,7 @@ var JavaClassTools =
 
 	/*!
 	 * https://github.com/leonardosnt/java-class-tools
-	 * 
+	 *
 	 * Copyright (C) 2017 leonardosnt
 	 * Licensed under the MIT License. See LICENSE file in the project root for full license information.
 	 */
@@ -98,7 +107,7 @@ var JavaClassTools =
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*!
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * https://github.com/leonardosnt/java-class-tools
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * 
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Copyright (C) 2017 leonardosnt
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Licensed under the MIT License. See LICENSE file in the project root for full license information.
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
@@ -125,7 +134,7 @@ var JavaClassTools =
 
 	/**
 	 * All objects (structure) follow Jvm8 specification.
-	 * 
+	 *
 	 * @see https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html
 	 */
 	var JavaClassFileReader = function () {
@@ -163,7 +172,7 @@ var JavaClassTools =
 	      this.classFile.minor_version = this.buf.readUint16();
 	      this.classFile.major_version = this.buf.readUint16();
 
-	      this.classFile.constant_pool_count = this.buf.readInt16();
+	      this.classFile.constant_pool_count = this.buf.readUint16();
 	      this.classFile.constant_pool = this._readConstantPool(this.classFile.constant_pool_count - 1);
 
 	      this.classFile.access_flags = this.buf.readUint16();
@@ -213,7 +222,7 @@ var JavaClassTools =
 	    key: '_readCommonFieldMethodArray',
 	    value: function _readCommonFieldMethodArray(count) {
 	      var values = [];
-	      while (count--) {
+	      while (count-- > 0) {
 	        var struct = {
 	          access_flags: this.buf.readUint16(),
 	          name_index: this.buf.readUint16(),
@@ -230,7 +239,7 @@ var JavaClassTools =
 	    key: '_readAttributeInfoArray',
 	    value: function _readAttributeInfoArray(attributes_count) {
 	      var attributes = [];
-	      while (attributes_count--) {
+	      while (attributes_count-- > 0) {
 	        attributes.push(this._readAttributeInfo());
 	      }
 	      return attributes;
@@ -309,7 +318,7 @@ var JavaClassTools =
 	            type_annotation.target_info.table = [];
 
 	            var table_length = type_annotation.target_info.table_length;
-	            while (table_length--) {
+	            while (table_length-- > 0) {
 	              var table_entry = {
 	                start_pc: this.buf.readUint16(),
 	                length: this.buf.readUint16(),
@@ -347,7 +356,7 @@ var JavaClassTools =
 	      };
 
 	      var path_length = type_annotation.type_path.path_length;
-	      while (path_length--) {
+	      while (path_length-- > 0) {
 	        var path_entry = {
 	          type_path_kind: this.buf.readUint8(),
 	          type_argument_index: this.buf.readUint8()
@@ -360,7 +369,7 @@ var JavaClassTools =
 	      type_annotation.element_value_pairs = [];
 
 	      var num_element_value_pairs = type_annotation.num_element_value_pairs;
-	      while (num_element_value_pairs--) {
+	      while (num_element_value_pairs-- > 0) {
 	        var element_value_entry = {
 	          element_name_index: this.buf.readUint16(),
 	          element_value: this._readElementValue()
@@ -393,7 +402,7 @@ var JavaClassTools =
 	            attribute.num_annotations = this.buf.readUint16();
 	            attribute.annotations = [];
 	            var num_annotations = attribute.num_annotations;
-	            while (num_annotations--) {
+	            while (num_annotations-- > 0) {
 	              attribute.annotations.push(this._readAttributeAnnotation());
 	            }
 	            break;
@@ -410,7 +419,7 @@ var JavaClassTools =
 	            attribute.classes = [];
 
 	            var number_of_classes = attribute.number_of_classes;
-	            while (number_of_classes--) {
+	            while (number_of_classes-- > 0) {
 	              var inner_class = {
 	                inner_class_info_index: this.buf.readUint16(),
 	                outer_class_info_index: this.buf.readUint16(),
@@ -428,7 +437,7 @@ var JavaClassTools =
 	            attribute.local_variable_table = [];
 
 	            var local_variable_table_length = attribute.local_variable_table_length;
-	            while (local_variable_table_length--) {
+	            while (local_variable_table_length-- > 0) {
 	              var local_variable = {
 	                start_pc: this.buf.readUint16(),
 	                length: this.buf.readUint16(),
@@ -447,7 +456,7 @@ var JavaClassTools =
 	            attribute.local_variable_type_table = [];
 
 	            var local_variable_type_table_length = attribute.local_variable_type_table_length;
-	            while (local_variable_type_table_length--) {
+	            while (local_variable_type_table_length-- > 0) {
 	              var local_variable_type = {
 	                start_pc: this.buf.readUint16(),
 	                length: this.buf.readUint16(),
@@ -467,14 +476,14 @@ var JavaClassTools =
 	            attribute.parameter_annotations = [];
 
 	            var num_parameters = attribute.num_parameters;
-	            while (num_parameters--) {
+	            while (num_parameters-- > 0) {
 	              var parameter_annotation = {
 	                num_annotations: this.buf.readUint16(),
 	                annotations: []
 	              };
 
 	              var _num_annotations = parameter_annotation.num_annotations;
-	              while (_num_annotations--) {
+	              while (_num_annotations-- > 0) {
 	                parameter_annotation.annotations.push(this._readAttributeAnnotation());
 	              }
 	              attribute.parameter_annotations.push(parameter_annotation);
@@ -488,7 +497,7 @@ var JavaClassTools =
 	            attribute.bootstrap_methods = [];
 
 	            var num_bootstrap_methods = attribute.num_bootstrap_methods;
-	            while (num_bootstrap_methods--) {
+	            while (num_bootstrap_methods-- > 0) {
 	              var bootstrap_method = {
 	                bootstrap_method_ref: this.buf.readUint16(),
 	                num_bootstrap_arguments: this.buf.readUint16(),
@@ -496,7 +505,7 @@ var JavaClassTools =
 	              };
 
 	              var num_bootstrap_arguments = bootstrap_method.num_bootstrap_arguments;
-	              while (num_bootstrap_arguments--) {
+	              while (num_bootstrap_arguments-- > 0) {
 	                bootstrap_method.bootstrap_arguments.push(this.buf.readUint16());
 	              }
 	              attribute.bootstrap_methods.push(bootstrap_method);
@@ -511,7 +520,7 @@ var JavaClassTools =
 	            attribute.annotations = [];
 
 	            var _num_annotations2 = attribute.num_annotations;
-	            while (_num_annotations2--) {
+	            while (_num_annotations2-- > 0) {
 	              attribute.annotations.push(this._readTypeAnnotation());
 	            }
 	            break;
@@ -522,7 +531,7 @@ var JavaClassTools =
 	            attribute.debug_extension = [];
 
 	            var attribute_length = attribute.attribute_length;
-	            while (attribute_length--) {
+	            while (attribute_length-- > 0) {
 	              attribute.debug_extension.push(this.buf.readUint8());
 	            }
 	            break;
@@ -547,7 +556,7 @@ var JavaClassTools =
 	            attribute.parameters = [];
 
 	            var parameters_count = attribute.parameters_count;
-	            while (parameters_count--) {
+	            while (parameters_count-- > 0) {
 	              var parameter = {
 	                name_index: this.buf.readUint16(),
 	                access_flags: this.buf.readUint16()
@@ -563,7 +572,7 @@ var JavaClassTools =
 	            attribute.exception_index_table = [];
 
 	            var number_of_exceptions = attribute.number_of_exceptions;
-	            while (number_of_exceptions--) {
+	            while (number_of_exceptions-- > 0) {
 	              attribute.exception_index_table.push(this.buf.readUint16());
 	            }
 	            break;
@@ -579,9 +588,9 @@ var JavaClassTools =
 
 	        /**
 	         * http://download.oracle.com/otndocs/jcp/7247-j2me_cldc-1.1-fr-spec-oth-JSpec/
-	         * 
+	         *
 	         * Appendix1-verifier.pdf at "2.1 Stack map format"
-	         * 
+	         *
 	         * "According to the CLDC specification, the sizes of some fields are not 16bit
 	         * but 32bit if the code size is more than 64K or the number of the local variables
 	         * is more than 64K.  However, for the J2ME CLDC technology, they are always 16bit.
@@ -593,7 +602,7 @@ var JavaClassTools =
 	            attribute.entries = [];
 
 	            var number_of_entries = attribute.number_of_entries;
-	            while (number_of_entries--) {
+	            while (number_of_entries-- > 0) {
 	              var stack_map_frame = {
 	                offset: this.buf.readUint16(),
 	                number_of_locals: this.buf.readUint16(),
@@ -602,14 +611,14 @@ var JavaClassTools =
 	              };
 
 	              var number_of_locals = stack_map_frame.number_of_locals;
-	              while (number_of_locals--) {
+	              while (number_of_locals-- > 0) {
 	                stack_map_frame.locals.push(this._readVerificationTypeInfo());
 	              }
 
 	              stack_map_frame.number_of_stack_items = this.buf.readUInt16();
 
 	              var number_of_stack_items = stack_map_frame.number_of_stack_items;
-	              while (number_of_stack_items--) {
+	              while (number_of_stack_items-- > 0) {
 	                stack_map_frame.stack.push(this._readVerificationTypeInfo());
 	              }
 
@@ -624,7 +633,7 @@ var JavaClassTools =
 	            attribute.entries = [];
 
 	            var _number_of_entries = attribute.number_of_entries;
-	            while (_number_of_entries--) {
+	            while (_number_of_entries-- > 0) {
 	              var _stack_map_frame = {
 	                frame_type: this.buf.readUint8()
 	              };
@@ -663,7 +672,7 @@ var JavaClassTools =
 	                      _stack_map_frame.locals = [];
 
 	                      var _number_of_locals = frame_type - 251;
-	                      while (_number_of_locals--) {
+	                      while (_number_of_locals-- > 0) {
 	                        _stack_map_frame.locals.push(this._readVerificationTypeInfo());
 	                      }
 	                    }
@@ -674,7 +683,7 @@ var JavaClassTools =
 	                        _stack_map_frame.locals = [];
 
 	                        var _number_of_locals2 = _stack_map_frame.number_of_locals;
-	                        while (_number_of_locals2--) {
+	                        while (_number_of_locals2-- > 0) {
 	                          _stack_map_frame.locals.push(this._readVerificationTypeInfo());
 	                        }
 
@@ -682,7 +691,7 @@ var JavaClassTools =
 	                        _stack_map_frame.stack = [];
 
 	                        var _number_of_stack_items = _stack_map_frame.number_of_stack_items;
-	                        while (_number_of_stack_items--) {
+	                        while (_number_of_stack_items-- > 0) {
 	                          _stack_map_frame.stack.push(this._readVerificationTypeInfo());
 	                        }
 	                      }
@@ -700,7 +709,7 @@ var JavaClassTools =
 
 	            // Reads "code" array
 	            var code_length = attribute.code_length;
-	            while (code_length--) {
+	            while (code_length-- > 0) {
 	              attribute.code.push(this.buf.readUint8());
 	            }
 
@@ -709,7 +718,7 @@ var JavaClassTools =
 
 	            // Reads exception_table
 	            var exception_table_length = attribute.exception_table_length;
-	            while (exception_table_length--) {
+	            while (exception_table_length-- > 0) {
 	              var exception_entry = {
 	                start_pc: this.buf.readUint16(),
 	                end_pc: this.buf.readUint16(),
@@ -730,7 +739,7 @@ var JavaClassTools =
 	            attribute.line_number_table = [];
 
 	            var line_number_table_length = attribute.line_number_table_length;
-	            while (line_number_table_length--) {
+	            while (line_number_table_length-- > 0) {
 	              var line_number = {
 	                start_pc: this.buf.readUint16(),
 	                line_number: this.buf.readUint16()
@@ -761,7 +770,7 @@ var JavaClassTools =
 	        element_value_pairs: []
 	      };
 	      var len = annotation.num_element_value_pairs;
-	      while (len--) {
+	      while (len-- > 0) {
 	        var element = {
 	          element_name_index: this.buf.readUint16(),
 	          element_value: this._readElementValue()
@@ -809,7 +818,7 @@ var JavaClassTools =
 	              values: []
 	            };
 	            var num_values = array_value.num_values;
-	            while (num_values--) {
+	            while (num_values-- > 0) {
 	              array_value.values.push(this._readElementValue());
 	            }
 	            element_value.value.array_value = array_value;
@@ -844,7 +853,7 @@ var JavaClassTools =
 	    key: '_readInterfaces',
 	    value: function _readInterfaces(interface_count) {
 	      var entries = [];
-	      while (interface_count--) {
+	      while (interface_count-- > 0) {
 	        entries.push(this.buf.readUint16());
 	      }
 	      return entries;
@@ -862,7 +871,7 @@ var JavaClassTools =
 	       * The constant_pool table is indexed from 1 to constant_pool_count-1.
 	       */
 	      var pool = [undefined];
-	      while (pool_size--) {
+	      while (pool_size-- > 0) {
 	        var entry = this._readConstantPoolEntry();
 	        pool.push(entry);
 
@@ -897,7 +906,7 @@ var JavaClassTools =
 	            var strLen = this.buf.readUint16();
 	            cp_info.length = strLen;
 	            cp_info.bytes = [];
-	            while (strLen--) {
+	            while (strLen-- > 0) {
 	              cp_info.bytes.push(this.buf.readUInt8());
 	            }
 	            break;
@@ -6150,7 +6159,7 @@ var JavaClassTools =
 
 	/*!
 	 * https://github.com/leonardosnt/java-class-tools
-	 * 
+	 *
 	 * Copyright (C) 2017 leonardosnt
 	 * Licensed under the MIT License. See LICENSE file in the project root for full license information.
 	 */
@@ -6182,7 +6191,7 @@ var JavaClassTools =
 
 	/*!
 	 * https://github.com/leonardosnt/java-class-tools
-	 * 
+	 *
 	 * Copyright (C) 2017 leonardosnt
 	 * Licensed under the MIT License. See LICENSE file in the project root for full license information.
 	 */
@@ -6405,7 +6414,7 @@ var JavaClassTools =
 
 	/*!
 	 * https://github.com/leonardosnt/java-class-tools
-	 * 
+	 *
 	 * Copyright (C) 2017 leonardosnt
 	 * Licensed under the MIT License. See LICENSE file in the project root for full license information.
 	 */
@@ -6445,7 +6454,7 @@ var JavaClassTools =
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*!
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * https://github.com/leonardosnt/java-class-tools
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * 
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Copyright (C) 2017 leonardosnt
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Licensed under the MIT License. See LICENSE file in the project root for full license information.
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
@@ -6464,7 +6473,7 @@ var JavaClassTools =
 
 	/**
 	 * All objects (structure) MUST follow Jvm8 specification.
-	 * 
+	 *
 	 * @see https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html
 	 */
 	var JavaClassFileWriter = function () {
@@ -6496,7 +6505,7 @@ var JavaClassTools =
 	      this.buf.writeUint16(classFile.minor_version);
 	      this.buf.writeUint16(classFile.major_version);
 
-	      this.buf.writeInt16(classFile.constant_pool_count);
+	      this.buf.writeUint16(classFile.constant_pool_count);
 	      this._writeConstantPool(classFile.constant_pool);
 
 	      this.buf.writeUint16(classFile.access_flags);
@@ -7047,35 +7056,12 @@ var JavaClassTools =
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var OPERAND_COUNT_MAP = {
-	  0x00: 0, 0x01: 0, 0x02: 0, 0x03: 0, 0x04: 0, 0x05: 0, 0x06: 0, 0x07: 0, 0x08: 0, 0x09: 0,
-	  0x0A: 0, 0x0B: 0, 0x0C: 0, 0x0D: 0, 0x0E: 0, 0x0F: 0, 0x1A: 0, 0x1B: 0, 0x1C: 0, 0x1D: 0,
-	  0x1E: 0, 0x1F: 0, 0x20: 0, 0x21: 0, 0x22: 0, 0x23: 0, 0x24: 0, 0x25: 0, 0x26: 0, 0x27: 0,
-	  0x28: 0, 0x29: 0, 0x2A: 0, 0x2B: 0, 0x2C: 0, 0x2D: 0, 0x2E: 0, 0x2F: 0, 0x30: 0, 0x31: 0,
-	  0x32: 0, 0x33: 0, 0x34: 0, 0x35: 0, 0x3B: 0, 0x3C: 0, 0x3D: 0, 0x3E: 0, 0x3F: 0, 0x40: 0,
-	  0x41: 0, 0x42: 0, 0x43: 0, 0x44: 0, 0x45: 0, 0x46: 0, 0x47: 0, 0x48: 0, 0x49: 0, 0x4A: 0,
-	  0x4B: 0, 0x4C: 0, 0x4D: 0, 0x4E: 0, 0x4F: 0, 0x50: 0, 0x51: 0, 0x52: 0, 0x53: 0, 0x54: 0,
-	  0x55: 0, 0x56: 0, 0x57: 0, 0x58: 0, 0x59: 0, 0x5A: 0, 0x5B: 0, 0x5C: 0, 0x5D: 0, 0x5E: 0,
-	  0x5F: 0, 0x60: 0, 0x61: 0, 0x62: 0, 0x63: 0, 0x64: 0, 0x65: 0, 0x66: 0, 0x67: 0, 0x68: 0,
-	  0x69: 0, 0x6A: 0, 0x6B: 0, 0x6C: 0, 0x6D: 0, 0x6E: 0, 0x6F: 0, 0x70: 0, 0x71: 0, 0x72: 0,
-	  0x73: 0, 0x74: 0, 0x75: 0, 0x76: 0, 0x77: 0, 0x78: 0, 0x79: 0, 0x7A: 0, 0x7B: 0, 0x7C: 0,
-	  0x7D: 0, 0x7E: 0, 0x7F: 0, 0x80: 0, 0x81: 0, 0x82: 0, 0x83: 0, 0x85: 0, 0x86: 0, 0x87: 0,
-	  0x88: 0, 0x89: 0, 0x8A: 0, 0x8B: 0, 0x8C: 0, 0x8D: 0, 0x8E: 0, 0x8F: 0, 0x90: 0, 0x91: 0,
-	  0x92: 0, 0x93: 0, 0x94: 0, 0x95: 0, 0x96: 0, 0x97: 0, 0x98: 0, 0xAC: 0, 0xAD: 0, 0xAE: 0,
-	  0xAF: 0, 0xB0: 0, 0xB1: 0, 0xBE: 0, 0xBF: 0, 0xC2: 0, 0xC3: 0, 0xCA: 0, 0xFE: 0, 0xFF: 0,
+	// -1 = variable length
+	// index = opcode
+	var opcodeOperandCount = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 2, 2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, -1, -1, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 4, 4, 2, 1, 2, 0, 0, 2, 2, 0, 0, -1, 3, 2, 2, 4, 4, 0];
 
-	  0x10: 1, 0x12: 1, 0x15: 1, 0x16: 1, 0x17: 1, 0x18: 1, 0x19: 1, 0x36: 1, 0x37: 1, 0x38: 1,
-	  0x39: 1, 0x3A: 1, 0xA9: 1, 0xBC: 1,
-
-	  0x11: 2, 0x13: 2, 0x14: 2, 0x84: 2, 0x99: 2, 0x9A: 2, 0x9B: 2, 0x9C: 2, 0x9D: 2, 0x9E: 2,
-	  0x9F: 2, 0xA0: 2, 0xA1: 2, 0xA2: 2, 0xA3: 2, 0xA4: 2, 0xA5: 2, 0xA6: 2, 0xA7: 2, 0xA8: 2,
-	  0xB2: 2, 0xB3: 2, 0xB4: 2, 0xB5: 2, 0xB6: 2, 0xB7: 2, 0xB8: 2, 0xBB: 2, 0xBD: 2, 0xC0: 2,
-	  0xC1: 2, 0xC6: 2, 0xC7: 2,
-
-	  0xC5: 3,
-
-	  0xB9: 4, 0xBA: 4, 0xC8: 4, 0xC9: 4
-	};
+	// index = opcode
+	var opcodeMnemonics = ['nop', 'aconst_null', 'iconst_m1', 'iconst_0', 'iconst_1', 'iconst_2', 'iconst_3', 'iconst_4', 'iconst_5', 'lconst_0', 'lconst_1', 'fconst_0', 'fconst_1', 'fconst_2', 'dconst_0', 'dconst_1', 'bipush', 'sipush', 'ldc', 'ldc_w', 'ldc2_w', 'iload', 'lload', 'fload', 'dload', 'aload', 'iload_0', 'iload_1', 'iload_2', 'iload_3', 'lload_0', 'lload_1', 'lload_2', 'lload_3', 'fload_0', 'fload_1', 'fload_2', 'fload_3', 'dload_0', 'dload_1', 'dload_2', 'dload_3', 'aload_0', 'aload_1', 'aload_2', 'aload_3', 'iaload', 'laload', 'faload', 'daload', 'aaload', 'baload', 'caload', 'saload', 'istore', 'lstore', 'fstore', 'dstore', 'astore', 'istore_0', 'istore_1', 'istore_2', 'istore_3', 'lstore_0', 'lstore_1', 'lstore_2', 'lstore_3', 'fstore_0', 'fstore_1', 'fstore_2', 'fstore_3', 'dstore_0', 'dstore_1', 'dstore_2', 'dstore_3', 'astore_0', 'astore_1', 'astore_2', 'astore_3', 'iastore', 'lastore', 'fastore', 'dastore', 'aastore', 'bastore', 'castore', 'sastore', 'pop', 'pop2', 'dup', 'dup_x1', 'dup_x2', 'dup2', 'dup2_x1', 'dup2_x2', 'swap', 'iadd', 'ladd', 'fadd', 'dadd', 'isub', 'lsub', 'fsub', 'dsub', 'imul', 'lmul', 'fmul', 'dmul', 'idiv', 'ldiv', 'fdiv', 'ddiv', 'irem', 'lrem', 'frem', 'drem', 'ineg', 'lneg', 'fneg', 'dneg', 'ishl', 'lshl', 'ishr', 'lshr', 'iushr', 'lushr', 'iand', 'land', 'ior', 'lor', 'ixor', 'lxor', 'iinc', 'i2l', 'i2f', 'i2d', 'l2i', 'l2f', 'l2d', 'f2i', 'f2l', 'f2d', 'd2i', 'd2l', 'd2f', 'i2b', 'i2c', 'i2s', 'lcmp', 'fcmpl', 'fcmpg', 'dcmpl', 'dcmpg', 'ifeq', 'ifne', 'iflt', 'ifge', 'ifgt', 'ifle', 'if_icmpeq', 'if_icmpne', 'if_icmplt', 'if_icmpge', 'if_icmpgt', 'if_icmple', 'if_acmpeq', 'if_acmpne', 'goto', 'jsr', 'ret', 'tableswitch', 'lookupswitch', 'ireturn', 'lreturn', 'freturn', 'dreturn', 'areturn', 'return', 'getstatic', 'putstatic', 'getfield', 'putfield', 'invokevirtual', 'invokespecial', 'invokestatic', 'invokeinterface', 'invokedynamic', 'new', 'newarray', 'anewarray', 'arraylength', 'athrow', 'checkcast', 'instanceof', 'monitorenter', 'monitorexit', 'wide', 'multianewarray', 'ifnull', 'ifnonnull', 'goto_w', 'jsr_w', 'breakpoint'];
 
 	var Instruction = function () {
 	  function Instruction(opcode, operands) {
@@ -7091,7 +7077,8 @@ var JavaClassTools =
 	  _createClass(Instruction, [{
 	    key: 'toString',
 	    value: function toString() {
-	      return 'Instruction { opcode: ' + opcodeToString(this.opcode) + ', operands: [' + this.operands + '] }';
+	      var opcodeMnemonic = opcodeMnemonics[this.opcode] || (this.opcode === 0xFE ? 'impdep1' : this.opcode === 0xFF ? 'impdep2' : undefined);
+	      return 'Instruction { opcode: ' + opcodeMnemonic + ', operands: [' + this.operands + '] }';
 	    }
 	  }]);
 
@@ -7130,7 +7117,7 @@ var JavaClassTools =
 	              var padding = bytecode.length % 4 ? 4 - bytecode.length % 4 : 0;
 	              var operandOffset = 0;
 
-	              while (padding--) {
+	              while (padding-- > 0) {
 	                bytecode.push(0);
 	              }
 
@@ -7142,7 +7129,7 @@ var JavaClassTools =
 
 	              bytecode.push(npairs >> 24 & 0xFF, npairs >> 16 & 0xFF, npairs >> 8 & 0xFF, npairs & 0xFF);
 
-	              while (npairs--) {
+	              while (npairs-- > 0) {
 	                var npair = current.operands[operandOffset++];
 	                var matchOffset = current.operands[operandOffset++] - 1;
 
@@ -7157,7 +7144,7 @@ var JavaClassTools =
 	              var _padding = bytecode.length % 4 ? 4 - bytecode.length % 4 : 0;
 	              var _operandOffset = 0;
 
-	              while (_padding--) {
+	              while (_padding-- > 0) {
 	                bytecode.push(0);
 	              }
 
@@ -7172,7 +7159,7 @@ var JavaClassTools =
 	              bytecode.push(high >> 24 & 0xFF, high >> 16 & 0xFF, high >> 8 & 0xFF, high & 0xFF);
 
 	              var jumpOffsets = high - low + 1;
-	              while (jumpOffsets--) {
+	              while (jumpOffsets-- > 0) {
 	                var jumpOffset = current.operands[_operandOffset++] - 1;
 	                bytecode.push(jumpOffset >> 24 & 0xFF, jumpOffset >> 16 & 0xFF, jumpOffset >> 8 & 0xFF, jumpOffset & 0xFF);
 	              }
@@ -7210,7 +7197,7 @@ var JavaClassTools =
 
 	          default:
 	            {
-	              var operandCount = OPERAND_COUNT_MAP[current.opcode];
+	              var operandCount = opcodeOperandCount[current.opcode];
 
 	              if (operandCount === undefined) {
 	                throw Error('Unexpected opcode: ' + current);
@@ -7269,7 +7256,7 @@ var JavaClassTools =
 	              var npairs = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
 	              instruction.operands.push(npairs);
 
-	              while (npairs--) {
+	              while (npairs-- > 0) {
 	                var npair = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
 	                var matchOffset = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
 	                instruction.operands.push(npair);
@@ -7295,7 +7282,7 @@ var JavaClassTools =
 	              instruction.operands.push(high);
 
 	              var jumpOffsets = high - low + 1;
-	              while (jumpOffsets--) {
+	              while (jumpOffsets-- > 0) {
 	                var jumpOffset = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
 	                instruction.operands.push(jumpOffset + 1);
 	              }
@@ -7333,13 +7320,13 @@ var JavaClassTools =
 
 	          default:
 	            {
-	              var operandCount = OPERAND_COUNT_MAP[current];
+	              var operandCount = opcodeOperandCount[current];
 
 	              if (operandCount === undefined) {
 	                throw Error('Unexpected opcode: ' + current);
 	              }
 
-	              while (operandCount--) {
+	              while (operandCount-- > 0) {
 	                instruction.operands.push(bytecode[offset++]);
 	              }
 	              break;
@@ -7355,45 +7342,12 @@ var JavaClassTools =
 	  return InstructionParser;
 	}();
 
-	var opcodeToString = function opcodeToString(opcode) {
-	  return {
-	    0x0: 'nop', 0x1: 'aconst_null', 0x2: 'iconst_m1', 0x3: 'iconst_0', 0x4: 'iconst_1', 0x5: 'iconst_2',
-	    0x6: 'iconst_3', 0x7: 'iconst_4', 0x8: 'iconst_5', 0x9: 'lconst_0', 0xa: 'lconst_1', 0xb: 'fconst_0', 0xc: 'fconst_1',
-	    0xd: 'fconst_2', 0xe: 'dconst_0', 0xf: 'dconst_1', 0x10: 'bipush', 0x11: 'sipush', 0x12: 'ldc', 0x13: 'ldc_w',
-	    0x14: 'ldc2_w', 0x15: 'iload', 0x16: 'lload', 0x17: 'fload', 0x18: 'dload', 0x19: 'aload', 0x1a: 'iload_0',
-	    0x1b: 'iload_1', 0x1c: 'iload_2', 0x1d: 'iload_3', 0x1e: 'lload_0', 0x1f: 'lload_1', 0x20: 'lload_2', 0x21: 'lload_3',
-	    0x22: 'fload_0', 0x23: 'fload_1', 0x24: 'fload_2', 0x25: 'fload_3', 0x26: 'dload_0', 0x27: 'dload_1', 0x28: 'dload_2',
-	    0x29: 'dload_3', 0x2a: 'aload_0', 0x2b: 'aload_1', 0x2c: 'aload_2', 0x2d: 'aload_3', 0x2e: 'iaload', 0x2f: 'laload',
-	    0x30: 'faload', 0x31: 'daload', 0x32: 'aaload', 0x33: 'baload', 0x34: 'caload', 0x35: 'saload', 0x36: 'istore',
-	    0x37: 'lstore', 0x38: 'fstore', 0x39: 'dstore', 0x3a: 'astore', 0x3b: 'istore_0', 0x3c: 'istore_1', 0x3d: 'istore_2',
-	    0x3e: 'istore_3', 0x3f: 'lstore_0', 0x40: 'lstore_1', 0x41: 'lstore_2', 0x42: 'lstore_3', 0x43: 'fstore_0', 0x44: 'fstore_1',
-	    0x45: 'fstore_2', 0x46: 'fstore_3', 0x47: 'dstore_0', 0x48: 'dstore_1', 0x49: 'dstore_2', 0x4a: 'dstore_3', 0x4b: 'astore_0',
-	    0x4c: 'astore_1', 0x4d: 'astore_2', 0x4e: 'astore_3', 0x4f: 'iastore', 0x50: 'lastore', 0x51: 'fastore', 0x52: 'dastore',
-	    0x53: 'aastore', 0x54: 'bastore', 0x55: 'castore', 0x56: 'sastore', 0x57: 'pop', 0x58: 'pop2', 0x59: 'dup',
-	    0x5a: 'dup_x1', 0x5b: 'dup_x2', 0x5c: 'dup2', 0x5d: 'dup2_x1', 0x5e: 'dup2_x2', 0x5f: 'swap', 0x60: 'iadd',
-	    0x61: 'ladd', 0x62: 'fadd', 0x63: 'dadd', 0x64: 'isub', 0x65: 'lsub', 0x66: 'fsub', 0x67: 'dsub',
-	    0x68: 'imul', 0x69: 'lmul', 0x6a: 'fmul', 0x6b: 'dmul', 0x6c: 'idiv', 0x6d: 'ldiv', 0x6e: 'fdiv',
-	    0x6f: 'ddiv', 0x70: 'irem', 0x71: 'lrem', 0x72: 'frem', 0x73: 'drem', 0x74: 'ineg', 0x75: 'lneg',
-	    0x76: 'fneg', 0x77: 'dneg', 0x78: 'ishl', 0x79: 'lshl', 0x7a: 'ishr', 0x7b: 'lshr', 0x7c: 'iushr',
-	    0x7d: 'lushr', 0x7e: 'iand', 0x7f: 'land', 0x80: 'ior', 0x81: 'lor', 0x82: 'ixor', 0x83: 'lxor',
-	    0x84: 'iinc', 0x85: 'i2l', 0x86: 'i2f', 0x87: 'i2d', 0x88: 'l2i', 0x89: 'l2f', 0x8a: 'l2d',
-	    0x8b: 'f2i', 0x8c: 'f2l', 0x8d: 'f2d', 0x8e: 'd2i', 0x8f: 'd2l', 0x90: 'd2f', 0x91: 'i2b',
-	    0x92: 'i2c', 0x93: 'i2s', 0x94: 'lcmp', 0x95: 'fcmpl', 0x96: 'fcmpg', 0x97: 'dcmpl', 0x98: 'dcmpg',
-	    0x99: 'ifeq', 0x9a: 'ifne', 0x9b: 'iflt', 0x9c: 'ifge', 0x9d: 'ifgt', 0x9e: 'ifle', 0x9f: 'if_icmpeq',
-	    0xa0: 'if_icmpne', 0xa1: 'if_icmplt', 0xa2: 'if_icmpge', 0xa3: 'if_icmpgt', 0xa4: 'if_icmple', 0xa5: 'if_acmpeq', 0xa6: 'if_acmpne',
-	    0xa7: 'goto', 0xa8: 'jsr', 0xa9: 'ret', 0xaa: 'tableswitch', 0xab: 'lookupswitch', 0xac: 'ireturn', 0xad: 'lreturn',
-	    0xae: 'freturn', 0xaf: 'dreturn', 0xb0: 'areturn', 0xb1: 'return', 0xb2: 'getstatic', 0xb3: 'putstatic', 0xb4: 'getfield',
-	    0xb5: 'putfield', 0xb6: 'invokevirtual', 0xb7: 'invokespecial', 0xb8: 'invokestatic', 0xb9: 'invokeinterface',
-	    0xba: 'invokedynamic', 0xbb: 'new', 0xbc: 'newarray', 0xbd: 'anewarray', 0xbe: 'arraylength', 0xbf: 'athrow', 0xc0: 'checkcast',
-	    0xc1: 'instanceof', 0xc2: 'monitorenter', 0xc3: 'monitorexit', 0xc4: 'wide', 0xc5: 'multianewarray', 0xc6: 'ifnull',
-	    0xc7: 'ifnonnull', 0xc8: 'goto_w', 0xc9: 'jsr_w', 0xca: 'breakpoint', 0xfe: 'impdep1', 0xff: 'impdep2'
-	  }[opcode];
-	};
-
 	module.exports = {
 	  Instruction: Instruction,
 	  InstructionParser: InstructionParser
 	};
 
 /***/ })
-/******/ ]);
+/******/ ])
+});
+;
