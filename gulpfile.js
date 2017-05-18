@@ -4,7 +4,16 @@ const gulp = require('gulp');
 const babel = require('gulp-babel');
 const webpack = require('webpack-stream');
 const rename = require('gulp-rename');
+const insert = require('gulp-insert');
 const uglifyjs = require('gulp-uglifyjs');
+
+const LICENSE_NOTICE = `/*!
+ * https://github.com/leonardosnt/java-class-tools
+ * 
+ * Copyright (C) 2017 leonardosnt
+ * Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
+ `;
 
 gulp.task('default', () => {
   return gulp
@@ -26,6 +35,7 @@ gulp.task('build:browser', () => {
     .pipe(gulp.dest('./dist'))
     .pipe(rename(path => path.extname = ".min.js"))
     .pipe(uglifyjs())
+    .pipe(insert.prepend(LICENSE_NOTICE))
     .pipe(gulp.dest('./dist'));
 });
 

@@ -5,7 +5,8 @@
   "main": "lib/index.js",
   "directories": {
     "example": "examples",
-    "test": "test"
+    "test": "test",
+    "dist": "dist"
   },
   "repository": {
     "type": "git",
@@ -46,6 +47,7 @@
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-cli": "^1.2.2",
+    "gulp-insert": "^0.5.0",
     "gulp-rename": "^1.2.2",
     "gulp-uglifyjs": "^0.6.2",
     "jszip": "^3.1.3",
@@ -54,8 +56,8 @@
     "webpack-stream": "^3.2.0"
   },
   "dependencies": {
-    "bytebuffer": "^5.0.1",
     "@types/bytebuffer": "^5.0.1",
-    "@types/node": "^7.0.18"
+    "@types/node": "^7.0.18",
+    "bytebuffer": "^5.0.1"
   }
 }
