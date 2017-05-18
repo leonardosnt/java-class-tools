@@ -35,7 +35,7 @@ class JavaClassFileWriter {
     this.buf.writeUint16(classFile.minor_version);
     this.buf.writeUint16(classFile.major_version);
 
-    this.buf.writeInt16(classFile.constant_pool_count);
+    this.buf.writeUint16(classFile.constant_pool_count);
     this._writeConstantPool(classFile.constant_pool);
 
     this.buf.writeUint16(classFile.access_flags);
