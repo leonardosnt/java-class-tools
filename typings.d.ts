@@ -43,6 +43,19 @@ declare module 'java-class-tools' {
     public minor_version: number;
 
     public constant_pool_count: number;
+    
+    /**
+     * "The constant_pool table is indexed from 1 to constant_pool_count - 1." - jvms 4.1
+     *
+     * So, constant_pool[0] is always undefined.
+     * 
+     * "All 8-byte constants take up two entries in the constant_pool table of the class file. 
+     * If a CONSTANT_Long_info or CONSTANT_Double_info structure is the item in the constant_pool table at index n, 
+     * then the next usable item in the pool is located at index n+2. 
+     * The constant_pool index n+1 must be valid but is considered unusable." - jvms 4.4.5
+     *
+     * So, the entry after a CONSTANT_Long or CONSTANT_Double is always undefined.
+     */
     public constant_pool: ConstantPoolInfo[];
 
     public access_flags: number;

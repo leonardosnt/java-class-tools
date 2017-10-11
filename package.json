@@ -19,9 +19,11 @@
     "class",
     "disassembler",
     "assembler",
+    "parser",
     "decompíler",
     "reader",
-    "writer"
+    "writer",
+    "bytecode"
   ],
   "author": "leonardosnt",
   "license": "MIT",
