@@ -1,6 +1,6 @@
 /*!
  * https://github.com/leonardosnt/java-class-tools
- * 
+ *
  * Copyright (C) 2017 leonardosnt
  * Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */
@@ -82,6 +82,7 @@ class InstructionParser {
       bytecode.push(current.opcode);
 
       switch (current.opcode) {
+        case Opcode.TABLESWITCH:
         case Opcode.LOOKUPSWITCH: {
           let padding = (bytecode.length % 4) ? 4 - (bytecode.length % 4) : 0;
           let operandOffset = 0;
@@ -90,47 +91,7 @@ class InstructionParser {
             bytecode.push(0);
           }
 
-          const defaultOffset = current.operands[operandOffset++] - 1;
-
-          bytecode.push((defaultOffset >> 24) & 0xFF, (defaultOffset >> 16) & 0xFF, (defaultOffset >> 8) & 0xFF, defaultOffset & 0xFF);
-
-          let npairs = current.operands[operandOffset++];
-
-          bytecode.push((npairs >> 24) & 0xFF, (npairs >> 16) & 0xFF, (npairs >> 8) & 0xFF, npairs & 0xFF);
-
-          while (npairs-- > 0) {
-            const npair = current.operands[operandOffset++];
-            const matchOffset = current.operands[operandOffset++] - 1;
-
-            bytecode.push((npair >> 24) & 0xFF, (npair >> 16) & 0xFF, (npair >> 8) & 0xFF, npair & 0xFF);
-            bytecode.push((matchOffset >> 24) & 0xFF, (matchOffset >> 16) & 0xFF, (matchOffset >> 8) & 0xFF, matchOffset & 0xFF);
-          }
-          break;
-        }
-
-        case Opcode.TABLESWITCH: {
-          let padding = (bytecode.length % 4) ? 4 - (bytecode.length % 4) : 0;
-          let operandOffset = 0;
-
-          while (padding-- > 0) {
-            bytecode.push(0);
-          }
-
-          const defaultOffset = current.operands[operandOffset++] - 1;
-
-          bytecode.push((defaultOffset >> 24) & 0xFF, (defaultOffset >> 16) & 0xFF, (defaultOffset >> 8) & 0xFF, defaultOffset & 0xFF);
-
-          const low = current.operands[operandOffset++];
-          const high = current.operands[operandOffset++];
-
-          bytecode.push((low >> 24) & 0xFF, (low >> 16) & 0xFF, (low >> 8) & 0xFF, low & 0xFF);
-          bytecode.push((high >> 24) & 0xFF, (high >> 16) & 0xFF, (high >> 8) & 0xFF, high & 0xFF);
-
-          let jumpOffsets = (high - low) + 1;
-          while (jumpOffsets-- > 0) {
-            const jumpOffset = current.operands[operandOffset++] - 1;
-            bytecode.push((jumpOffset >> 24) & 0xFF, (jumpOffset >> 16) & 0xFF, (jumpOffset >> 8) & 0xFF, jumpOffset & 0xFF);
-          }
+          bytecode.push(...current.operands);
           break;
         }
 
@@ -210,19 +171,16 @@ class InstructionParser {
           const padding = (offset % 4) ? 4 - (offset % 4) : 0;
           offset += padding; // Skip padding
 
-          // the "default" case offset
-          const defaultOffset = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
-          instruction.operands.push(defaultOffset + 1);
+          // default case bytes + npair bytes
+          for (var i = 0; i < 8; i++) {
+            instruction.operands.push(bytecode[offset++]);
+          }
 
-          // number of "cases"
-          let npairs = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
-          instruction.operands.push(npairs);
+          let npairs = (bytecode[offset-4] << 24) | (bytecode[offset-3] << 16) | (bytecode[offset-2] << 8) | (bytecode[offset-1]);
 
-          while (npairs-- > 0) {
-            const npair = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
-            const matchOffset = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
-            instruction.operands.push(npair);
-            instruction.operands.push(matchOffset + 1);
+          // match-offset pairs
+          for (var i = 0; i < npairs * 8; i++) {
+            instruction.operands.push(bytecode[offset++]);
           }
           break;
         }
@@ -232,20 +190,18 @@ class InstructionParser {
           const padding = (offset % 4) ? 4 - (offset % 4) : 0;
           offset += padding; // Skip padding
 
-          // the "default" case offset
-          const defaultOffset = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
-          instruction.operands.push(defaultOffset + 1);
+          // default bytes (4) + low bytes (4) + high bytes (4)
+          for (var i = 0; i < 12; i++) {
+            instruction.operands.push(bytecode[offset++]);
+          }
 
-          const low = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
-          const high = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
+          const low = (bytecode[offset-8] << 24) | (bytecode[offset-7] << 16) | (bytecode[offset-6] << 8) | (bytecode[offset-5]);
+          const high = (bytecode[offset-4] << 24) | (bytecode[offset-3] << 16) | (bytecode[offset-2] << 8) | (bytecode[offset-1]);
+          const numJumpOffsets = (high - low) + 1;
 
-          instruction.operands.push(low);
-          instruction.operands.push(high);
-
-          let jumpOffsets = (high - low) + 1;
-          while (jumpOffsets-- > 0) {
-            const jumpOffset = (bytecode[offset++] << 24) | (bytecode[offset++] << 16) | (bytecode[offset++] << 8) | (bytecode[offset++]);
-            instruction.operands.push(jumpOffset + 1);
+          // jump offset's
+          for (var i = 0; i < numJumpOffsets * 4; i++) {
+            instruction.operands.push(bytecode[offset++]);
           }
           break;
         }
