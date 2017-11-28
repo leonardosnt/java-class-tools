@@ -47,12 +47,13 @@ const opcodeMnemonics = [
 ];
 
 class Instruction {
-  constructor(opcode, operands) {
+  constructor(opcode, operands, bytecodeOffset) {
     if (typeof opcode !== 'number') throw TypeError('opcode must be a number');
     if (!Array.isArray(operands)) throw TypeError('operands must be an array');
 
     this.opcode = opcode;
     this.operands = operands;
+    this.bytecodeOffset = bytecodeOffset;
   }
 
   toString() {
@@ -163,7 +164,7 @@ class InstructionParser {
 
     while (offset < bytecode.length) {
       const current = bytecode[offset++];
-      const instruction = new Instruction(current, []);
+      const instruction = new Instruction(current, [], offset - 1);
 
       switch (current) {
         // https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.lookupswitch
