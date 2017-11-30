@@ -591,6 +591,136 @@ class JavaClassFileReader {
         break;
       }
 
+      case 'ModuleMainClass':
+        attribute.main_class_index = this.buf.readUint16();
+        break;
+
+      case 'Module': {
+        attribute.module_name_index = this.buf.readUint16();
+        attribute.module_flags = this.buf.readUint16();
+        attribute.module_version_index = this.buf.readUint16();
+
+        attribute.requires_count = this.buf.readUint16();
+        attribute.requires = [];
+
+        let requires_count = attribute.requires_count;
+        while (requires_count-- > 0) {
+          attribute.requires.push({
+            requires_index: this.buf.readUint16(),
+            requires_flags: this.buf.readUint16(),
+            requires_version_index: this.buf.readUint16()
+          });
+        }
+
+        attribute.exports_count = this.buf.readUint16();
+        attribute.exports = [];
+
+        let exports_count = attribute.exports_count;
+        while (exports_count-- > 0) {
+          const entry = {
+            exports_index: this.buf.readUint16(),
+            exports_flags: this.buf.readUint16(),
+            exports_to_count: this.buf.readUint16(),
+            exports_to_index: []
+          };
+
+          let exports_to_count = entry.exports_to_count;
+          while (exports_to_count-- > 0) {
+            entry.exports_to_index.push(this.buf.readUint16());
+          }
+
+          attribute.exports.push(entry);
+        }
+
+        attribute.opens_count = this.buf.readUint16();
+        attribute.opens = [];
+
+        let opens_count = attribute.opens_count;
+        while (opens_count-- > 0) {
+          const entry = {
+            opens_index: this.buf.readUint16(),
+            opens_flags: this.buf.readUint16(),
+            opens_to_count: this.buf.readUint16(),
+            opens_to_index: []
+          };
+
+          let opens_to_count = entry.opens_to_count;
+          while (opens_to_count-- > 0) {
+            entry.opens_to_index.push(this.buf.readUint16());
+          }
+
+          attribute.opens.push(entry);
+        }
+
+        attribute.uses_count = this.buf.readUint16();
+        attribute.uses_index = [];
+
+        let uses_count = attribute.uses_count;
+        while (uses_count-- > 0) {
+          attribute.uses_index.push(this.buf.readUint16());
+        }
+
+        attribute.provides_count = this.buf.readUint16();
+        attribute.provides = [];
+
+        let provides_count = attribute.provides_count;
+        while (provides_count-- > 0) {
+          const entry = {
+            provides_index: this.buf.readUint16(),
+            provides_with_count: this.buf.readUint16(),
+            provides_with_index: []
+          };
+
+          let provides_with_count = entry.provides_with_count;
+          while (provides_with_count-- > 0) {
+            entry.provides_with_index.push(this.buf.readUint16());
+          }
+
+          attribute.provides.push(entry);
+        }
+        break;
+      }
+
+      case 'ModulePackages': {
+        attribute.package_count = this.buf.readUint16();
+        attribute.package_index = [];
+
+        let package_count = attribute.package_count;
+        while (package_count-- > 0) {
+          attribute.package_index.push(this.buf.readUint16());
+        }
+        break;
+      }
+
+      /* Not specified in JVMS 9 */
+      case 'ModuleTarget':
+        attribute.target_platform_index = this.buf.readUint16();
+        break;
+
+      case 'ModuleHashes': {
+        attribute.algorithm_index = this.buf.readUint16();
+        attribute.hashes_table_length = this.buf.readUint16();
+        attribute.hashes_table = [];
+
+        let hashes_table_length = attribute.hashes_table_length;
+        while (hashes_table_length-- > 0) {
+          const entry = {
+            module_name_index: this.buf.readUint16(),
+            hash_length: this.buf.readUint16(),
+            hash: []
+          };
+
+          let hash_length = entry.hash_length;
+          while (hash_length-- > 0) {
+            entry.hash.push(this.buf.readUInt8());
+          }
+
+          attribute.hashes_table.push(entry);
+        }
+        break;
+      }
+      /* -- */
+
       default:
         throw Error(`Unexpected attributeName: ${attributeName}`);
     }
@@ -745,6 +875,8 @@ class JavaClassFileReader {
         cp_info.low_bytes = this.buf.readUint32();
         break;
 
+      case ConstantType.PACKAGE:
+      case ConstantType.MODULE:
       case ConstantType.CLASS:
         cp_info.name_index = this.buf.readUInt16();
         break;

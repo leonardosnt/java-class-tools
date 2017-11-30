@@ -450,6 +450,94 @@ class JavaClassFileWriter {
         }
         break;
 
+      case 'Module': {
+        this.buf.writeUint16(attribute_info.module_name_index);
+        this.buf.writeUint16(attribute_info.module_flags);
+        this.buf.writeUint16(attribute_info.module_version_index);
+
+        this.buf.writeUint16(attribute_info.requires_count);
+        for (var i = 0; i < attribute_info.requires_count; i++) {
+          const entry = attribute_info.requires[i];
+
+          this.buf.writeUint16(entry.requires_index);
+          this.buf.writeUint16(entry.requires_flags);
+          this.buf.writeUint16(entry.requires_version_index);
+        }
+
+        this.buf.writeUint16(attribute_info.exports_count);
+        for (var i = 0; i < attribute_info.exports_count; i++) {
+          const entry = attribute_info.exports[i];
+
+          this.buf.writeUint16(entry.exports_index);
+          this.buf.writeUint16(entry.exports_flags);
+          this.buf.writeUint16(entry.exports_to_count);
+
+          for (var j = 0; j < entry.exports_to_count; j++) {
+            this.buf.writeUint16(entry.exports_to_index[j]);
+          }
+        }
+
+        this.buf.writeUint16(attribute_info.opens_count);
+        for (var i = 0; i < attribute_info.opens_count; i++) {
+          const entry = attribute_info.opens[i];
+
+          this.buf.writeUint16(entry.opens_index);
+          this.buf.writeUint16(entry.opens_flags);
+          this.buf.writeUint16(entry.opens_to_count);
+
+          for (var j = 0; j < entry.opens_to_count; j++) {
+            this.buf.writeUint16(entry.opens_to_index[j]);
+          }
+        }
+
+        this.buf.writeUint16(attribute_info.uses_count);
+        for (var i = 0; i < attribute_info.uses_count; i++) {
+          this.buf.writeUint16(attribute_info.uses_index[i]);
+        }
+
+        this.buf.writeUint16(attribute_info.provides_count);
+        for (var i = 0; i < attribute_info.provides_count; i++) {
+          const entry = attribute_info.provides[i];
+
+          this.buf.writeUint16(entry.provides_index);
+          this.buf.writeUint16(entry.provides_with_count);
+
+          for (var j = 0; j < entry.provides_with_count; j++) {
+            this.buf.writeUint16(entry.provides_with_index[j]);
+          }
+        }
+        break;
+      }
+
+      case 'ModulePackages':
+        this.buf.writeUint16(attribute_info.package_count);
+        for (var i = 0; i < attribute_info.package_count; i++) {
+          this.buf.writeUint16(attribute_info.package_index[i]);
+        }
+        break;
+
+      /* Not specified in JVMS 9 */
+      case 'ModuleTarget':
+        this.buf.writeUint16(attribute_info.target_platform_index);
+        break;
+
+      case 'ModuleHashes': {
+        this.buf.writeUint16(attribute_info.algorithm_index);
+        this.buf.writeUint16(attribute_info.hashes_table_length);
+
+        for (var i = 0; i < attribute_info.hashes_table_length; i++) {
+          const entry = attribute_info.hashes_table[i];
+          this.buf.writeUint16(entry.module_name_index);
+          this.buf.writeUint16(entry.hash_length);
+
+          for (var j = 0; j < entry.hash_length; j++) {
+            this.buf.writeUint8(entry.hash[j]);
+          }
+        }
+        break;
+      }
+      /* -- */
+
       default:
         throw Error(`Unexpected attributeName: ${attributeName}`);
     }
@@ -504,6 +592,8 @@ class JavaClassFileWriter {
         this.buf.writeUint32(entry.low_bytes);
         break;
 
+      case ConstantType.PACKAGE:
+      case ConstantType.MODULE:
       case ConstantType.CLASS:
         this.buf.writeUint16(entry.name_index);
         break;
@@ -539,7 +629,7 @@ class JavaClassFileWriter {
         break;
 
       default:
-        throw Error(`Unexpected tag: ${cp_info.tag}`);
+        throw Error(`Unexpected tag: ${entry.tag}`);
     }
 
   }

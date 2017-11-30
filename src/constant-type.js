@@ -19,7 +19,9 @@ const ConstantType = {
   NAME_AND_TYPE: 12,
   METHOD_HANDLE: 15,
   METHOD_TYPE: 16,
-  INVOKE_DYNAMIC: 18
+  INVOKE_DYNAMIC: 18,
+  MODULE: 19,
+  PACKAGE: 20,
 };
 
 module.exports = ConstantType;
