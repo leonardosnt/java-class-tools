@@ -60,7 +60,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _javaClassReader2 = _interopRequireDefault(_javaClassReader);
 
-	var _javaClassWriter = __webpack_require__(11);
+	var _javaClassWriter = __webpack_require__(9);
 
 	var _javaClassWriter2 = _interopRequireDefault(_javaClassWriter);
 
@@ -68,11 +68,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _constantType2 = _interopRequireDefault(_constantType);
 
-	var _opcode = __webpack_require__(8);
+	var _opcode = __webpack_require__(10);
 
 	var _opcode2 = _interopRequireDefault(_opcode);
 
-	var _modifier = __webpack_require__(9);
+	var _modifier = __webpack_require__(11);
 
 	var _modifier2 = _interopRequireDefault(_modifier);
 
@@ -120,14 +120,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _constantType2 = _interopRequireDefault(_constantType);
 
-	var _opcode = __webpack_require__(8);
-
-	var _opcode2 = _interopRequireDefault(_opcode);
-
-	var _modifier = __webpack_require__(9);
-
-	var _modifier2 = _interopRequireDefault(_modifier);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -165,7 +157,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.classFile = new function ClassFile() {}();
 
 	      // Read magic
-	      if (this.buf.readUInt8() != 0xCA || this.buf.readUInt8() != 0xFE || this.buf.readUInt8() != 0xBA || this.buf.readUInt8() != 0xBE) {
+	      if (this.buf.readUInt8() !== 0xCA || this.buf.readUInt8() !== 0xFE || this.buf.readUInt8() !== 0xBA || this.buf.readUInt8() !== 0xBE) {
 	        throw Error('Invalid MAGIC value');
 	      }
 
@@ -204,7 +196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function readFromFile(path) {
 	      if ((typeof process === 'undefined' ? 'undefined' : _typeof(process)) !== undefined) {
 	        // node
-	        var fs = __webpack_require__(10);
+	        var fs = __webpack_require__(8);
 	        return this.read(fs.readFileSync(path));
 	      } else {
 	        throw Error('not supported in browser.');
@@ -256,9 +248,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var type_info = {
 	        tag: this.buf.readUint8()
 	      };
-	      if (type_info.tag == 7) {
+	      if (type_info.tag === 7) {
 	        type_info.cpool_index = this.buf.readUint16();
-	      } else if (type_info.tag == 8) {
+	      } else if (type_info.tag === 8) {
 	        type_info.offset = this.buf.readUint16();
 	      }
 	      return type_info;
@@ -658,7 +650,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _stack_map_frame.stack = [this._readVerificationTypeInfo()];
 	              }
 	              // SAME_LOCALS_1_STACK_ITEM_EXTENDED
-	              else if (_stack_map_frame.frame_type == 247) {
+	              else if (_stack_map_frame.frame_type === 247) {
 	                  _stack_map_frame.offset_delta = this.buf.readUint16();
 	                  _stack_map_frame.stack = [this._readVerificationTypeInfo()];
 	                }
@@ -677,7 +669,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                      }
 	                    }
 	                    // FULL_FRAME
-	                    else if (frame_type == 255) {
+	                    else if (frame_type === 255) {
 	                        _stack_map_frame.offset_delta = this.buf.readUint16();
 	                        _stack_map_frame.number_of_locals = this.buf.readUint16();
 	                        _stack_map_frame.locals = [];
@@ -748,6 +740,139 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            break;
 	          }
+
+	        case 'ModuleMainClass':
+	          attribute.main_class_index = this.buf.readUint16();
+	          break;
+
+	        case 'Module':
+	          {
+	            attribute.module_name_index = this.buf.readUint16();
+	            attribute.module_flags = this.buf.readUint16();
+	            attribute.module_version_index = this.buf.readUint16();
+
+	            attribute.requires_count = this.buf.readUint16();
+	            attribute.requires = [];
+
+	            var requires_count = attribute.requires_count;
+	            while (requires_count-- > 0) {
+	              attribute.requires.push({
+	                requires_index: this.buf.readUint16(),
+	                requires_flags: this.buf.readUint16(),
+	                requires_version_index: this.buf.readUint16()
+	              });
+	            }
+
+	            attribute.exports_count = this.buf.readUint16();
+	            attribute.exports = [];
+
+	            var exports_count = attribute.exports_count;
+	            while (exports_count-- > 0) {
+	              var entry = {
+	                exports_index: this.buf.readUint16(),
+	                exports_flags: this.buf.readUint16(),
+	                exports_to_count: this.buf.readUint16(),
+	                exports_to_index: []
+	              };
+
+	              var exports_to_count = entry.exports_to_count;
+	              while (exports_to_count-- > 0) {
+	                entry.exports_to_index.push(this.buf.readUint16());
+	              }
+
+	              attribute.exports.push(entry);
+	            }
+
+	            attribute.opens_count = this.buf.readUint16();
+	            attribute.opens = [];
+
+	            var opens_count = attribute.opens_count;
+	            while (opens_count-- > 0) {
+	              var _entry = {
+	                opens_index: this.buf.readUint16(),
+	                opens_flags: this.buf.readUint16(),
+	                opens_to_count: this.buf.readUint16(),
+	                opens_to_index: []
+	              };
+
+	              var opens_to_count = _entry.opens_to_count;
+	              while (opens_to_count-- > 0) {
+	                _entry.opens_to_index.push(this.buf.readUint16());
+	              }
+
+	              attribute.opens.push(_entry);
+	            }
+
+	            attribute.uses_count = this.buf.readUint16();
+	            attribute.uses_index = [];
+
+	            var uses_count = attribute.uses_count;
+	            while (uses_count-- > 0) {
+	              attribute.uses_index.push(this.buf.readUint16());
+	            }
+
+	            attribute.provides_count = this.buf.readUint16();
+	            attribute.provides = [];
+
+	            var provides_count = attribute.provides_count;
+	            while (provides_count-- > 0) {
+	              var _entry2 = {
+	                provides_index: this.buf.readUint16(),
+	                provides_with_count: this.buf.readUint16(),
+	                provides_with_index: []
+	              };
+
+	              var provides_with_count = _entry2.provides_with_count;
+	              while (provides_with_count-- > 0) {
+	                _entry2.provides_with_index.push(this.buf.readUint16());
+	              }
+
+	              attribute.provides.push(_entry2);
+	            }
+	            break;
+	          }
+
+	        case 'ModulePackages':
+	          {
+	            attribute.package_count = this.buf.readUint16();
+	            attribute.package_index = [];
+
+	            var package_count = attribute.package_count;
+	            while (package_count-- > 0) {
+	              attribute.package_index.push(this.buf.readUint16());
+	            }
+	            break;
+	          }
+
+	        /* Not specified in JVMS 9 */
+	        case 'ModuleTarget':
+	          attribute.target_platform_index = this.buf.readUint16();
+	          break;
+
+	        case 'ModuleHashes':
+	          {
+	            attribute.algorithm_index = this.buf.readUint16();
+	            attribute.hashes_table_length = this.buf.readUint16();
+	            attribute.hashes_table = [];
+
+	            var hashes_table_length = attribute.hashes_table_length;
+	            while (hashes_table_length-- > 0) {
+	              var _entry3 = {
+	                module_name_index: this.buf.readUint16(),
+	                hash_length: this.buf.readUint16(),
+	                hash: []
+	              };
+
+	              var hash_length = _entry3.hash_length;
+	              while (hash_length-- > 0) {
+	                _entry3.hash.push(this.buf.readUInt8());
+	              }
+
+	              attribute.hashes_table.push(_entry3);
+	            }
+	            break;
+	          }
+	        /* -- */
 
 	        default:
 	          throw Error('Unexpected attributeName: ' + attributeName);
@@ -883,7 +1008,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * then the next usable item in the pool is located at index n+2.
 	         * The constant_pool index n+ must be valid but is considered unusable.
 	         */
-	        if (entry.tag == _constantType2.default.LONG || entry.tag == _constantType2.default.DOUBLE) {
+	        if (entry.tag === _constantType2.default.LONG || entry.tag === _constantType2.default.DOUBLE) {
 	          pool.push(undefined);
 	          pool_size--;
 	        }
@@ -923,6 +1048,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          cp_info.low_bytes = this.buf.readUint32();
 	          break;
 
+	        case _constantType2.default.PACKAGE:
+	        case _constantType2.default.MODULE:
 	        case _constantType2.default.CLASS:
 	          cp_info.name_index = this.buf.readUInt16();
 	          break;
@@ -6178,7 +6305,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  NAME_AND_TYPE: 12,
 	  METHOD_HANDLE: 15,
 	  METHOD_TYPE: 16,
-	  INVOKE_DYNAMIC: 18
+	  INVOKE_DYNAMIC: 18,
+	  MODULE: 19,
+	  PACKAGE: 20
 	};
 
 	module.exports = ConstantType;
@@ -6187,267 +6316,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 8 */
 /***/ (function(module, exports) {
 
-	"use strict";
-
-	/*!
-	 * https://github.com/leonardosnt/java-class-tools
-	 *
-	 * Copyright (C) 2017 leonardosnt
-	 * Licensed under the MIT License. See LICENSE file in the project root for full license information.
-	 */
-
-	var Opcode = {
-	  NOP: 0x0,
-	  ACONST_NULL: 0x1,
-	  ICONST_M1: 0x2,
-	  ICONST_0: 0x3,
-	  ICONST_1: 0x4,
-	  ICONST_2: 0x5,
-	  ICONST_3: 0x6,
-	  ICONST_4: 0x7,
-	  ICONST_5: 0x8,
-	  LCONST_0: 0x9,
-	  LCONST_1: 0xa,
-	  FCONST_0: 0xb,
-	  FCONST_1: 0xc,
-	  FCONST_2: 0xd,
-	  DCONST_0: 0xe,
-	  DCONST_1: 0xf,
-	  BIPUSH: 0x10,
-	  SIPUSH: 0x11,
-	  LDC: 0x12,
-	  LDC_W: 0x13,
-	  LDC2_W: 0x14,
-	  ILOAD: 0x15,
-	  LLOAD: 0x16,
-	  FLOAD: 0x17,
-	  DLOAD: 0x18,
-	  ALOAD: 0x19,
-	  ILOAD_0: 0x1a,
-	  ILOAD_1: 0x1b,
-	  ILOAD_2: 0x1c,
-	  ILOAD_3: 0x1d,
-	  LLOAD_0: 0x1e,
-	  LLOAD_1: 0x1f,
-	  LLOAD_2: 0x20,
-	  LLOAD_3: 0x21,
-	  FLOAD_0: 0x22,
-	  FLOAD_1: 0x23,
-	  FLOAD_2: 0x24,
-	  FLOAD_3: 0x25,
-	  DLOAD_0: 0x26,
-	  DLOAD_1: 0x27,
-	  DLOAD_2: 0x28,
-	  DLOAD_3: 0x29,
-	  ALOAD_0: 0x2a,
-	  ALOAD_1: 0x2b,
-	  ALOAD_2: 0x2c,
-	  ALOAD_3: 0x2d,
-	  IALOAD: 0x2e,
-	  LALOAD: 0x2f,
-	  FALOAD: 0x30,
-	  DALOAD: 0x31,
-	  AALOAD: 0x32,
-	  BALOAD: 0x33,
-	  CALOAD: 0x34,
-	  SALOAD: 0x35,
-	  ISTORE: 0x36,
-	  LSTORE: 0x37,
-	  FSTORE: 0x38,
-	  DSTORE: 0x39,
-	  ASTORE: 0x3a,
-	  ISTORE_0: 0x3b,
-	  ISTORE_1: 0x3c,
-	  ISTORE_2: 0x3d,
-	  ISTORE_3: 0x3e,
-	  LSTORE_0: 0x3f,
-	  LSTORE_1: 0x40,
-	  LSTORE_2: 0x41,
-	  LSTORE_3: 0x42,
-	  FSTORE_0: 0x43,
-	  FSTORE_1: 0x44,
-	  FSTORE_2: 0x45,
-	  FSTORE_3: 0x46,
-	  DSTORE_0: 0x47,
-	  DSTORE_1: 0x48,
-	  DSTORE_2: 0x49,
-	  DSTORE_3: 0x4a,
-	  ASTORE_0: 0x4b,
-	  ASTORE_1: 0x4c,
-	  ASTORE_2: 0x4d,
-	  ASTORE_3: 0x4e,
-	  IASTORE: 0x4f,
-	  LASTORE: 0x50,
-	  FASTORE: 0x51,
-	  DASTORE: 0x52,
-	  AASTORE: 0x53,
-	  BASTORE: 0x54,
-	  CASTORE: 0x55,
-	  SASTORE: 0x56,
-	  POP: 0x57,
-	  POP2: 0x58,
-	  DUP: 0x59,
-	  DUP_X1: 0x5a,
-	  DUP_X2: 0x5b,
-	  DUP2: 0x5c,
-	  DUP2_X1: 0x5d,
-	  DUP2_X2: 0x5e,
-	  SWAP: 0x5f,
-	  IADD: 0x60,
-	  LADD: 0x61,
-	  FADD: 0x62,
-	  DADD: 0x63,
-	  ISUB: 0x64,
-	  LSUB: 0x65,
-	  FSUB: 0x66,
-	  DSUB: 0x67,
-	  IMUL: 0x68,
-	  LMUL: 0x69,
-	  FMUL: 0x6a,
-	  DMUL: 0x6b,
-	  IDIV: 0x6c,
-	  LDIV: 0x6d,
-	  FDIV: 0x6e,
-	  DDIV: 0x6f,
-	  IREM: 0x70,
-	  LREM: 0x71,
-	  FREM: 0x72,
-	  DREM: 0x73,
-	  INEG: 0x74,
-	  LNEG: 0x75,
-	  FNEG: 0x76,
-	  DNEG: 0x77,
-	  ISHL: 0x78,
-	  LSHL: 0x79,
-	  ISHR: 0x7a,
-	  LSHR: 0x7b,
-	  IUSHR: 0x7c,
-	  LUSHR: 0x7d,
-	  IAND: 0x7e,
-	  LAND: 0x7f,
-	  IOR: 0x80,
-	  LOR: 0x81,
-	  IXOR: 0x82,
-	  LXOR: 0x83,
-	  IINC: 0x84,
-	  I2L: 0x85,
-	  I2F: 0x86,
-	  I2D: 0x87,
-	  L2I: 0x88,
-	  L2F: 0x89,
-	  L2D: 0x8a,
-	  F2I: 0x8b,
-	  F2L: 0x8c,
-	  F2D: 0x8d,
-	  D2I: 0x8e,
-	  D2L: 0x8f,
-	  D2F: 0x90,
-	  I2B: 0x91,
-	  I2C: 0x92,
-	  I2S: 0x93,
-	  LCMP: 0x94,
-	  FCMPL: 0x95,
-	  FCMPG: 0x96,
-	  DCMPL: 0x97,
-	  DCMPG: 0x98,
-	  IFEQ: 0x99,
-	  IFNE: 0x9a,
-	  IFLT: 0x9b,
-	  IFGE: 0x9c,
-	  IFGT: 0x9d,
-	  IFLE: 0x9e,
-	  IF_ICMPEQ: 0x9f,
-	  IF_ICMPNE: 0xa0,
-	  IF_ICMPLT: 0xa1,
-	  IF_ICMPGE: 0xa2,
-	  IF_ICMPGT: 0xa3,
-	  IF_ICMPLE: 0xa4,
-	  IF_ACMPEQ: 0xa5,
-	  IF_ACMPNE: 0xa6,
-	  GOTO: 0xa7,
-	  JSR: 0xa8,
-	  RET: 0xa9,
-	  TABLESWITCH: 0xaa,
-	  LOOKUPSWITCH: 0xab,
-	  IRETURN: 0xac,
-	  LRETURN: 0xad,
-	  FRETURN: 0xae,
-	  DRETURN: 0xaf,
-	  ARETURN: 0xb0,
-	  RETURN: 0xb1,
-	  GETSTATIC: 0xb2,
-	  PUTSTATIC: 0xb3,
-	  GETFIELD: 0xb4,
-	  PUTFIELD: 0xb5,
-	  INVOKEVIRTUAL: 0xb6,
-	  INVOKESPECIAL: 0xb7,
-	  INVOKESTATIC: 0xb8,
-	  INVOKEINTERFACE: 0xb9,
-	  INVOKEDYNAMIC: 0xba,
-	  NEW: 0xbb,
-	  NEWARRAY: 0xbc,
-	  ANEWARRAY: 0xbd,
-	  ARRAYLENGTH: 0xbe,
-	  ATHROW: 0xbf,
-	  CHECKCAST: 0xc0,
-	  INSTANCEOF: 0xc1,
-	  MONITORENTER: 0xc2,
-	  MONITOREXIT: 0xc3,
-	  WIDE: 0xc4,
-	  MULTIANEWARRAY: 0xc5,
-	  IFNULL: 0xc6,
-	  IFNONNULL: 0xc7,
-	  GOTO_W: 0xc8,
-	  JSR_W: 0xc9,
-	  BREAKPOINT: 0xca,
-	  IMPDEP1: 0xfe,
-	  IMPDEP2: 0xff
-	};
-
-	module.exports = Opcode;
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports) {
-
-	"use strict";
-
-	/*!
-	 * https://github.com/leonardosnt/java-class-tools
-	 *
-	 * Copyright (C) 2017 leonardosnt
-	 * Licensed under the MIT License. See LICENSE file in the project root for full license information.
-	 */
-
-	var Modifier = {
-	  PUBLIC: 0x0001,
-	  PRIVATE: 0x0002,
-	  PROTECTED: 0x0004,
-	  STATIC: 0x0008,
-	  FINAL: 0x0010,
-	  SUPER: 0x0020,
-	  VOLATILE: 0x0040,
-	  BRIDGE: 0x0040,
-	  TRANSIENT: 0x0080,
-	  VARARGS: 0x0080,
-	  NATIVE: 0x0100,
-	  INTERFACE: 0x0200,
-	  ABSTRACT: 0x0400,
-	  SYNTHETIC: 0x1000,
-	  ANNOTATION: 0x2000,
-	  ENUM: 0x4000
-	};
-
-	module.exports = Modifier;
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
 	
 
 /***/ }),
-/* 11 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6860,7 +6732,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this._writeVerificationTypeInfo(stack_map_frame.stack[0]);
 	              }
 	              // SAME_LOCALS_1_STACK_ITEM_EXTENDED
-	              else if (stack_map_frame.frame_type == 247) {
+	              else if (stack_map_frame.frame_type === 247) {
 	                  this.buf.writeUint16(stack_map_frame.offset_delta);
 	                  this._writeVerificationTypeInfo(stack_map_frame.stack[0]);
 	                }
@@ -6878,7 +6750,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                      }
 	                    }
 	                    // FULL_FRAME
-	                    else if (frame_type == 255) {
+	                    else if (frame_type === 255) {
 	                        this.buf.writeUint16(stack_map_frame.offset_delta);
 	                        this.buf.writeUint16(stack_map_frame.number_of_locals);
 
@@ -6931,6 +6803,96 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	          break;
 
+	        case 'Module':
+	          {
+	            this.buf.writeUint16(attribute_info.module_name_index);
+	            this.buf.writeUint16(attribute_info.module_flags);
+	            this.buf.writeUint16(attribute_info.module_version_index);
+
+	            this.buf.writeUint16(attribute_info.requires_count);
+	            for (var i = 0; i < attribute_info.requires_count; i++) {
+	              var entry = attribute_info.requires[i];
+
+	              this.buf.writeUint16(entry.requires_index);
+	              this.buf.writeUint16(entry.requires_flags);
+	              this.buf.writeUint16(entry.requires_version_index);
+	            }
+
+	            this.buf.writeUint16(attribute_info.exports_count);
+	            for (var i = 0; i < attribute_info.exports_count; i++) {
+	              var _entry = attribute_info.exports[i];
+
+	              this.buf.writeUint16(_entry.exports_index);
+	              this.buf.writeUint16(_entry.exports_flags);
+	              this.buf.writeUint16(_entry.exports_to_count);
+
+	              for (var j = 0; j < _entry.exports_to_count; j++) {
+	                this.buf.writeUint16(_entry.exports_to_index[j]);
+	              }
+	            }
+
+	            this.buf.writeUint16(attribute_info.opens_count);
+	            for (var i = 0; i < attribute_info.opens_count; i++) {
+	              var _entry2 = attribute_info.opens[i];
+
+	              this.buf.writeUint16(_entry2.opens_index);
+	              this.buf.writeUint16(_entry2.opens_flags);
+	              this.buf.writeUint16(_entry2.opens_to_count);
+
+	              for (var j = 0; j < _entry2.opens_to_count; j++) {
+	                this.buf.writeUint16(_entry2.opens_to_index[j]);
+	              }
+	            }
+
+	            this.buf.writeUint16(attribute_info.uses_count);
+	            for (var i = 0; i < attribute_info.uses_count; i++) {
+	              this.buf.writeUint16(attribute_info.uses_index[i]);
+	            }
+
+	            this.buf.writeUint16(attribute_info.provides_count);
+	            for (var i = 0; i < attribute_info.provides_count; i++) {
+	              var _entry3 = attribute_info.provides[i];
+
+	              this.buf.writeUint16(_entry3.provides_index);
+	              this.buf.writeUint16(_entry3.provides_with_count);
+
+	              for (var j = 0; j < _entry3.provides_with_count; j++) {
+	                this.buf.writeUint16(_entry3.provides_with_index[j]);
+	              }
+	            }
+	            break;
+	          }
+
+	        case 'ModulePackages':
+	          this.buf.writeUint16(attribute_info.package_count);
+	          for (var i = 0; i < attribute_info.package_count; i++) {
+	            this.buf.writeUint16(attribute_info.package_index[i]);
+	          }
+	          break;
+
+	        /* Not specified in JVMS 9 */
+	        case 'ModuleTarget':
+	          this.buf.writeUint16(attribute_info.target_platform_index);
+	          break;
+
+	        case 'ModuleHashes':
+	          {
+	            this.buf.writeUint16(attribute_info.algorithm_index);
+	            this.buf.writeUint16(attribute_info.hashes_table_length);
+
+	            for (var i = 0; i < attribute_info.hashes_table_length; i++) {
+	              var _entry4 = attribute_info.hashes_table[i];
+	              this.buf.writeUint16(_entry4.module_name_index);
+	              this.buf.writeUint16(_entry4.hash_length);
+
+	              for (var j = 0; j < _entry4.hash_length; j++) {
+	                this.buf.writeUint8(_entry4.hash[j]);
+	              }
+	            }
+	            break;
+	          }
+	        /* -- */
+
 	        default:
 	          throw Error('Unexpected attributeName: ' + attributeName);
 	      }
@@ -6939,9 +6901,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_writeVerificationTypeInfo',
 	    value: function _writeVerificationTypeInfo(type_info) {
 	      this.buf.writeUint8(type_info.tag);
-	      if (type_info.tag == 7) {
+	      if (type_info.tag === 7) {
 	        this.buf.writeUint16(type_info.cpool_index);
-	      } else if (type_info.tag == 8) {
+	      } else if (type_info.tag === 8) {
 	        this.buf.writeUint16(type_info.offset);
 	      }
 	    }
@@ -6990,6 +6952,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this.buf.writeUint32(entry.low_bytes);
 	          break;
 
+	        case _constantType2.default.PACKAGE:
+	        case _constantType2.default.MODULE:
 	        case _constantType2.default.CLASS:
 	          this.buf.writeUint16(entry.name_index);
 	          break;
@@ -7025,7 +6989,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          break;
 
 	        default:
-	          throw Error('Unexpected tag: ' + cp_info.tag);
+	          throw Error('Unexpected tag: ' + entry.tag);
 	      }
 	    }
 	  }]);
@@ -7036,6 +7000,270 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = JavaClassFileWriter;
 
 /***/ }),
+/* 10 */
+/***/ (function(module, exports) {
+
+	"use strict";
+
+	/*!
+	 * https://github.com/leonardosnt/java-class-tools
+	 *
+	 * Copyright (C) 2017 leonardosnt
+	 * Licensed under the MIT License. See LICENSE file in the project root for full license information.
+	 */
+
+	var Opcode = {
+	  NOP: 0x0,
+	  ACONST_NULL: 0x1,
+	  ICONST_M1: 0x2,
+	  ICONST_0: 0x3,
+	  ICONST_1: 0x4,
+	  ICONST_2: 0x5,
+	  ICONST_3: 0x6,
+	  ICONST_4: 0x7,
+	  ICONST_5: 0x8,
+	  LCONST_0: 0x9,
+	  LCONST_1: 0xa,
+	  FCONST_0: 0xb,
+	  FCONST_1: 0xc,
+	  FCONST_2: 0xd,
+	  DCONST_0: 0xe,
+	  DCONST_1: 0xf,
+	  BIPUSH: 0x10,
+	  SIPUSH: 0x11,
+	  LDC: 0x12,
+	  LDC_W: 0x13,
+	  LDC2_W: 0x14,
+	  ILOAD: 0x15,
+	  LLOAD: 0x16,
+	  FLOAD: 0x17,
+	  DLOAD: 0x18,
+	  ALOAD: 0x19,
+	  ILOAD_0: 0x1a,
+	  ILOAD_1: 0x1b,
+	  ILOAD_2: 0x1c,
+	  ILOAD_3: 0x1d,
+	  LLOAD_0: 0x1e,
+	  LLOAD_1: 0x1f,
+	  LLOAD_2: 0x20,
+	  LLOAD_3: 0x21,
+	  FLOAD_0: 0x22,
+	  FLOAD_1: 0x23,
+	  FLOAD_2: 0x24,
+	  FLOAD_3: 0x25,
+	  DLOAD_0: 0x26,
+	  DLOAD_1: 0x27,
+	  DLOAD_2: 0x28,
+	  DLOAD_3: 0x29,
+	  ALOAD_0: 0x2a,
+	  ALOAD_1: 0x2b,
+	  ALOAD_2: 0x2c,
+	  ALOAD_3: 0x2d,
+	  IALOAD: 0x2e,
+	  LALOAD: 0x2f,
+	  FALOAD: 0x30,
+	  DALOAD: 0x31,
+	  AALOAD: 0x32,
+	  BALOAD: 0x33,
+	  CALOAD: 0x34,
+	  SALOAD: 0x35,
+	  ISTORE: 0x36,
+	  LSTORE: 0x37,
+	  FSTORE: 0x38,
+	  DSTORE: 0x39,
+	  ASTORE: 0x3a,
+	  ISTORE_0: 0x3b,
+	  ISTORE_1: 0x3c,
+	  ISTORE_2: 0x3d,
+	  ISTORE_3: 0x3e,
+	  LSTORE_0: 0x3f,
+	  LSTORE_1: 0x40,
+	  LSTORE_2: 0x41,
+	  LSTORE_3: 0x42,
+	  FSTORE_0: 0x43,
+	  FSTORE_1: 0x44,
+	  FSTORE_2: 0x45,
+	  FSTORE_3: 0x46,
+	  DSTORE_0: 0x47,
+	  DSTORE_1: 0x48,
+	  DSTORE_2: 0x49,
+	  DSTORE_3: 0x4a,
+	  ASTORE_0: 0x4b,
+	  ASTORE_1: 0x4c,
+	  ASTORE_2: 0x4d,
+	  ASTORE_3: 0x4e,
+	  IASTORE: 0x4f,
+	  LASTORE: 0x50,
+	  FASTORE: 0x51,
+	  DASTORE: 0x52,
+	  AASTORE: 0x53,
+	  BASTORE: 0x54,
+	  CASTORE: 0x55,
+	  SASTORE: 0x56,
+	  POP: 0x57,
+	  POP2: 0x58,
+	  DUP: 0x59,
+	  DUP_X1: 0x5a,
+	  DUP_X2: 0x5b,
+	  DUP2: 0x5c,
+	  DUP2_X1: 0x5d,
+	  DUP2_X2: 0x5e,
+	  SWAP: 0x5f,
+	  IADD: 0x60,
+	  LADD: 0x61,
+	  FADD: 0x62,
+	  DADD: 0x63,
+	  ISUB: 0x64,
+	  LSUB: 0x65,
+	  FSUB: 0x66,
+	  DSUB: 0x67,
+	  IMUL: 0x68,
+	  LMUL: 0x69,
+	  FMUL: 0x6a,
+	  DMUL: 0x6b,
+	  IDIV: 0x6c,
+	  LDIV: 0x6d,
+	  FDIV: 0x6e,
+	  DDIV: 0x6f,
+	  IREM: 0x70,
+	  LREM: 0x71,
+	  FREM: 0x72,
+	  DREM: 0x73,
+	  INEG: 0x74,
+	  LNEG: 0x75,
+	  FNEG: 0x76,
+	  DNEG: 0x77,
+	  ISHL: 0x78,
+	  LSHL: 0x79,
+	  ISHR: 0x7a,
+	  LSHR: 0x7b,
+	  IUSHR: 0x7c,
+	  LUSHR: 0x7d,
+	  IAND: 0x7e,
+	  LAND: 0x7f,
+	  IOR: 0x80,
+	  LOR: 0x81,
+	  IXOR: 0x82,
+	  LXOR: 0x83,
+	  IINC: 0x84,
+	  I2L: 0x85,
+	  I2F: 0x86,
+	  I2D: 0x87,
+	  L2I: 0x88,
+	  L2F: 0x89,
+	  L2D: 0x8a,
+	  F2I: 0x8b,
+	  F2L: 0x8c,
+	  F2D: 0x8d,
+	  D2I: 0x8e,
+	  D2L: 0x8f,
+	  D2F: 0x90,
+	  I2B: 0x91,
+	  I2C: 0x92,
+	  I2S: 0x93,
+	  LCMP: 0x94,
+	  FCMPL: 0x95,
+	  FCMPG: 0x96,
+	  DCMPL: 0x97,
+	  DCMPG: 0x98,
+	  IFEQ: 0x99,
+	  IFNE: 0x9a,
+	  IFLT: 0x9b,
+	  IFGE: 0x9c,
+	  IFGT: 0x9d,
+	  IFLE: 0x9e,
+	  IF_ICMPEQ: 0x9f,
+	  IF_ICMPNE: 0xa0,
+	  IF_ICMPLT: 0xa1,
+	  IF_ICMPGE: 0xa2,
+	  IF_ICMPGT: 0xa3,
+	  IF_ICMPLE: 0xa4,
+	  IF_ACMPEQ: 0xa5,
+	  IF_ACMPNE: 0xa6,
+	  GOTO: 0xa7,
+	  JSR: 0xa8,
+	  RET: 0xa9,
+	  TABLESWITCH: 0xaa,
+	  LOOKUPSWITCH: 0xab,
+	  IRETURN: 0xac,
+	  LRETURN: 0xad,
+	  FRETURN: 0xae,
+	  DRETURN: 0xaf,
+	  ARETURN: 0xb0,
+	  RETURN: 0xb1,
+	  GETSTATIC: 0xb2,
+	  PUTSTATIC: 0xb3,
+	  GETFIELD: 0xb4,
+	  PUTFIELD: 0xb5,
+	  INVOKEVIRTUAL: 0xb6,
+	  INVOKESPECIAL: 0xb7,
+	  INVOKESTATIC: 0xb8,
+	  INVOKEINTERFACE: 0xb9,
+	  INVOKEDYNAMIC: 0xba,
+	  NEW: 0xbb,
+	  NEWARRAY: 0xbc,
+	  ANEWARRAY: 0xbd,
+	  ARRAYLENGTH: 0xbe,
+	  ATHROW: 0xbf,
+	  CHECKCAST: 0xc0,
+	  INSTANCEOF: 0xc1,
+	  MONITORENTER: 0xc2,
+	  MONITOREXIT: 0xc3,
+	  WIDE: 0xc4,
+	  MULTIANEWARRAY: 0xc5,
+	  IFNULL: 0xc6,
+	  IFNONNULL: 0xc7,
+	  GOTO_W: 0xc8,
+	  JSR_W: 0xc9,
+	  BREAKPOINT: 0xca,
+	  IMPDEP1: 0xfe,
+	  IMPDEP2: 0xff
+	};
+
+	module.exports = Opcode;
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+	"use strict";
+
+	/*!
+	 * https://github.com/leonardosnt/java-class-tools
+	 *
+	 * Copyright (C) 2017 leonardosnt
+	 * Licensed under the MIT License. See LICENSE file in the project root for full license information.
+	 */
+
+	var Modifier = {
+	  PUBLIC: 0x0001,
+	  PRIVATE: 0x0002,
+	  PROTECTED: 0x0004,
+	  STATIC: 0x0008,
+	  FINAL: 0x0010,
+	  SYNCHRONIZED: 0x0020,
+	  VOLATILE: 0x0040,
+	  BRIDGE: 0x0040,
+	  TRANSIENT: 0x0080,
+	  VARARGS: 0x0080,
+	  NATIVE: 0x0100,
+	  ABSTRACT: 0x0400,
+	  STRICT: 0x0800,
+	  SYNTHETIC: 0x1000,
+
+	  // Class only
+	  INTERFACE: 0x0200,
+	  SUPER: 0x0020,
+	  ANNOTATION: 0x2000,
+	  ENUM: 0x4000,
+
+	  // Java SE 9
+	  MODULE: 0x8000
+	};
+
+	module.exports = Modifier;
+
+/***/ }),
 /* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -7043,16 +7271,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*!
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * https://github.com/leonardosnt/java-class-tools
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * 
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Copyright (C) 2017 leonardosnt
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Licensed under the MIT License. See LICENSE file in the project root for full license information.
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 
-	var _opcode = __webpack_require__(8);
+	var _opcode = __webpack_require__(10);
 
 	var _opcode2 = _interopRequireDefault(_opcode);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -7064,7 +7294,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var opcodeMnemonics = ['nop', 'aconst_null', 'iconst_m1', 'iconst_0', 'iconst_1', 'iconst_2', 'iconst_3', 'iconst_4', 'iconst_5', 'lconst_0', 'lconst_1', 'fconst_0', 'fconst_1', 'fconst_2', 'dconst_0', 'dconst_1', 'bipush', 'sipush', 'ldc', 'ldc_w', 'ldc2_w', 'iload', 'lload', 'fload', 'dload', 'aload', 'iload_0', 'iload_1', 'iload_2', 'iload_3', 'lload_0', 'lload_1', 'lload_2', 'lload_3', 'fload_0', 'fload_1', 'fload_2', 'fload_3', 'dload_0', 'dload_1', 'dload_2', 'dload_3', 'aload_0', 'aload_1', 'aload_2', 'aload_3', 'iaload', 'laload', 'faload', 'daload', 'aaload', 'baload', 'caload', 'saload', 'istore', 'lstore', 'fstore', 'dstore', 'astore', 'istore_0', 'istore_1', 'istore_2', 'istore_3', 'lstore_0', 'lstore_1', 'lstore_2', 'lstore_3', 'fstore_0', 'fstore_1', 'fstore_2', 'fstore_3', 'dstore_0', 'dstore_1', 'dstore_2', 'dstore_3', 'astore_0', 'astore_1', 'astore_2', 'astore_3', 'iastore', 'lastore', 'fastore', 'dastore', 'aastore', 'bastore', 'castore', 'sastore', 'pop', 'pop2', 'dup', 'dup_x1', 'dup_x2', 'dup2', 'dup2_x1', 'dup2_x2', 'swap', 'iadd', 'ladd', 'fadd', 'dadd', 'isub', 'lsub', 'fsub', 'dsub', 'imul', 'lmul', 'fmul', 'dmul', 'idiv', 'ldiv', 'fdiv', 'ddiv', 'irem', 'lrem', 'frem', 'drem', 'ineg', 'lneg', 'fneg', 'dneg', 'ishl', 'lshl', 'ishr', 'lshr', 'iushr', 'lushr', 'iand', 'land', 'ior', 'lor', 'ixor', 'lxor', 'iinc', 'i2l', 'i2f', 'i2d', 'l2i', 'l2f', 'l2d', 'f2i', 'f2l', 'f2d', 'd2i', 'd2l', 'd2f', 'i2b', 'i2c', 'i2s', 'lcmp', 'fcmpl', 'fcmpg', 'dcmpl', 'dcmpg', 'ifeq', 'ifne', 'iflt', 'ifge', 'ifgt', 'ifle', 'if_icmpeq', 'if_icmpne', 'if_icmplt', 'if_icmpge', 'if_icmpgt', 'if_icmple', 'if_acmpeq', 'if_acmpne', 'goto', 'jsr', 'ret', 'tableswitch', 'lookupswitch', 'ireturn', 'lreturn', 'freturn', 'dreturn', 'areturn', 'return', 'getstatic', 'putstatic', 'getfield', 'putfield', 'invokevirtual', 'invokespecial', 'invokestatic', 'invokeinterface', 'invokedynamic', 'new', 'newarray', 'anewarray', 'arraylength', 'athrow', 'checkcast', 'instanceof', 'monitorenter', 'monitorexit', 'wide', 'multianewarray', 'ifnull', 'ifnonnull', 'goto_w', 'jsr_w', 'breakpoint'];
 
 	var Instruction = function () {
-	  function Instruction(opcode, operands) {
+	  function Instruction(opcode, operands, bytecodeOffset) {
 	    _classCallCheck(this, Instruction);
 
 	    if (typeof opcode !== 'number') throw TypeError('opcode must be a number');
@@ -7072,6 +7302,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this.opcode = opcode;
 	    this.operands = operands;
+	    this.bytecodeOffset = bytecodeOffset;
 	  }
 
 	  _createClass(Instruction, [{
@@ -7112,6 +7343,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        bytecode.push(current.opcode);
 
 	        switch (current.opcode) {
+	          case _opcode2.default.TABLESWITCH:
 	          case _opcode2.default.LOOKUPSWITCH:
 	            {
 	              var padding = bytecode.length % 4 ? 4 - bytecode.length % 4 : 0;
@@ -7121,48 +7353,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                bytecode.push(0);
 	              }
 
-	              var defaultOffset = current.operands[operandOffset++] - 1;
-
-	              bytecode.push(defaultOffset >> 24 & 0xFF, defaultOffset >> 16 & 0xFF, defaultOffset >> 8 & 0xFF, defaultOffset & 0xFF);
-
-	              var npairs = current.operands[operandOffset++];
-
-	              bytecode.push(npairs >> 24 & 0xFF, npairs >> 16 & 0xFF, npairs >> 8 & 0xFF, npairs & 0xFF);
-
-	              while (npairs-- > 0) {
-	                var npair = current.operands[operandOffset++];
-	                var matchOffset = current.operands[operandOffset++] - 1;
-
-	                bytecode.push(npair >> 24 & 0xFF, npair >> 16 & 0xFF, npair >> 8 & 0xFF, npair & 0xFF);
-	                bytecode.push(matchOffset >> 24 & 0xFF, matchOffset >> 16 & 0xFF, matchOffset >> 8 & 0xFF, matchOffset & 0xFF);
-	              }
-	              break;
-	            }
-
-	          case _opcode2.default.TABLESWITCH:
-	            {
-	              var _padding = bytecode.length % 4 ? 4 - bytecode.length % 4 : 0;
-	              var _operandOffset = 0;
-
-	              while (_padding-- > 0) {
-	                bytecode.push(0);
-	              }
-
-	              var _defaultOffset = current.operands[_operandOffset++] - 1;
-
-	              bytecode.push(_defaultOffset >> 24 & 0xFF, _defaultOffset >> 16 & 0xFF, _defaultOffset >> 8 & 0xFF, _defaultOffset & 0xFF);
-
-	              var low = current.operands[_operandOffset++];
-	              var high = current.operands[_operandOffset++];
-
-	              bytecode.push(low >> 24 & 0xFF, low >> 16 & 0xFF, low >> 8 & 0xFF, low & 0xFF);
-	              bytecode.push(high >> 24 & 0xFF, high >> 16 & 0xFF, high >> 8 & 0xFF, high & 0xFF);
-
-	              var jumpOffsets = high - low + 1;
-	              while (jumpOffsets-- > 0) {
-	                var jumpOffset = current.operands[_operandOffset++] - 1;
-	                bytecode.push(jumpOffset >> 24 & 0xFF, jumpOffset >> 16 & 0xFF, jumpOffset >> 8 & 0xFF, jumpOffset & 0xFF);
-	              }
+	              bytecode.push.apply(bytecode, _toConsumableArray(current.operands));
 	              break;
 	            }
 
@@ -7239,7 +7430,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      while (offset < bytecode.length) {
 	        var current = bytecode[offset++];
-	        var instruction = new Instruction(current, []);
+	        var instruction = new Instruction(current, [], offset - 1);
 
 	        switch (current) {
 	          // https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.lookupswitch
@@ -7248,19 +7439,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	              var padding = offset % 4 ? 4 - offset % 4 : 0;
 	              offset += padding; // Skip padding
 
-	              // the "default" case offset
-	              var defaultOffset = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
-	              instruction.operands.push(defaultOffset + 1);
+	              // default case bytes + npair bytes
+	              for (var i = 0; i < 8; i++) {
+	                instruction.operands.push(bytecode[offset++]);
+	              }
 
-	              // number of "cases"
-	              var npairs = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
-	              instruction.operands.push(npairs);
+	              var npairs = bytecode[offset - 4] << 24 | bytecode[offset - 3] << 16 | bytecode[offset - 2] << 8 | bytecode[offset - 1];
 
-	              while (npairs-- > 0) {
-	                var npair = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
-	                var matchOffset = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
-	                instruction.operands.push(npair);
-	                instruction.operands.push(matchOffset + 1);
+	              // match-offset pairs
+	              for (var i = 0; i < npairs * 8; i++) {
+	                instruction.operands.push(bytecode[offset++]);
 	              }
 	              break;
 	            }
@@ -7268,23 +7456,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	          // https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.tableswitch
 	          case _opcode2.default.TABLESWITCH:
 	            {
-	              var _padding2 = offset % 4 ? 4 - offset % 4 : 0;
-	              offset += _padding2; // Skip padding
+	              var _padding = offset % 4 ? 4 - offset % 4 : 0;
+	              offset += _padding; // Skip padding
 
-	              // the "default" case offset
-	              var _defaultOffset2 = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
-	              instruction.operands.push(_defaultOffset2 + 1);
+	              // default bytes (4) + low bytes (4) + high bytes (4)
+	              for (var i = 0; i < 12; i++) {
+	                instruction.operands.push(bytecode[offset++]);
+	              }
 
-	              var low = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
-	              var high = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
+	              var low = bytecode[offset - 8] << 24 | bytecode[offset - 7] << 16 | bytecode[offset - 6] << 8 | bytecode[offset - 5];
+	              var high = bytecode[offset - 4] << 24 | bytecode[offset - 3] << 16 | bytecode[offset - 2] << 8 | bytecode[offset - 1];
+	              var numJumpOffsets = high - low + 1;
 
-	              instruction.operands.push(low);
-	              instruction.operands.push(high);
-
-	              var jumpOffsets = high - low + 1;
-	              while (jumpOffsets-- > 0) {
-	                var jumpOffset = bytecode[offset++] << 24 | bytecode[offset++] << 16 | bytecode[offset++] << 8 | bytecode[offset++];
-	                instruction.operands.push(jumpOffset + 1);
+	              // jump offset's
+	              for (var i = 0; i < numJumpOffsets * 4; i++) {
+	                instruction.operands.push(bytecode[offset++]);
 	              }
 	              break;
 	            }
