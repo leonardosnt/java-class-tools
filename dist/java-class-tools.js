@@ -874,8 +874,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	        /* -- */
 
+	        // Unknown attributes
+	        // See: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.1
 	        default:
-	          throw Error('Unexpected attributeName: ' + attributeName);
+	          {
+	            attribute.info = [];
+	            var _attribute_length = attribute.attribute_length;
+	            while (_attribute_length-- > 0) {
+	              attribute.info.push(this.buf.readUInt8());
+	            }
+	          }
 	      }
 
 	      return attribute;
@@ -6893,8 +6901,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	        /* -- */
 
+	        // Unknown attributes
+	        // See: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.1
 	        default:
-	          throw Error('Unexpected attributeName: ' + attributeName);
+	          {
+	            for (var i = 0; i < attribute_info.attribute_length; i++) {
+	              this.buf.writeUint8(attribute_info.info[i]);
+	            }
+	          }
 	      }
 	    }
 	  }, {

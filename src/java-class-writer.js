@@ -538,8 +538,13 @@ class JavaClassFileWriter {
       }
       /* -- */
 
-      default:
-        throw Error(`Unexpected attributeName: ${attributeName}`);
+      // Unknown attributes
+      // See: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.1
+      default: {
+        for (var i = 0; i < attribute_info.attribute_length; i++) {
+          this.buf.writeUint8(attribute_info.info[i]);
+        }
+      }
     }
   }
 

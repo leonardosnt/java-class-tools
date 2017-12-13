@@ -721,8 +721,15 @@ class JavaClassFileReader {
       }
       /* -- */
 
-      default:
-        throw Error(`Unexpected attributeName: ${attributeName}`);
+      // Unknown attributes
+      // See: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.1
+      default: {
+        attribute.info = [];
+        let attribute_length = attribute.attribute_length;
+        while (attribute_length-- > 0) {
+          attribute.info.push(this.buf.readUInt8());
+        }
+      }
     }
 
     return attribute;
