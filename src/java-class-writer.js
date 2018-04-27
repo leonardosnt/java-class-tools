@@ -46,10 +46,10 @@ class JavaClassFileWriter {
     this._writeInterfaces(classFile.interfaces);
 
     this.buf.writeUint16(classFile.fields_count);
-    this._writeCommonFieldMethodArray(classFile.fields);
+    this._writeMemberInfoArray(classFile.fields);
 
     this.buf.writeUint16(classFile.methods_count);
-    this._writeCommonFieldMethodArray(classFile.methods);
+    this._writeMemberInfoArray(classFile.methods);
 
     this.buf.writeUint16(classFile.attributes_count);
     this._writeAttributeInfoArray(classFile.attributes);
@@ -58,7 +58,7 @@ class JavaClassFileWriter {
     return this.buf;
   }
 
-  _writeCommonFieldMethodArray(array) {
+  _writeMemberInfoArray(array) {
     for (var i = 0; i < array.length; i++) {
       const entry = array[i];
 

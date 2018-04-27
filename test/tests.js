@@ -238,7 +238,7 @@ describe('ReadMethodsTest_0', () => {
       });
 
       it('the bytecode should be equals to [iload_1, iload_2, iadd, ireturn]', () => {
-        assert.deepStrictEqual(codeAttr.code, [
+        assert.deepEqual(codeAttr.code, [
           0x1b, // iload_1
           0x1c, // iload_2
           0x60, // iadd
@@ -729,19 +729,4 @@ function getAttribute(source, attrName, classFile) {
     const attrName = CPUtil.getString(classFile, attr.attribute_name_index);
     return attrName === attrName
   })[0];
-}
-
-function deepInspect(obj) {
-  return util.inspect(obj, undefined, 100, true);
-}
-
-function dumpConstantPool(classFile) {
-  for (var i = 0; i < classFile.constant_pool.length; i++) {
-    let entry = classFile.constant_pool[i];
-
-    if (entry && entry.tag === ConstantType.UTF8) {
-      entry.str = new Buffer(entry.bytes).toString('utf-8');
-    }
-    console.log(i + " = " + util.inspect(entry, undefined, 2, true));
-  }
 }

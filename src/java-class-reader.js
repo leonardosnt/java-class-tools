@@ -34,10 +34,7 @@ class JavaClassFileReader {
     this.classFile = new (function ClassFile(){});
 
     // Read magic
-    if (this.buf.readUInt8() !== 0xCA ||
-        this.buf.readUInt8() !== 0xFE ||
-        this.buf.readUInt8() !== 0xBA ||
-        this.buf.readUInt8() !== 0xBE) {
+    if (this.buf.readUint32() !== 0xCAFEBABE) {
       throw Error('Invalid MAGIC value');
     }
 
@@ -55,10 +52,10 @@ class JavaClassFileReader {
     this.classFile.interfaces = this._readInterfaces(this.classFile.interfaces_count);
 
     this.classFile.fields_count = this.buf.readUint16();
-    this.classFile.fields = this._readCommonFieldMethodArray(this.classFile.fields_count);
+    this.classFile.fields = this._readMemberInfoArray(this.classFile.fields_count);
 
     this.classFile.methods_count = this.buf.readUint16();
-    this.classFile.methods = this._readCommonFieldMethodArray(this.classFile.methods_count);
+    this.classFile.methods = this._readMemberInfoArray(this.classFile.methods_count);
 
     this.classFile.attributes_count = this.buf.readUint16();
     this.classFile.attributes = this._readAttributeInfoArray(this.classFile.attributes_count);
@@ -82,12 +79,12 @@ class JavaClassFileReader {
   }
 
   /**
-   * The "method_info" and "field_info" structures are identical.
+   * Read an array of field_info/method_info structures.
    *
    * https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.6
    * https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.5
    */
-  _readCommonFieldMethodArray(count) {
+  _readMemberInfoArray(count) {
     const values = [];
     while (count-- > 0) {
       const struct = {
@@ -399,7 +396,7 @@ class JavaClassFileReader {
         break;
 
       case 'MethodParameters': {
-        attribute.parameters_count = this.buf.readUInt8();
+        attribute.parameters_count = this.buf.readUint8();
         attribute.parameters = [];
 
         let parameters_count = attribute.parameters_count;
@@ -460,7 +457,7 @@ class JavaClassFileReader {
             stack_map_frame.locals.push(this._readVerificationTypeInfo());
           }
 
-          stack_map_frame.number_of_stack_items = this.buf.readUInt16();
+          stack_map_frame.number_of_stack_items = this.buf.readUint16();
 
           let number_of_stack_items = stack_map_frame.number_of_stack_items;
           while (number_of_stack_items-- > 0) {
@@ -712,7 +709,7 @@ class JavaClassFileReader {
 
           let hash_length = entry.hash_length;
           while (hash_length-- > 0) {
-            entry.hash.push(this.buf.readUInt8());
+            entry.hash.push(this.buf.readUint8());
           }
 
           attribute.hashes_table.push(entry);
@@ -727,7 +724,7 @@ class JavaClassFileReader {
         attribute.info = [];
         let attribute_length = attribute.attribute_length;
         while (attribute_length-- > 0) {
-          attribute.info.push(this.buf.readUInt8());
+          attribute.info.push(this.buf.readUint8());
         }
       }
     }
@@ -783,7 +780,7 @@ class JavaClassFileReader {
 
       case 91: { // [
         const array_value = {
-          num_values: this.buf.readUInt16(),
+          num_values: this.buf.readUint16(),
           values: []
         };
         let num_values = array_value.num_values;
@@ -854,10 +851,9 @@ class JavaClassFileReader {
     return pool;
   }
 
-  /** @private */
   _readConstantPoolEntry() {
     const cp_info = {
-      tag: this.buf.readUInt8()
+      tag: this.buf.readUint8()
     };
 
     switch (cp_info.tag) {
@@ -866,7 +862,7 @@ class JavaClassFileReader {
         cp_info.length = strLen;
         cp_info.bytes = [];
         while (strLen-- > 0) {
-          cp_info.bytes.push(this.buf.readUInt8());
+          cp_info.bytes.push(this.buf.readUint8());
         }
         break;
       }
@@ -885,11 +881,11 @@ class JavaClassFileReader {
       case ConstantType.PACKAGE:
       case ConstantType.MODULE:
       case ConstantType.CLASS:
-        cp_info.name_index = this.buf.readUInt16();
+        cp_info.name_index = this.buf.readUint16();
         break;
 
       case ConstantType.STRING:
-        cp_info.string_index = this.buf.readUInt16();
+        cp_info.string_index = this.buf.readUint16();
         break;
 
       /**
@@ -914,7 +910,7 @@ class JavaClassFileReader {
         break;
 
       case ConstantType.METHOD_TYPE:
-        cp_info.descriptor_index = this.buf.readUInt16();
+        cp_info.descriptor_index = this.buf.readUint16();
         break;
 
       case ConstantType.INVOKE_DYNAMIC:

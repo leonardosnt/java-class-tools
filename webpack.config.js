@@ -9,7 +9,8 @@ module.exports = {
     library: 'JavaClassTools'
   },
   node: {
-    fs: "empty"
+    fs: "empty",
+    process: "empty"
   },
   module: {
     loaders: [
