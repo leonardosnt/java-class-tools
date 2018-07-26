@@ -726,7 +726,6 @@ function compileAndRead(options) {
 
 function getAttribute(source, attrName, classFile) {
   return source.attributes.filter(attr => {
-    const attrName = CPUtil.getString(classFile, attr.attribute_name_index);
-    return attrName === attrName
+    return attrName === CPUtil.getString(classFile, attr.attribute_name_index);
   })[0];
 }
