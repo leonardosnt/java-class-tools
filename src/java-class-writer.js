@@ -339,7 +339,7 @@ class JavaClassFileWriter {
         break;
 
       case 'MethodParameters':
-        this.buf.writeUint16(attribute_info.parameters_count);
+        this.buf.writeUint8(attribute_info.parameters_count);
 
         for (var i = 0; i < attribute_info.parameters_count; i++) {
           const parameter = attribute_info.parameters[i];
