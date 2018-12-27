@@ -23,9 +23,7 @@ gulp.task('default', () => {
 
 gulp.task('build', () => {
   return gulp.src('src/**')
-    .pipe(babel({
-        presets: ['es2015']
-    }))
+    .pipe(babel())
     .pipe(gulp.dest('lib'));
 });
 
@@ -43,7 +41,7 @@ gulp.task('watch', () => {
   return gulp.watch('src/*.js', e => {
     if (e.type === 'changed') {
       console.log(`${e.path} changed, building...`);
-      
+
       gulp.src(e.path)
         .pipe(babel({ presets: ['es2015'], highlightCode: false }).on('error', err => console.error(err)))
         .pipe(gulp.dest('lib'));

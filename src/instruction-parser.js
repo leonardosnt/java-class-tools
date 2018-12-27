@@ -209,7 +209,7 @@ class InstructionParser {
 
         // https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.wide
         case Opcode.WIDE: {
-          const targetOpcode = bytecode[offset];
+          const targetOpcode = bytecode[offset++];
           switch (targetOpcode) {
             case Opcode.ILOAD:
             case Opcode.FLOAD:
@@ -222,11 +222,11 @@ class InstructionParser {
             case Opcode.LSTORE:
             case Opcode.DSTORE:
             case Opcode.RET:
-              instruction.operands.push(bytecode[offset++], bytecode[offset++], bytecode[offset++]);
+              instruction.operands.push(targetOpcode, bytecode[offset++], bytecode[offset++]);
               break;
 
             case Opcode.IINC:
-              instruction.operands.push(bytecode[offset++], bytecode[offset++], bytecode[offset++], bytecode[offset++], bytecode[offset++]);
+              instruction.operands.push(targetOpcode, bytecode[offset++], bytecode[offset++], bytecode[offset++], bytecode[offset++]);
               break;
 
             default:
