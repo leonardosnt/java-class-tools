@@ -5,3 +5,7 @@ coverage/
 lib/
 test/coverage.js
 test/fuzz.js
+test/data/classes/*
+test/data/*.class
+test/perf.js
+TODO.txt
