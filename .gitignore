@@ -8,4 +8,5 @@ test/fuzz.js
 test/data/classes/*
 test/data/*.class
 test/perf.js
+test/test-deopts.js
 TODO.txt
