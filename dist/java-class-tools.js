@@ -60,7 +60,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _javaClassReader2 = _interopRequireDefault(_javaClassReader);
 
-	var _javaClassWriter = __webpack_require__(9);
+	var _javaClassWriter = __webpack_require__(8);
 
 	var _javaClassWriter2 = _interopRequireDefault(_javaClassWriter);
 
@@ -68,15 +68,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _constantType2 = _interopRequireDefault(_constantType);
 
-	var _opcode = __webpack_require__(10);
+	var _opcode = __webpack_require__(9);
 
 	var _opcode2 = _interopRequireDefault(_opcode);
 
-	var _modifier = __webpack_require__(11);
+	var _modifier = __webpack_require__(10);
 
 	var _modifier2 = _interopRequireDefault(_modifier);
 
-	var _instructionParser = __webpack_require__(12);
+	var _instructionParser = __webpack_require__(11);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -157,7 +157,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.classFile = new function ClassFile() {}();
 
 	      // Read magic
-	      if (this.buf.readUInt8() !== 0xCA || this.buf.readUInt8() !== 0xFE || this.buf.readUInt8() !== 0xBA || this.buf.readUInt8() !== 0xBE) {
+	      if (this.buf.readUint32() !== 0xCAFEBABE) {
 	        throw Error('Invalid MAGIC value');
 	      }
 
@@ -175,10 +175,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.classFile.interfaces = this._readInterfaces(this.classFile.interfaces_count);
 
 	      this.classFile.fields_count = this.buf.readUint16();
-	      this.classFile.fields = this._readCommonFieldMethodArray(this.classFile.fields_count);
+	      this.classFile.fields = this._readMemberInfoArray(this.classFile.fields_count);
 
 	      this.classFile.methods_count = this.buf.readUint16();
-	      this.classFile.methods = this._readCommonFieldMethodArray(this.classFile.methods_count);
+	      this.classFile.methods = this._readMemberInfoArray(this.classFile.methods_count);
 
 	      this.classFile.attributes_count = this.buf.readUint16();
 	      this.classFile.attributes = this._readAttributeInfoArray(this.classFile.attributes_count);
@@ -195,44 +195,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'readFromFile',
 	    value: function readFromFile(path) {
 	      if ((typeof process === 'undefined' ? 'undefined' : _typeof(process)) !== undefined) {
-	        // node
-	        var fs = __webpack_require__(8);
+	        var fs = __webpack_require__(2);
 	        return this.read(fs.readFileSync(path));
 	      } else {
-	        throw Error('not supported in browser.');
+	        throw Error('readFromFile is not supported in the browser.');
 	      }
 	    }
 
 	    /**
-	     * The "method_info" and "field_info" structures are identical.
+	     * Read an array of field_info or method_info structures.
 	     *
 	     * https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.6
 	     * https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.5
 	     */
 
 	  }, {
-	    key: '_readCommonFieldMethodArray',
-	    value: function _readCommonFieldMethodArray(count) {
-	      var values = [];
-	      while (count-- > 0) {
-	        var struct = {
+	    key: '_readMemberInfoArray',
+	    value: function _readMemberInfoArray(count) {
+	      var members = new Array(count);
+	      for (var i = 0; i < count; i++) {
+	        var memberInfo = {
 	          access_flags: this.buf.readUint16(),
 	          name_index: this.buf.readUint16(),
 	          descriptor_index: this.buf.readUint16(),
-	          attributes_count: this.buf.readUint16(),
-	          attributes: []
+	          attributes_count: this.buf.readUint16()
 	        };
-	        struct.attributes = this._readAttributeInfoArray(struct.attributes_count);
-	        values.push(struct);
+	        memberInfo.attributes = this._readAttributeInfoArray(memberInfo.attributes_count);
+	        members[i] = memberInfo;
 	      }
-	      return values;
+	      return members;
 	    }
 	  }, {
 	    key: '_readAttributeInfoArray',
 	    value: function _readAttributeInfoArray(attributes_count) {
-	      var attributes = [];
-	      while (attributes_count-- > 0) {
-	        attributes.push(this._readAttributeInfo());
+	      var attributes = new Array(attributes_count);
+	      for (var i = 0; i < attributes_count; i++) {
+	        attributes[i] = this._readAttributeInfo();
 	      }
 	      return attributes;
 	    }
@@ -307,16 +305,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case 0x40:case 0x41:
 	          {
 	            type_annotation.target_info.table_length = this.buf.readUint16();
-	            type_annotation.target_info.table = [];
+	            type_annotation.target_info.table = new Array(type_annotation.target_info.table_length);
 
-	            var table_length = type_annotation.target_info.table_length;
-	            while (table_length-- > 0) {
+	            for (var i = 0; i < type_annotation.target_info.table_length; i++) {
 	              var table_entry = {
 	                start_pc: this.buf.readUint16(),
 	                length: this.buf.readUint16(),
 	                index: this.buf.readUint16()
 	              };
-	              type_annotation.target_info.table.push(table_entry);
+	              type_annotation.target_info.table[i] = table_entry;
 	            }
 	            break;
 	          }
@@ -342,31 +339,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      // Reads "type_path" structure
-	      type_annotation.type_path = {
-	        path_length: this.buf.readUint8(),
-	        path: []
-	      };
+	      type_annotation.type_path = { path_length: this.buf.readUint8() };
+	      type_annotation.type_path.path = new Array(type_annotation.type_path.path_length);
 
-	      var path_length = type_annotation.type_path.path_length;
-	      while (path_length-- > 0) {
-	        var path_entry = {
+	      for (var _i = 0; _i < type_annotation.type_path.path_length; _i++) {
+	        type_annotation.type_path.path[_i] = {
 	          type_path_kind: this.buf.readUint8(),
 	          type_argument_index: this.buf.readUint8()
 	        };
-	        type_annotation.type_path.path.push(path_entry);
 	      }
 
 	      type_annotation.type_index = this.buf.readUint16();
 	      type_annotation.num_element_value_pairs = this.buf.readUint16();
-	      type_annotation.element_value_pairs = [];
+	      type_annotation.element_value_pairs = new Array(type_annotation.num_element_value_pairs);
 
-	      var num_element_value_pairs = type_annotation.num_element_value_pairs;
-	      while (num_element_value_pairs-- > 0) {
-	        var element_value_entry = {
+	      for (var _i2 = 0; _i2 < type_annotation.num_element_value_pairs; _i2++) {
+	        type_annotation.element_value_pairs[_i2] = {
 	          element_name_index: this.buf.readUint16(),
 	          element_value: this._readElementValue()
 	        };
-	        type_annotation.element_value_pairs.push(element_value_entry);
 	      }
 	      return type_annotation;
 	    }
@@ -388,37 +379,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var attributeName = String.fromCharCode.apply(null, attributeNameBytes); // TODO: is this safe?
 
 	      switch (attributeName) {
-	        case 'RuntimeInvisibleAnnotations':
-	        case 'RuntimeVisibleAnnotations':
-	          {
-	            attribute.num_annotations = this.buf.readUint16();
-	            attribute.annotations = [];
-	            var num_annotations = attribute.num_annotations;
-	            while (num_annotations-- > 0) {
-	              attribute.annotations.push(this._readAttributeAnnotation());
-	            }
-	            break;
-	          }
-
-	        // There's no additional information
 	        case 'Deprecated':
 	        case 'Synthetic':
 	          break;
 
+	        case 'RuntimeInvisibleAnnotations':
+	        case 'RuntimeVisibleAnnotations':
+	          {
+	            attribute.num_annotations = this.buf.readUint16();
+	            attribute.annotations = new Array(attribute.num_annotations);
+
+	            for (var i = 0; i < attribute.num_annotations; i++) {
+	              attribute.annotations[i] = this._readAttributeAnnotation();
+	            }
+	            break;
+	          }
+
 	        case 'InnerClasses':
 	          {
 	            attribute.number_of_classes = this.buf.readUint16();
-	            attribute.classes = [];
+	            attribute.classes = new Array(attribute.number_of_classes);
 
-	            var number_of_classes = attribute.number_of_classes;
-	            while (number_of_classes-- > 0) {
-	              var inner_class = {
+	            for (var _i3 = 0; _i3 < attribute.number_of_classes; _i3++) {
+	              attribute.classes[_i3] = {
 	                inner_class_info_index: this.buf.readUint16(),
 	                outer_class_info_index: this.buf.readUint16(),
 	                inner_name_index: this.buf.readUint16(),
 	                inner_class_access_flags: this.buf.readUint16()
 	              };
-	              attribute.classes.push(inner_class);
 	            }
 	            break;
 	          }
@@ -426,18 +414,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case 'LocalVariableTable':
 	          {
 	            attribute.local_variable_table_length = this.buf.readUint16();
-	            attribute.local_variable_table = [];
+	            attribute.local_variable_table = new Array(attribute.local_variable_table_length);
 
-	            var local_variable_table_length = attribute.local_variable_table_length;
-	            while (local_variable_table_length-- > 0) {
-	              var local_variable = {
+	            for (var _i4 = 0; _i4 < attribute.local_variable_table_length; _i4++) {
+	              attribute.local_variable_table[_i4] = {
 	                start_pc: this.buf.readUint16(),
 	                length: this.buf.readUint16(),
 	                name_index: this.buf.readUint16(),
 	                descriptor_index: this.buf.readUint16(),
 	                index: this.buf.readUint16()
 	              };
-	              attribute.local_variable_table.push(local_variable);
 	            }
 	            break;
 	          }
@@ -445,18 +431,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case 'LocalVariableTypeTable':
 	          {
 	            attribute.local_variable_type_table_length = this.buf.readUint16();
-	            attribute.local_variable_type_table = [];
+	            attribute.local_variable_type_table = new Array(attribute.local_variable_type_table_length);
 
-	            var local_variable_type_table_length = attribute.local_variable_type_table_length;
-	            while (local_variable_type_table_length-- > 0) {
-	              var local_variable_type = {
+	            for (var _i5 = 0; _i5 < attribute.local_variable_type_table_length; _i5++) {
+	              attribute.local_variable_type_table[_i5] = {
 	                start_pc: this.buf.readUint16(),
 	                length: this.buf.readUint16(),
 	                name_index: this.buf.readUint16(),
 	                signature_index: this.buf.readUint16(),
 	                index: this.buf.readUint16()
 	              };
-	              attribute.local_variable_type_table.push(local_variable_type);
 	            }
 	            break;
 	          }
@@ -465,20 +449,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case 'RuntimeVisibleParameterAnnotations':
 	          {
 	            attribute.num_parameters = this.buf.readUint8();
-	            attribute.parameter_annotations = [];
+	            attribute.parameter_annotations = new Array(attribute.num_parameters);
 
-	            var num_parameters = attribute.num_parameters;
-	            while (num_parameters-- > 0) {
-	              var parameter_annotation = {
-	                num_annotations: this.buf.readUint16(),
-	                annotations: []
-	              };
+	            for (var parameterIndex = 0; parameterIndex < attribute.num_parameters; parameterIndex++) {
+	              var parameter_annotation = { num_annotations: this.buf.readUint16() };
+	              parameter_annotation.annotations = new Array(parameter_annotation.num_annotations);
 
-	              var _num_annotations = parameter_annotation.num_annotations;
-	              while (_num_annotations-- > 0) {
-	                parameter_annotation.annotations.push(this._readAttributeAnnotation());
+	              for (var annotationIndex = 0; annotationIndex < parameter_annotation.num_annotations; annotationIndex++) {
+	                parameter_annotation.annotations[annotationIndex] = this._readAttributeAnnotation();
 	              }
-	              attribute.parameter_annotations.push(parameter_annotation);
+
+	              attribute.parameter_annotations[parameterIndex] = parameter_annotation;
 	            }
 	            break;
 	          }
@@ -486,21 +467,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case 'BootstrapMethods':
 	          {
 	            attribute.num_bootstrap_methods = this.buf.readUint16();
-	            attribute.bootstrap_methods = [];
+	            attribute.bootstrap_methods = new Array(attribute.num_bootstrap_methods);
 
-	            var num_bootstrap_methods = attribute.num_bootstrap_methods;
-	            while (num_bootstrap_methods-- > 0) {
+	            for (var bootstrapMethodIndex = 0; bootstrapMethodIndex < attribute.num_bootstrap_methods; bootstrapMethodIndex++) {
 	              var bootstrap_method = {
 	                bootstrap_method_ref: this.buf.readUint16(),
-	                num_bootstrap_arguments: this.buf.readUint16(),
-	                bootstrap_arguments: []
+	                num_bootstrap_arguments: this.buf.readUint16()
 	              };
+	              bootstrap_method.bootstrap_arguments = new Array(bootstrap_method.num_bootstrap_arguments);
 
-	              var num_bootstrap_arguments = bootstrap_method.num_bootstrap_arguments;
-	              while (num_bootstrap_arguments-- > 0) {
-	                bootstrap_method.bootstrap_arguments.push(this.buf.readUint16());
+	              for (var bootstrapArgumentIndex = 0; bootstrapArgumentIndex < bootstrap_method.num_bootstrap_arguments; bootstrapArgumentIndex++) {
+	                bootstrap_method.bootstrap_arguments[bootstrapArgumentIndex] = this.buf.readUint16();
 	              }
-	              attribute.bootstrap_methods.push(bootstrap_method);
+	              attribute.bootstrap_methods[bootstrapMethodIndex] = bootstrap_method;
 	            }
 	            break;
 	          }
@@ -509,22 +488,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case 'RuntimeVisibleTypeAnnotations':
 	          {
 	            attribute.num_annotations = this.buf.readUint16();
-	            attribute.annotations = [];
+	            attribute.annotations = new Array(attribute.num_annotations);
 
-	            var _num_annotations2 = attribute.num_annotations;
-	            while (_num_annotations2-- > 0) {
-	              attribute.annotations.push(this._readTypeAnnotation());
+	            for (var _i6 = 0; _i6 < attribute.num_annotations; _i6++) {
+	              attribute.annotations[_i6] = this._readTypeAnnotation();
 	            }
 	            break;
 	          }
 
 	        case 'SourceDebugExtension':
 	          {
-	            attribute.debug_extension = [];
+	            attribute.debug_extension = new Array(attribute.attribute_length);
 
-	            var attribute_length = attribute.attribute_length;
-	            while (attribute_length-- > 0) {
-	              attribute.debug_extension.push(this.buf.readUint8());
+	            for (var _i7 = 0; _i7 < attribute.attribute_length; _i7++) {
+	              attribute.debug_extension[_i7] = this.buf.readUint8();
 	            }
 	            break;
 	          }
@@ -544,28 +521,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        case 'MethodParameters':
 	          {
-	            attribute.parameters_count = this.buf.readUInt8();
-	            attribute.parameters = [];
+	            attribute.parameters_count = this.buf.readUint8();
+	            attribute.parameters = new Array(attribute.parameters_count);
 
-	            var parameters_count = attribute.parameters_count;
-	            while (parameters_count-- > 0) {
-	              var parameter = {
+	            for (var _i8 = 0; _i8 < attribute.parameters_count; _i8++) {
+	              attribute.parameters[_i8] = {
 	                name_index: this.buf.readUint16(),
 	                access_flags: this.buf.readUint16()
 	              };
-	              attribute.parameters.push(parameter);
-	            }
-	            break;
-	          }
-
-	        case 'Exceptions':
-	          {
-	            attribute.number_of_exceptions = this.buf.readUint16();
-	            attribute.exception_index_table = [];
-
-	            var number_of_exceptions = attribute.number_of_exceptions;
-	            while (number_of_exceptions-- > 0) {
-	              attribute.exception_index_table.push(this.buf.readUint16());
 	            }
 	            break;
 	          }
@@ -578,273 +541,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	          attribute.signature_index = this.buf.readUint16();
 	          break;
 
-	        /**
-	         * http://download.oracle.com/otndocs/jcp/7247-j2me_cldc-1.1-fr-spec-oth-JSpec/
-	         *
-	         * Appendix1-verifier.pdf at "2.1 Stack map format"
-	         *
-	         * "According to the CLDC specification, the sizes of some fields are not 16bit
-	         * but 32bit if the code size is more than 64K or the number of the local variables
-	         * is more than 64K.  However, for the J2ME CLDC technology, they are always 16bit.
-	         * The implementation of the StackMap class assumes they are 16bit." - javaassist
-	         */
 	        case 'StackMap':
-	          {
-	            attribute.number_of_entries = this.buf.readUint16();
-	            attribute.entries = [];
-
-	            var number_of_entries = attribute.number_of_entries;
-	            while (number_of_entries-- > 0) {
-	              var stack_map_frame = {
-	                offset: this.buf.readUint16(),
-	                number_of_locals: this.buf.readUint16(),
-	                locals: [],
-	                stack: []
-	              };
-
-	              var number_of_locals = stack_map_frame.number_of_locals;
-	              while (number_of_locals-- > 0) {
-	                stack_map_frame.locals.push(this._readVerificationTypeInfo());
-	              }
-
-	              stack_map_frame.number_of_stack_items = this.buf.readUInt16();
-
-	              var number_of_stack_items = stack_map_frame.number_of_stack_items;
-	              while (number_of_stack_items-- > 0) {
-	                stack_map_frame.stack.push(this._readVerificationTypeInfo());
-	              }
-
-	              attribute.entries.push(stack_map_frame);
-	            }
-	            break;
-	          }
-
+	          return this._readStackMapAttribute(attribute);
+	        case 'Exceptions':
+	          return this._readExceptionsAttribute(attribute);
 	        case 'StackMapTable':
-	          {
-	            attribute.number_of_entries = this.buf.readUint16();
-	            attribute.entries = [];
-
-	            var _number_of_entries = attribute.number_of_entries;
-	            while (_number_of_entries-- > 0) {
-	              var _stack_map_frame = {
-	                frame_type: this.buf.readUint8()
-	              };
-
-	              // Shorthand
-	              var frame_type = _stack_map_frame.frame_type;
-
-	              /**
-	               * offset_delta's that is "constant" are omited.
-	               *
-	               * like in "SAME" that offset_delta is the value of the tag item, frame_type. Or in
-	               * "SAME_LOCALS_1_STACK_ITEM" that offset_delta is given by the formula frame_type - 64.
-	               *
-	               * "SAME (0-63)" frame_type is omited because it's empty.
-	               *
-	               * See https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.4
-	               * for more information.
-	               */
-
-	              // SAME_LOCALS_1_STACK_ITEM
-	              if (frame_type >= 64 && frame_type <= 127) {
-	                _stack_map_frame.stack = [this._readVerificationTypeInfo()];
-	              }
-	              // SAME_LOCALS_1_STACK_ITEM_EXTENDED
-	              else if (_stack_map_frame.frame_type === 247) {
-	                  _stack_map_frame.offset_delta = this.buf.readUint16();
-	                  _stack_map_frame.stack = [this._readVerificationTypeInfo()];
-	                }
-	                // CHOP = 248-250, SAME_FRAME_EXTENDED = 251
-	                else if (frame_type >= 248 && frame_type <= 251) {
-	                    _stack_map_frame.offset_delta = this.buf.readUint16();
-	                  }
-	                  // APPEND
-	                  else if (frame_type >= 252 && frame_type <= 254) {
-	                      _stack_map_frame.offset_delta = this.buf.readUint16();
-	                      _stack_map_frame.locals = [];
-
-	                      var _number_of_locals = frame_type - 251;
-	                      while (_number_of_locals-- > 0) {
-	                        _stack_map_frame.locals.push(this._readVerificationTypeInfo());
-	                      }
-	                    }
-	                    // FULL_FRAME
-	                    else if (frame_type === 255) {
-	                        _stack_map_frame.offset_delta = this.buf.readUint16();
-	                        _stack_map_frame.number_of_locals = this.buf.readUint16();
-	                        _stack_map_frame.locals = [];
-
-	                        var _number_of_locals2 = _stack_map_frame.number_of_locals;
-	                        while (_number_of_locals2-- > 0) {
-	                          _stack_map_frame.locals.push(this._readVerificationTypeInfo());
-	                        }
-
-	                        _stack_map_frame.number_of_stack_items = this.buf.readUint16();
-	                        _stack_map_frame.stack = [];
-
-	                        var _number_of_stack_items = _stack_map_frame.number_of_stack_items;
-	                        while (_number_of_stack_items-- > 0) {
-	                          _stack_map_frame.stack.push(this._readVerificationTypeInfo());
-	                        }
-	                      }
-	              attribute.entries.push(_stack_map_frame);
-	            }
-	            break;
-	          }
-
+	          return this._readStackMapTableAttribute(attribute);
 	        case 'Code':
-	          {
-	            attribute.max_stack = this.buf.readUint16();
-	            attribute.max_locals = this.buf.readUint16();
-	            attribute.code_length = this.buf.readUint32();
-	            attribute.code = [];
-
-	            // Reads "code" array
-	            var code_length = attribute.code_length;
-	            while (code_length-- > 0) {
-	              attribute.code.push(this.buf.readUint8());
-	            }
-
-	            attribute.exception_table_length = this.buf.readUint16();
-	            attribute.exception_table = [];
-
-	            // Reads exception_table
-	            var exception_table_length = attribute.exception_table_length;
-	            while (exception_table_length-- > 0) {
-	              var exception_entry = {
-	                start_pc: this.buf.readUint16(),
-	                end_pc: this.buf.readUint16(),
-	                handler_pc: this.buf.readUint16(),
-	                catch_type: this.buf.readUint16()
-	              };
-	              attribute.exception_table.push(exception_entry);
-	            }
-
-	            attribute.attributes_count = this.buf.readUint16();
-	            attribute.attributes = this._readAttributeInfoArray(attribute.attributes_count);
-	            break;
-	          }
-
+	          return this._readCodeAttribute(attribute);
 	        case 'LineNumberTable':
-	          {
-	            attribute.line_number_table_length = this.buf.readUint16();
-	            attribute.line_number_table = [];
-
-	            var line_number_table_length = attribute.line_number_table_length;
-	            while (line_number_table_length-- > 0) {
-	              var line_number = {
-	                start_pc: this.buf.readUint16(),
-	                line_number: this.buf.readUint16()
-	              };
-	              attribute.line_number_table.push(line_number);
-	            }
-	            break;
-	          }
+	          return this._readLineNumberTableAttribute(attribute);
+	        case 'Module':
+	          return this._readModuleAttribute(attribute);
+	        case 'ModulePackages':
+	          return this._readModulePackagesAttribute(attribute);
 
 	        case 'ModuleMainClass':
 	          attribute.main_class_index = this.buf.readUint16();
 	          break;
 
-	        case 'Module':
-	          {
-	            attribute.module_name_index = this.buf.readUint16();
-	            attribute.module_flags = this.buf.readUint16();
-	            attribute.module_version_index = this.buf.readUint16();
-
-	            attribute.requires_count = this.buf.readUint16();
-	            attribute.requires = [];
-
-	            var requires_count = attribute.requires_count;
-	            while (requires_count-- > 0) {
-	              attribute.requires.push({
-	                requires_index: this.buf.readUint16(),
-	                requires_flags: this.buf.readUint16(),
-	                requires_version_index: this.buf.readUint16()
-	              });
-	            }
-
-	            attribute.exports_count = this.buf.readUint16();
-	            attribute.exports = [];
-
-	            var exports_count = attribute.exports_count;
-	            while (exports_count-- > 0) {
-	              var entry = {
-	                exports_index: this.buf.readUint16(),
-	                exports_flags: this.buf.readUint16(),
-	                exports_to_count: this.buf.readUint16(),
-	                exports_to_index: []
-	              };
-
-	              var exports_to_count = entry.exports_to_count;
-	              while (exports_to_count-- > 0) {
-	                entry.exports_to_index.push(this.buf.readUint16());
-	              }
-
-	              attribute.exports.push(entry);
-	            }
-
-	            attribute.opens_count = this.buf.readUint16();
-	            attribute.opens = [];
-
-	            var opens_count = attribute.opens_count;
-	            while (opens_count-- > 0) {
-	              var _entry = {
-	                opens_index: this.buf.readUint16(),
-	                opens_flags: this.buf.readUint16(),
-	                opens_to_count: this.buf.readUint16(),
-	                opens_to_index: []
-	              };
-
-	              var opens_to_count = _entry.opens_to_count;
-	              while (opens_to_count-- > 0) {
-	                _entry.opens_to_index.push(this.buf.readUint16());
-	              }
-
-	              attribute.opens.push(_entry);
-	            }
-
-	            attribute.uses_count = this.buf.readUint16();
-	            attribute.uses_index = [];
-
-	            var uses_count = attribute.uses_count;
-	            while (uses_count-- > 0) {
-	              attribute.uses_index.push(this.buf.readUint16());
-	            }
-
-	            attribute.provides_count = this.buf.readUint16();
-	            attribute.provides = [];
-
-	            var provides_count = attribute.provides_count;
-	            while (provides_count-- > 0) {
-	              var _entry2 = {
-	                provides_index: this.buf.readUint16(),
-	                provides_with_count: this.buf.readUint16(),
-	                provides_with_index: []
-	              };
-
-	              var provides_with_count = _entry2.provides_with_count;
-	              while (provides_with_count-- > 0) {
-	                _entry2.provides_with_index.push(this.buf.readUint16());
-	              }
-
-	              attribute.provides.push(_entry2);
-	            }
-	            break;
-	          }
-
-	        case 'ModulePackages':
-	          {
-	            attribute.package_count = this.buf.readUint16();
-	            attribute.package_index = [];
-
-	            var package_count = attribute.package_count;
-	            while (package_count-- > 0) {
-	              attribute.package_index.push(this.buf.readUint16());
-	            }
-	            break;
-	          }
-
 	        /* Not specified in JVMS 9 */
+	        // TODO: remove?
 	        case 'ModuleTarget':
 	          attribute.target_platform_index = this.buf.readUint16();
 	          break;
@@ -857,18 +574,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            var hashes_table_length = attribute.hashes_table_length;
 	            while (hashes_table_length-- > 0) {
-	              var _entry3 = {
+	              var entry = {
 	                module_name_index: this.buf.readUint16(),
 	                hash_length: this.buf.readUint16(),
 	                hash: []
 	              };
 
-	              var hash_length = _entry3.hash_length;
+	              var hash_length = entry.hash_length;
 	              while (hash_length-- > 0) {
-	                _entry3.hash.push(this.buf.readUInt8());
+	                entry.hash.push(this.buf.readUint8());
 	              }
 
-	              attribute.hashes_table.push(_entry3);
+	              attribute.hashes_table.push(entry);
 	            }
 	            break;
 	          }
@@ -878,14 +595,277 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // See: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.1
 	        default:
 	          {
-	            attribute.info = [];
-	            var _attribute_length = attribute.attribute_length;
-	            while (_attribute_length-- > 0) {
-	              attribute.info.push(this.buf.readUInt8());
+	            attribute.info = new Array(attribute.attribute_length);
+	            for (var _i9 = 0; _i9 < attribute.attribute_length; _i9++) {
+	              attribute.info[_i9] = this.buf.readUint8();
 	            }
 	          }
 	      }
 
+	      return attribute;
+	    }
+	  }, {
+	    key: '_readCodeAttribute',
+	    value: function _readCodeAttribute(attribute) {
+	      attribute.max_stack = this.buf.readUint16();
+	      attribute.max_locals = this.buf.readUint16();
+	      attribute.code_length = this.buf.readUint32();
+	      attribute.code = new Array(attribute.code_length);
+
+	      // Reads "code" array
+	      for (var i = 0; i < attribute.code_length; i++) {
+	        attribute.code[i] = this.buf.readUint8();
+	      }
+
+	      attribute.exception_table_length = this.buf.readUint16();
+	      attribute.exception_table = new Array(attribute.exception_table_length);
+
+	      // Reads exception_table
+	      for (var _i10 = 0; _i10 < attribute.exception_table_length; _i10++) {
+	        attribute.exception_table[_i10] = {
+	          start_pc: this.buf.readUint16(),
+	          end_pc: this.buf.readUint16(),
+	          handler_pc: this.buf.readUint16(),
+	          catch_type: this.buf.readUint16()
+	        };
+	      }
+
+	      attribute.attributes_count = this.buf.readUint16();
+	      attribute.attributes = this._readAttributeInfoArray(attribute.attributes_count);
+	      return attribute;
+	    }
+	  }, {
+	    key: '_readLineNumberTableAttribute',
+	    value: function _readLineNumberTableAttribute(attribute) {
+	      attribute.line_number_table_length = this.buf.readUint16();
+	      attribute.line_number_table = new Array(attribute.line_number_table_length);
+
+	      for (var i = 0; i < attribute.line_number_table_length; i++) {
+	        attribute.line_number_table[i] = {
+	          start_pc: this.buf.readUint16(),
+	          line_number: this.buf.readUint16()
+	        };
+	      }
+	      return attribute;
+	    }
+
+	    // TODO: this function is being deoptimized one time... Check why
+
+	  }, {
+	    key: '_readStackMapTableAttribute',
+	    value: function _readStackMapTableAttribute(attribute) {
+	      attribute.number_of_entries = this.buf.readUint16();
+	      attribute.entries = new Array(attribute.number_of_entries);
+
+	      for (var entryIndex = 0; entryIndex < attribute.number_of_entries; entryIndex++) {
+	        var stack_map_frame = {
+	          frame_type: this.buf.readUint8()
+	        };
+
+	        // Shorthand
+	        var frame_type = stack_map_frame.frame_type;
+
+	        /**
+	         * offset_delta's that are "constant" are omitted.
+	         * E.g:
+	         *  The offset_delta for the "same_frame" is the value of the tag item (frame_type).
+	         *  The offset_delta for the "same_locals_1_stack_item_frame " is given by the formula frame_type - 64.
+	         *
+	         * See https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.4
+	         * for more information.
+	         */
+
+	        // SAME
+	        if (frame_type >= 0 && frame_type <= 63) {
+	          attribute.entries[entryIndex] = stack_map_frame;
+	          continue;
+	        }
+
+	        // SAME_LOCALS_1_STACK_ITEM
+	        if (frame_type >= 64 && frame_type <= 127) {
+	          stack_map_frame.stack = [this._readVerificationTypeInfo()];
+	        }
+	        // SAME_LOCALS_1_STACK_ITEM_EXTENDED
+	        else if (stack_map_frame.frame_type === 247) {
+	            stack_map_frame.offset_delta = this.buf.readUint16();
+	            stack_map_frame.stack = [this._readVerificationTypeInfo()];
+	          }
+	          // CHOP = 248-250, SAME_FRAME_EXTENDED = 251
+	          else if (frame_type >= 248 && frame_type <= 251) {
+	              stack_map_frame.offset_delta = this.buf.readUint16();
+	            }
+	            // APPEND
+	            else if (frame_type >= 252 && frame_type <= 254) {
+	                var numberOfLocals = frame_type - 251;
+
+	                stack_map_frame.offset_delta = this.buf.readUint16();
+	                stack_map_frame.locals = new Array(numberOfLocals);
+
+	                for (var i = 0; i < numberOfLocals; i++) {
+	                  stack_map_frame.locals[i] = this._readVerificationTypeInfo();
+	                }
+	              }
+	              // FULL_FRAME
+	              else if (frame_type === 255) {
+	                  stack_map_frame.offset_delta = this.buf.readUint16();
+	                  stack_map_frame.number_of_locals = this.buf.readUint16();
+	                  stack_map_frame.locals = new Array(stack_map_frame.number_of_locals);
+
+	                  for (var _i11 = 0; _i11 < stack_map_frame.number_of_locals; _i11++) {
+	                    stack_map_frame.locals[_i11] = this._readVerificationTypeInfo();
+	                  }
+
+	                  stack_map_frame.number_of_stack_items = this.buf.readUint16();
+	                  stack_map_frame.stack = new Array(stack_map_frame.number_of_stack_items);
+
+	                  for (var _i12 = 0; _i12 < stack_map_frame.number_of_stack_items; _i12++) {
+	                    stack_map_frame.stack[_i12] = this._readVerificationTypeInfo();
+	                  }
+	                }
+
+	        attribute.entries[entryIndex] = stack_map_frame;
+	      }
+	      return attribute;
+	    }
+	  }, {
+	    key: '_readExceptionsAttribute',
+	    value: function _readExceptionsAttribute(attribute) {
+	      attribute.number_of_exceptions = this.buf.readUint16();
+	      attribute.exception_index_table = new Array(attribute.number_of_exceptions);
+
+	      for (var i = 0; i < attribute.number_of_exceptions; i++) {
+	        attribute.exception_index_table[i] = this.buf.readUint16();
+	      }
+	      return attribute;
+	    }
+
+	    /**
+	     * http://download.oracle.com/otndocs/jcp/7247-j2me_cldc-1.1-fr-spec-oth-JSpec/
+	     *
+	     * Appendix1-verifier.pdf at "2.1 Stack map format"
+	     *
+	     * "According to the CLDC specification, the sizes of some fields are not 16bit
+	     * but 32bit if the code size is more than 64K or the number of the local variables
+	     * is more than 64K.  However, for the J2ME CLDC technology, they are always 16bit.
+	     * The implementation of the StackMap class assumes they are 16bit." - javaassist
+	     */
+
+	  }, {
+	    key: '_readStackMapAttribute',
+	    value: function _readStackMapAttribute(attribute) {
+	      attribute.number_of_entries = this.buf.readUint16();
+	      attribute.entries = new Array(attribute.number_of_entries);
+
+	      for (var entryIndex = 0; entryIndex < attribute.number_of_entries; entryIndex++) {
+	        var stack_map_frame = { offset: this.buf.readUint16() };
+
+	        // Read locals
+	        stack_map_frame.number_of_locals = this.buf.readUint16();
+	        stack_map_frame.locals = new Array(stack_map_frame.number_of_locals);
+
+	        for (var i = 0; i < stack_map_frame.number_of_locals; i++) {
+	          stack_map_frame.locals[i] = this._readVerificationTypeInfo();
+	        }
+
+	        // Read stack
+	        stack_map_frame.number_of_stack_items = this.buf.readUint16();
+	        stack_map_frame.stack = new Array(stack_map_frame.number_of_stack_items);
+
+	        for (var _i13 = 0; _i13 < stack_map_frame.number_of_stack_items; _i13++) {
+	          stack_map_frame.stack[_i13] = this._readVerificationTypeInfo();
+	        }
+
+	        attribute.entries[entryIndex] = stack_map_frame;
+	      }
+	      return attribute;
+	    }
+	  }, {
+	    key: '_readModuleAttribute',
+	    value: function _readModuleAttribute(attribute) {
+	      attribute.module_name_index = this.buf.readUint16();
+	      attribute.module_flags = this.buf.readUint16();
+	      attribute.module_version_index = this.buf.readUint16();
+
+	      attribute.requires_count = this.buf.readUint16();
+	      attribute.requires = new Array(attribute.requires_count);
+
+	      for (var i = 0; i < attribute.requires_count; i++) {
+	        attribute.requires[i] = {
+	          requires_index: this.buf.readUint16(),
+	          requires_flags: this.buf.readUint16(),
+	          requires_version_index: this.buf.readUint16()
+	        };
+	      }
+
+	      attribute.exports_count = this.buf.readUint16();
+	      attribute.exports = new Array(attribute.exports_count);
+
+	      for (var exportIndex = 0; exportIndex < attribute.exports_count; exportIndex++) {
+	        var exportEntry = {
+	          exports_index: this.buf.readUint16(),
+	          exports_flags: this.buf.readUint16(),
+	          exports_to_count: this.buf.readUint16()
+	        };
+	        exportEntry.exports_to_index = new Array(exportEntry.exports_to_count);
+
+	        for (var exportsToIndex = 0; exportsToIndex < exportEntry.exports_to_count; exportsToIndex++) {
+	          exportEntry.exports_to_index[exportsToIndex] = this.buf.readUint16();
+	        }
+
+	        attribute.exports[exportIndex] = exportEntry;
+	      }
+
+	      attribute.opens_count = this.buf.readUint16();
+	      attribute.opens = new Array(attribute.opens_count);
+
+	      for (var openIndex = 0; openIndex < attribute.opens_count; openIndex++) {
+	        var openEntry = {
+	          opens_index: this.buf.readUint16(),
+	          opens_flags: this.buf.readUint16(),
+	          opens_to_count: this.buf.readUint16()
+	        };
+	        openEntry.opens_to_index = new Array(openEntry.opens_to_count);
+
+	        for (var opensToIndex = 0; opensToIndex < openEntry.opens_to_count; opensToIndex++) {
+	          openEntry.opens_to_index[opensToIndex] = this.buf.readUint16();
+	        }
+
+	        attribute.opens[openIndex] = openEntry;
+	      }
+
+	      attribute.uses_count = this.buf.readUint16();
+	      attribute.uses_index = new Array(attribute.uses_count);;
+
+	      for (var _i14 = 0; _i14 < attribute.uses_count; _i14++) {
+	        attribute.uses_index[_i14] = this.buf.readUint16();
+	      }
+
+	      attribute.provides_count = this.buf.readUint16();
+	      attribute.provides = new Array(attribute.provides_count);
+
+	      for (var providesIndex = 0; providesIndex < attribute.provides_count; providesIndex++) {
+	        var provideEntry = {
+	          provides_index: this.buf.readUint16(),
+	          provides_with_count: this.buf.readUint16()
+	        };
+	        provideEntry.provides_with_index = new Array(provideEntry.provides_with_count);
+
+	        for (var providesWithIndex = 0; providesWithIndex < provideEntry.provides_with_count; providesWithIndex++) {
+	          provideEntry.provides_with_index[providesWithIndex] = this.buf.readUint16();
+	        }
+
+	        attribute.provides[providesIndex] = provideEntry;
+	      }
+	      return attribute;
+	    }
+	  }, {
+	    key: '_readModulePackagesAttribute',
+	    value: function _readModulePackagesAttribute(attribute) {
+	      attribute.package_count = this.buf.readUint16();
+	      attribute.package_index = new Array(attribute.package_count);
+	      for (var i = 0; i < attribute.package_count; i++) {
+	        attribute.package_index[i] = this.buf.readUint16();
+	      }
 	      return attribute;
 	    }
 
@@ -899,16 +879,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _readAttributeAnnotation() {
 	      var annotation = {
 	        type_index: this.buf.readUint16(),
-	        num_element_value_pairs: this.buf.readUint16(),
-	        element_value_pairs: []
+	        num_element_value_pairs: this.buf.readUint16()
 	      };
-	      var len = annotation.num_element_value_pairs;
-	      while (len-- > 0) {
-	        var element = {
+	      annotation.element_value_pairs = new Array(annotation.num_element_value_pairs);
+
+	      for (var i = 0; i < annotation.num_element_value_pairs; i++) {
+	        annotation.element_value_pairs[i] = {
 	          element_name_index: this.buf.readUint16(),
 	          element_value: this._readElementValue()
 	        };
-	        annotation.element_value_pairs.push(element);
 	      }
 	      return annotation;
 	    }
@@ -946,15 +925,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case 91:
 	          {
 	            // [
-	            var array_value = {
-	              num_values: this.buf.readUInt16(),
-	              values: []
-	            };
-	            var num_values = array_value.num_values;
-	            while (num_values-- > 0) {
-	              array_value.values.push(this._readElementValue());
+	            var num_values = this.buf.readUint16();
+	            var values = new Array(num_values);
+
+	            for (var i = 0; i < num_values; i++) {
+	              values[i] = this._readElementValue();
 	            }
-	            element_value.value.array_value = array_value;
+
+	            element_value.value.array_value = {
+	              num_values: num_values,
+	              values: values
+	            };
 	            break;
 	          }
 
@@ -984,12 +965,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: '_readInterfaces',
-	    value: function _readInterfaces(interface_count) {
-	      var entries = [];
-	      while (interface_count-- > 0) {
-	        entries.push(this.buf.readUint16());
+	    value: function _readInterfaces(interfaceCount) {
+	      var interfaces = new Array(interfaceCount);
+	      for (var i = 0; i < interfaceCount; i++) {
+	        interfaces[i] = this.buf.readUint16();
 	      }
-	      return entries;
+	      return interfaces;
 	    }
 
 	    /**
@@ -998,15 +979,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  }, {
 	    key: '_readConstantPool',
-	    value: function _readConstantPool(pool_size) {
+	    value: function _readConstantPool(poolCount) {
 	      /**
 	       * https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.1
 	       * The constant_pool table is indexed from 1 to constant_pool_count-1.
 	       */
-	      var pool = [undefined];
-	      while (pool_size-- > 0) {
+	      var pool = new Array(poolCount);
+
+	      for (var i = 1; i <= poolCount; i++) {
 	        var entry = this._readConstantPoolEntry();
-	        pool.push(entry);
+
+	        pool[i] = entry;
 
 	        /**
 	         * https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.5
@@ -1017,54 +1000,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * The constant_pool index n+ must be valid but is considered unusable.
 	         */
 	        if (entry.tag === _constantType2.default.LONG || entry.tag === _constantType2.default.DOUBLE) {
-	          pool.push(undefined);
-	          pool_size--;
+	          pool[++i] = undefined;
 	        }
 	      }
 	      return pool;
 	    }
+	  }, {
+	    key: '_readUtf8PoolEntry',
+	    value: function _readUtf8PoolEntry(tag) {
+	      var length = this.buf.readUint16();
+	      var bytes = new Array(length);
 
-	    /** @private */
+	      for (var i = 0; i < length; i++) {
+	        bytes[i] = this.buf.readUint8();
+	      }
 
+	      return { tag: tag, length: length, bytes: bytes };
+	    }
 	  }, {
 	    key: '_readConstantPoolEntry',
 	    value: function _readConstantPoolEntry() {
-	      var cp_info = {
-	        tag: this.buf.readUInt8()
-	      };
+	      var tag = this.buf.readUint8();
 
-	      switch (cp_info.tag) {
+	      switch (tag) {
 	        case _constantType2.default.UTF8:
-	          {
-	            var strLen = this.buf.readUint16();
-	            cp_info.length = strLen;
-	            cp_info.bytes = [];
-	            while (strLen-- > 0) {
-	              cp_info.bytes.push(this.buf.readUInt8());
-	            }
-	            break;
-	          }
+	          return this._readUtf8PoolEntry(tag);
 
 	        case _constantType2.default.INTEGER:
 	        case _constantType2.default.FLOAT:
-	          cp_info.bytes = this.buf.readUint32();
-	          break;
+	          return { tag: tag, bytes: this.buf.readUint32() };
 
 	        case _constantType2.default.LONG:
 	        case _constantType2.default.DOUBLE:
-	          cp_info.high_bytes = this.buf.readUint32();
-	          cp_info.low_bytes = this.buf.readUint32();
-	          break;
+	          return { tag: tag, high_bytes: this.buf.readUint32(), low_bytes: this.buf.readUint32() };
 
 	        case _constantType2.default.PACKAGE:
 	        case _constantType2.default.MODULE:
 	        case _constantType2.default.CLASS:
-	          cp_info.name_index = this.buf.readUInt16();
-	          break;
+	          return { tag: tag, name_index: this.buf.readUint16() };
 
 	        case _constantType2.default.STRING:
-	          cp_info.string_index = this.buf.readUInt16();
-	          break;
+	          return { tag: tag, string_index: this.buf.readUint16() };
 
 	        /**
 	         * Fields, methods, and interface methods are represented by similar structures
@@ -1073,32 +1049,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case _constantType2.default.FIELDREF:
 	        case _constantType2.default.METHODREF:
 	        case _constantType2.default.INTERFACE_METHODREF:
-	          cp_info.class_index = this.buf.readUint16(), cp_info.name_and_type_index = this.buf.readUint16();
-	          break;
+	          return { tag: tag, class_index: this.buf.readUint16(), name_and_type_index: this.buf.readUint16() };
 
 	        case _constantType2.default.NAME_AND_TYPE:
-	          cp_info.name_index = this.buf.readUint16();
-	          cp_info.descriptor_index = this.buf.readUint16();
-	          break;
+	          return { tag: tag, name_index: this.buf.readUint16(), descriptor_index: this.buf.readUint16() };
 
 	        case _constantType2.default.METHOD_HANDLE:
-	          cp_info.reference_kind = this.buf.readUint8();
-	          cp_info.reference_index = this.buf.readUint16();
-	          break;
+	          return { tag: tag, reference_kind: this.buf.readUint8(), reference_index: this.buf.readUint16() };
 
 	        case _constantType2.default.METHOD_TYPE:
-	          cp_info.descriptor_index = this.buf.readUInt16();
-	          break;
+	          return { tag: tag, descriptor_index: this.buf.readUint16() };
 
 	        case _constantType2.default.INVOKE_DYNAMIC:
-	          cp_info.bootstrap_method_attr_index = this.buf.readUint16();
-	          cp_info.name_and_type_index = this.buf.readUint16();
-	          break;
+	          return { tag: tag, bootstrap_method_attr_index: this.buf.readUint16(), name_and_type_index: this.buf.readUint16() };
 
 	        default:
-	          throw Error('Unexpected tag: ' + cp_info.tag);
+	          throw Error('Unexpected tag: ' + tag);
 	      }
-	      return cp_info;
 	    }
 	  }]);
 
@@ -1112,187 +1079,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ (function(module, exports) {
 
-	// shim for using process in browser
-	var process = module.exports = {};
-
-	// cached from whatever global is present so that test runners that stub it
-	// don't break things.  But we need to wrap it in a try catch in case it is
-	// wrapped in strict mode code which doesn't define any globals.  It's inside a
-	// function because try/catches deoptimize in certain engines.
-
-	var cachedSetTimeout;
-	var cachedClearTimeout;
-
-	function defaultSetTimout() {
-	    throw new Error('setTimeout has not been defined');
-	}
-	function defaultClearTimeout () {
-	    throw new Error('clearTimeout has not been defined');
-	}
-	(function () {
-	    try {
-	        if (typeof setTimeout === 'function') {
-	            cachedSetTimeout = setTimeout;
-	        } else {
-	            cachedSetTimeout = defaultSetTimout;
-	        }
-	    } catch (e) {
-	        cachedSetTimeout = defaultSetTimout;
-	    }
-	    try {
-	        if (typeof clearTimeout === 'function') {
-	            cachedClearTimeout = clearTimeout;
-	        } else {
-	            cachedClearTimeout = defaultClearTimeout;
-	        }
-	    } catch (e) {
-	        cachedClearTimeout = defaultClearTimeout;
-	    }
-	} ())
-	function runTimeout(fun) {
-	    if (cachedSetTimeout === setTimeout) {
-	        //normal enviroments in sane situations
-	        return setTimeout(fun, 0);
-	    }
-	    // if setTimeout wasn't available but was latter defined
-	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-	        cachedSetTimeout = setTimeout;
-	        return setTimeout(fun, 0);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedSetTimeout(fun, 0);
-	    } catch(e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-	            return cachedSetTimeout.call(null, fun, 0);
-	        } catch(e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-	            return cachedSetTimeout.call(this, fun, 0);
-	        }
-	    }
-
-
-	}
-	function runClearTimeout(marker) {
-	    if (cachedClearTimeout === clearTimeout) {
-	        //normal enviroments in sane situations
-	        return clearTimeout(marker);
-	    }
-	    // if clearTimeout wasn't available but was latter defined
-	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-	        cachedClearTimeout = clearTimeout;
-	        return clearTimeout(marker);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedClearTimeout(marker);
-	    } catch (e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-	            return cachedClearTimeout.call(null, marker);
-	        } catch (e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-	            return cachedClearTimeout.call(this, marker);
-	        }
-	    }
-
-
-
-	}
-	var queue = [];
-	var draining = false;
-	var currentQueue;
-	var queueIndex = -1;
-
-	function cleanUpNextTick() {
-	    if (!draining || !currentQueue) {
-	        return;
-	    }
-	    draining = false;
-	    if (currentQueue.length) {
-	        queue = currentQueue.concat(queue);
-	    } else {
-	        queueIndex = -1;
-	    }
-	    if (queue.length) {
-	        drainQueue();
-	    }
-	}
-
-	function drainQueue() {
-	    if (draining) {
-	        return;
-	    }
-	    var timeout = runTimeout(cleanUpNextTick);
-	    draining = true;
-
-	    var len = queue.length;
-	    while(len) {
-	        currentQueue = queue;
-	        queue = [];
-	        while (++queueIndex < len) {
-	            if (currentQueue) {
-	                currentQueue[queueIndex].run();
-	            }
-	        }
-	        queueIndex = -1;
-	        len = queue.length;
-	    }
-	    currentQueue = null;
-	    draining = false;
-	    runClearTimeout(timeout);
-	}
-
-	process.nextTick = function (fun) {
-	    var args = new Array(arguments.length - 1);
-	    if (arguments.length > 1) {
-	        for (var i = 1; i < arguments.length; i++) {
-	            args[i - 1] = arguments[i];
-	        }
-	    }
-	    queue.push(new Item(fun, args));
-	    if (queue.length === 1 && !draining) {
-	        runTimeout(drainQueue);
-	    }
-	};
-
-	// v8 likes predictible objects
-	function Item(fun, array) {
-	    this.fun = fun;
-	    this.array = array;
-	}
-	Item.prototype.run = function () {
-	    this.fun.apply(null, this.array);
-	};
-	process.title = 'browser';
-	process.browser = true;
-	process.env = {};
-	process.argv = [];
-	process.version = ''; // empty string to avoid regexp issues
-	process.versions = {};
-
-	function noop() {}
-
-	process.on = noop;
-	process.addListener = noop;
-	process.once = noop;
-	process.off = noop;
-	process.removeListener = noop;
-	process.removeAllListeners = noop;
-	process.emit = noop;
-
-	process.binding = function (name) {
-	    throw new Error('process.binding is not supported');
-	};
-
-	process.cwd = function () { return '/' };
-	process.chdir = function (dir) {
-	    throw new Error('process.chdir is not supported');
-	};
-	process.umask = function() { return 0; };
-
+	
 
 /***/ }),
 /* 3 */
@@ -6322,12 +6109,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ }),
 /* 8 */
-/***/ (function(module, exports) {
-
-	
-
-/***/ }),
-/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6396,10 +6177,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._writeInterfaces(classFile.interfaces);
 
 	      this.buf.writeUint16(classFile.fields_count);
-	      this._writeCommonFieldMethodArray(classFile.fields);
+	      this._writeMemberInfoArray(classFile.fields);
 
 	      this.buf.writeUint16(classFile.methods_count);
-	      this._writeCommonFieldMethodArray(classFile.methods);
+	      this._writeMemberInfoArray(classFile.methods);
 
 	      this.buf.writeUint16(classFile.attributes_count);
 	      this._writeAttributeInfoArray(classFile.attributes);
@@ -6408,8 +6189,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this.buf;
 	    }
 	  }, {
-	    key: '_writeCommonFieldMethodArray',
-	    value: function _writeCommonFieldMethodArray(array) {
+	    key: '_writeMemberInfoArray',
+	    value: function _writeMemberInfoArray(array) {
 	      for (var i = 0; i < array.length; i++) {
 	        var entry = array[i];
 
@@ -6699,7 +6480,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          break;
 
 	        case 'MethodParameters':
-	          this.buf.writeUint16(attribute_info.parameters_count);
+	          this.buf.writeUint8(attribute_info.parameters_count);
 
 	          for (var i = 0; i < attribute_info.parameters_count; i++) {
 	            var parameter = attribute_info.parameters[i];
@@ -7014,7 +6795,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = JavaClassFileWriter;
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -7237,7 +7018,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = Opcode;
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -7278,7 +7059,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = Modifier;
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7290,7 +7071,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Licensed under the MIT License. See LICENSE file in the project root for full license information.
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 
-	var _opcode = __webpack_require__(10);
+	var _opcode = __webpack_require__(9);
 
 	var _opcode2 = _interopRequireDefault(_opcode);
 
@@ -7361,7 +7142,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	          case _opcode2.default.LOOKUPSWITCH:
 	            {
 	              var padding = bytecode.length % 4 ? 4 - bytecode.length % 4 : 0;
-	              var operandOffset = 0;
 
 	              while (padding-- > 0) {
 	                bytecode.push(0);
@@ -7461,7 +7241,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              var npairs = bytecode[offset - 4] << 24 | bytecode[offset - 3] << 16 | bytecode[offset - 2] << 8 | bytecode[offset - 1];
 
 	              // match-offset pairs
-	              for (var i = 0; i < npairs * 8; i++) {
+	              for (var _i = 0; _i < npairs * 8; _i++) {
 	                instruction.operands.push(bytecode[offset++]);
 	              }
 	              break;
@@ -7474,7 +7254,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              offset += _padding; // Skip padding
 
 	              // default bytes (4) + low bytes (4) + high bytes (4)
-	              for (var i = 0; i < 12; i++) {
+	              for (var _i2 = 0; _i2 < 12; _i2++) {
 	                instruction.operands.push(bytecode[offset++]);
 	              }
 
@@ -7483,7 +7263,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              var numJumpOffsets = high - low + 1;
 
 	              // jump offset's
-	              for (var i = 0; i < numJumpOffsets * 4; i++) {
+	              for (var _i3 = 0; _i3 < numJumpOffsets * 4; _i3++) {
 	                instruction.operands.push(bytecode[offset++]);
 	              }
 	              break;
@@ -7492,7 +7272,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          // https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.wide
 	          case _opcode2.default.WIDE:
 	            {
-	              var targetOpcode = bytecode[offset];
+	              var targetOpcode = bytecode[offset++];
 	              switch (targetOpcode) {
 	                case _opcode2.default.ILOAD:
 	                case _opcode2.default.FLOAD:
@@ -7505,11 +7285,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                case _opcode2.default.LSTORE:
 	                case _opcode2.default.DSTORE:
 	                case _opcode2.default.RET:
-	                  instruction.operands.push(bytecode[offset++], bytecode[offset++], bytecode[offset++]);
+	                  instruction.operands.push(targetOpcode, bytecode[offset++], bytecode[offset++]);
 	                  break;
 
 	                case _opcode2.default.IINC:
-	                  instruction.operands.push(bytecode[offset++], bytecode[offset++], bytecode[offset++], bytecode[offset++], bytecode[offset++]);
+	                  instruction.operands.push(targetOpcode, bytecode[offset++], bytecode[offset++], bytecode[offset++], bytecode[offset++]);
 	                  break;
 
 	                default:
