@@ -1,6 +1,6 @@
 /*!
  * https://github.com/leonardosnt/java-class-tools
- * 
+ *
  * Copyright (C) 2017 leonardosnt
  * Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */
@@ -9,7 +9,7 @@
 /// <reference types="bytebuffer" />
 
 declare module 'java-class-tools' {
-  
+
   export class JavaClassFileReader {
     public read(data: Uint8Array | Buffer | number[] | string): JavaClassFile;
 
@@ -43,15 +43,15 @@ declare module 'java-class-tools' {
     public minor_version: number;
 
     public constant_pool_count: number;
-    
+
     /**
      * "The constant_pool table is indexed from 1 to constant_pool_count - 1." - jvms 4.1
      *
      * So, constant_pool[0] is always undefined.
-     * 
-     * "All 8-byte constants take up two entries in the constant_pool table of the class file. 
-     * If a CONSTANT_Long_info or CONSTANT_Double_info structure is the item in the constant_pool table at index n, 
-     * then the next usable item in the pool is located at index n+2. 
+     *
+     * "All 8-byte constants take up two entries in the constant_pool table of the class file.
+     * If a CONSTANT_Long_info or CONSTANT_Double_info structure is the item in the constant_pool table at index n,
+     * then the next usable item in the pool is located at index n+2.
      * The constant_pool index n+1 must be valid but is considered unusable." - jvms 4.4.5
      *
      * So, the entry after a CONSTANT_Long or CONSTANT_Double is always undefined.
@@ -59,10 +59,10 @@ declare module 'java-class-tools' {
     public constant_pool: ConstantPoolInfo[];
 
     public access_flags: number;
-    
+
     public this_class: number;
     public super_class: number;
-    
+
     public interfaces_count: number;
     public interfaces: number[];
 
@@ -98,7 +98,7 @@ declare module 'java-class-tools' {
     class_index: number;
     name_and_type_index: number;
   }
- 
+
   export class StringInfo extends ConstantPoolInfo {
     string_index: number;
   }
@@ -197,7 +197,7 @@ declare module 'java-class-tools' {
 
   export type SameLocalsOneStackItemFrameExtended = {
     /**
-     * 247 
+     * 247
      * @type {number}
      */
     frame_type: number;
@@ -225,7 +225,7 @@ declare module 'java-class-tools' {
 
   export type AppendFrame = {
     /**
-     * 252-254 
+     * 252-254
      * @type {number}
      */
     frame_type: number;
@@ -250,7 +250,7 @@ declare module 'java-class-tools' {
     stack: VerificationTypeInfo[];
   }
 
-  export type VerificationTypeInfo = TopVariableInfo | IntegerVariableInfo | FloatVariableInfo | LongVariableInfo | 
+  export type VerificationTypeInfo = TopVariableInfo | IntegerVariableInfo | FloatVariableInfo | LongVariableInfo |
     DoubleVariableInfo | NullVariableInfo | UninitializedThisVariableInfo | ObjectVariableInfo | UninitializedVariableInfo;
 
   export type TopVariableInfo = {
@@ -298,7 +298,7 @@ declare module 'java-class-tools' {
 
   export class InnerClassesAttributeInfo extends AttributeInfo {
     public number_of_classes: number;
-    public classes: {   
+    public classes: {
       inner_class_info_index: number;
       outer_class_info_index: number;
       inner_name_index: number;
@@ -319,7 +319,7 @@ declare module 'java-class-tools' {
 
   export class SourceFileAttributeInfo extends AttributeInfo {
     public sourcefile_index: number;
-  }  
+  }
 
   export class SourceDebugExtensionAttributeInfo extends AttributeInfo {
     public debug_extension: number;
@@ -416,13 +416,13 @@ declare module 'java-class-tools' {
 
   /**
    * https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.16.1
-   * 
+   *
    * @class ElementValue
    */
   class ElementValue {
     /**
      * The tag item uses a single ASCII character to indicate the type of the `value`.
-     * 
+     *
      * @type {number}
      * @memberOf ElementValue
      */
@@ -438,7 +438,7 @@ declare module 'java-class-tools' {
     public value: const_value_index | enum_const_value | class_info_index | annotation_value | array_value;
   }
 
-  export type enum_const_value = { 
+  export type enum_const_value = {
     type_name_index: number;
     const_name_index: number;
   }
@@ -449,7 +449,7 @@ declare module 'java-class-tools' {
 
   export type annotation_value = { annotation_value: Annotation; }
 
-  export type array_value = { 
+  export type array_value = {
     num_values: number;
     values: ElementValue[];
   }
@@ -480,8 +480,8 @@ declare module 'java-class-tools' {
   }
 
   export class Instruction {
-    public opcode: number;
-    public operands: any[];
+    public opcode: Opcode;
+    public operands: number[];
   }
 
   export enum ConstantType {
@@ -522,7 +522,7 @@ declare module 'java-class-tools' {
 
   export enum Opcode {
     // This was automatically generated!
-    
+
     /**
      * Operation:
      *   - Do nothing
@@ -2893,7 +2893,7 @@ declare module 'java-class-tools' {
       *   - `<opcode>`
       *   - `indexbyte1`
       *   - `indexbyte2`
-      * 
+      *
       * Operands: (if opcode is iinc)
       *   - `iinc`
       *   - `indexbyte1`
