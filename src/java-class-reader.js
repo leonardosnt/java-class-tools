@@ -847,7 +847,7 @@ class JavaClassFileReader {
 
       case ConstantType.LONG:
       case ConstantType.DOUBLE:
-        return { tag, high_bytes: this.buf.readUint32(), low_bytes: this.buf.readUint32() }
+        return { tag, high_bytes: this.buf.readUint32(), low_bytes: this.buf.readUint32() };
 
       case ConstantType.PACKAGE:
       case ConstantType.MODULE:
