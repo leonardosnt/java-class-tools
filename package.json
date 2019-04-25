@@ -20,7 +20,7 @@
     "disassembler",
     "assembler",
     "parser",
-    "decompíler",
+    "decompiler",
     "reader",
     "writer",
     "bytecode"
@@ -37,6 +37,8 @@
     "watch": "gulp watch"
   },
   "devDependencies": {
+    "@types/bytebuffer": "^5.0.1",
+    "@types/node": "^7.0.18",
     "babel-cli": "^6.22.2",
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
@@ -51,10 +53,10 @@
     "gulp-uglifyjs": "^0.6.2",
     "jszip": "^3.1.3",
     "mocha": "^3.2.0",
+    "natives": "^1.1.6",
     "tmp": "^0.0.31",
-    "webpack-stream": "^3.2.0",
-    "@types/bytebuffer": "^5.0.1",
-    "@types/node": "^7.0.18"
+    "utf8-string-bytes": "^1.0.3",
+    "webpack-stream": "^3.2.0"
   },
   "dependencies": {
     "bytebuffer": "^5.0.1"
