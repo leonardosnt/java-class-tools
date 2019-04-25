@@ -86,7 +86,6 @@ class InstructionParser {
         case Opcode.TABLESWITCH:
         case Opcode.LOOKUPSWITCH: {
           let padding = (bytecode.length % 4) ? 4 - (bytecode.length % 4) : 0;
-          let operandOffset = 0;
 
           while (padding-- > 0) {
             bytecode.push(0);
@@ -173,14 +172,14 @@ class InstructionParser {
           offset += padding; // Skip padding
 
           // default case bytes + npair bytes
-          for (var i = 0; i < 8; i++) {
+          for (let i = 0; i < 8; i++) {
             instruction.operands.push(bytecode[offset++]);
           }
 
           let npairs = (bytecode[offset-4] << 24) | (bytecode[offset-3] << 16) | (bytecode[offset-2] << 8) | (bytecode[offset-1]);
 
           // match-offset pairs
-          for (var i = 0; i < npairs * 8; i++) {
+          for (let i = 0; i < npairs * 8; i++) {
             instruction.operands.push(bytecode[offset++]);
           }
           break;
@@ -192,7 +191,7 @@ class InstructionParser {
           offset += padding; // Skip padding
 
           // default bytes (4) + low bytes (4) + high bytes (4)
-          for (var i = 0; i < 12; i++) {
+          for (let i = 0; i < 12; i++) {
             instruction.operands.push(bytecode[offset++]);
           }
 
@@ -201,7 +200,7 @@ class InstructionParser {
           const numJumpOffsets = (high - low) + 1;
 
           // jump offset's
-          for (var i = 0; i < numJumpOffsets * 4; i++) {
+          for (let i = 0; i < numJumpOffsets * 4; i++) {
             instruction.operands.push(bytecode[offset++]);
           }
           break;
