@@ -520,6 +520,17 @@ class JavaClassFileWriter {
         this.buf.writeUint16(attribute_info.main_class_index);
         break;
 
+      case 'NestHost':
+        this.buf.writeUint16(attribute_info.host_class_index);
+        break;
+
+      case 'NestMembers':
+        this.buf.writeUint16(attribute_info.number_of_classes);
+        for (let i = 0; i < attribute_info.number_of_classes; i++) {
+           this.buf.writeUint16(attribute_info.classes[i]);
+        }
+        break;
+
       // Unknown attributes
       // See: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.1
       default: {

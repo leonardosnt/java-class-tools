@@ -406,10 +406,21 @@ class JavaClassFileReader {
         attribute.main_class_index = this.buf.readUint16();
         break;
 
+      case 'NestHost':
+        attribute.host_class_index = this.buf.readUint16();
+        break;
+
+      case 'NestMembers':
+        attribute.number_of_classes = this.buf.readUint16();
+        attribute.classes = new Array(attribute.number_of_classes);
+        for (let i = 0; i < attribute.number_of_classes; i++) {
+          attribute.classes[i] = this.buf.readUint16();
+        }
+        break;
+
       // Unknown attributes
       // See: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.1
       default: {
-        console.log('Unknown attribute: ' + attributeName);
         attribute.info = new Array(attribute.attribute_length);
         for (let i = 0; i < attribute.attribute_length; i++) {
           attribute.info[i] = this.buf.readUint8();
