@@ -406,39 +406,10 @@ class JavaClassFileReader {
         attribute.main_class_index = this.buf.readUint16();
         break;
 
-      /* Not specified in JVMS 9 */
-      // TODO: remove?
-      case 'ModuleTarget':
-        attribute.target_platform_index = this.buf.readUint16();
-        break;
-
-      case 'ModuleHashes': {
-        attribute.algorithm_index = this.buf.readUint16();
-        attribute.hashes_table_length = this.buf.readUint16();
-        attribute.hashes_table = [];
-
-        let hashes_table_length = attribute.hashes_table_length;
-        while (hashes_table_length-- > 0) {
-          const entry = {
-            module_name_index: this.buf.readUint16(),
-            hash_length: this.buf.readUint16(),
-            hash: []
-          };
-
-          let hash_length = entry.hash_length;
-          while (hash_length-- > 0) {
-            entry.hash.push(this.buf.readUint8());
-          }
-
-          attribute.hashes_table.push(entry);
-        }
-        break;
-      }
-      /* -- */
-
       // Unknown attributes
       // See: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.1
       default: {
+        console.log('Unknown attribute: ' + attributeName);
         attribute.info = new Array(attribute.attribute_length);
         for (let i = 0; i < attribute.attribute_length; i++) {
           attribute.info[i] = this.buf.readUint8();

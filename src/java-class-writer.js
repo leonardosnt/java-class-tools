@@ -516,28 +516,6 @@ class JavaClassFileWriter {
         }
         break;
 
-      /* Not specified in JVMS 9 */
-      case 'ModuleTarget':
-        this.buf.writeUint16(attribute_info.target_platform_index);
-        break;
-
-      case 'ModuleHashes': {
-        this.buf.writeUint16(attribute_info.algorithm_index);
-        this.buf.writeUint16(attribute_info.hashes_table_length);
-
-        for (var i = 0; i < attribute_info.hashes_table_length; i++) {
-          const entry = attribute_info.hashes_table[i];
-          this.buf.writeUint16(entry.module_name_index);
-          this.buf.writeUint16(entry.hash_length);
-
-          for (var j = 0; j < entry.hash_length; j++) {
-            this.buf.writeUint8(entry.hash[j]);
-          }
-        }
-        break;
-      }
-      /* -- */
-
       // Unknown attributes
       // See: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.1
       default: {
