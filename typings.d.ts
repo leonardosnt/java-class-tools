@@ -498,6 +498,7 @@ declare module 'java-class-tools' {
     NAME_AND_TYPE = 12,
     METHOD_HANDLE = 15,
     METHOD_TYPE = 16,
+    DYNAMIC = 17,
     INVOKE_DYNAMIC = 18
   }
 

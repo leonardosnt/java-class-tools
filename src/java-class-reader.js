@@ -875,6 +875,7 @@ class JavaClassFileReader {
       case ConstantType.METHOD_TYPE:
         return { tag, descriptor_index: this.buf.readUint16() };
 
+      case ConstantType.DYNAMIC:
       case ConstantType.INVOKE_DYNAMIC:
         return { tag, bootstrap_method_attr_index: this.buf.readUint16(), name_and_type_index: this.buf.readUint16() };
 

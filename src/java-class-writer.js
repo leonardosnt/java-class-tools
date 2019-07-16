@@ -628,6 +628,7 @@ class JavaClassFileWriter {
         this.buf.writeUint16(entry.descriptor_index);
         break;
 
+      case ConstantType.DYNAMIC:
       case ConstantType.INVOKE_DYNAMIC:
         this.buf.writeUint16(entry.bootstrap_method_attr_index);
         this.buf.writeUint16(entry.name_and_type_index);
