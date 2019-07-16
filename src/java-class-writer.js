@@ -218,20 +218,20 @@ class JavaClassFileWriter {
     }
   }
 
-  _writeAttributeInfo(attribute_info) {
-    this.buf.writeUint16(attribute_info.attribute_name_index);
-    this.buf.writeUint32(attribute_info.attribute_length);
+  _writeAttributeInfo(attribute) {
+    this.buf.writeUint16(attribute.attribute_name_index);
+    this.buf.writeUint32(attribute.attribute_length);
 
-    let attributeNameBytes = this.classFile.constant_pool[attribute_info.attribute_name_index].bytes;
-    let attributeName = String.fromCharCode.apply(null, attributeNameBytes); // TODO: is this safe?
+    const attributeNameBytes = this.classFile.constant_pool[attribute.attribute_name_index].bytes;
+    const attributeName = String.fromCharCode.apply(null, attributeNameBytes); // TODO: is this safe?
 
     switch (attributeName) {
       case 'RuntimeInvisibleAnnotations':
       case 'RuntimeVisibleAnnotations':
-        this.buf.writeUint16(attribute_info.num_annotations);
+        this.buf.writeUint16(attribute.num_annotations);
 
-        for (var i = 0; i < attribute_info.num_annotations; i++) {
-          this._writeAttributeAnnotation(attribute_info.annotations[i]);
+        for (var i = 0; i < attribute.num_annotations; i++) {
+          this._writeAttributeAnnotation(attribute.annotations[i]);
         }
         break;
 
@@ -241,10 +241,10 @@ class JavaClassFileWriter {
         break;
 
       case 'InnerClasses':
-        this.buf.writeUint16(attribute_info.number_of_classes);
+        this.buf.writeUint16(attribute.number_of_classes);
 
-        for (var i = 0; i < attribute_info.number_of_classes; i++) {
-          const inner_class = attribute_info.classes[i];
+        for (var i = 0; i < attribute.number_of_classes; i++) {
+          const inner_class = attribute.classes[i];
 
           this.buf.writeUint16(inner_class.inner_class_info_index);
           this.buf.writeUint16(inner_class.outer_class_info_index);
@@ -254,10 +254,10 @@ class JavaClassFileWriter {
         break;
 
       case 'LocalVariableTable':
-        this.buf.writeUint16(attribute_info.local_variable_table_length);
+        this.buf.writeUint16(attribute.local_variable_table_length);
 
-        for (var i = 0; i < attribute_info.local_variable_table_length; i++) {
-          const local_variable = attribute_info.local_variable_table[i];
+        for (var i = 0; i < attribute.local_variable_table_length; i++) {
+          const local_variable = attribute.local_variable_table[i];
 
           this.buf.writeUint16(local_variable.start_pc);
           this.buf.writeUint16(local_variable.length);
@@ -268,10 +268,10 @@ class JavaClassFileWriter {
         break;
 
       case 'LocalVariableTypeTable':
-        this.buf.writeUint16(attribute_info.local_variable_type_table_length);
+        this.buf.writeUint16(attribute.local_variable_type_table_length);
 
-        for (var i = 0; i < attribute_info.local_variable_type_table_length; i++) {
-          const local_variable_type = attribute_info.local_variable_type_table[i];
+        for (var i = 0; i < attribute.local_variable_type_table_length; i++) {
+          const local_variable_type = attribute.local_variable_type_table[i];
 
           this.buf.writeUint16(local_variable_type.start_pc);
           this.buf.writeUint16(local_variable_type.length);
@@ -283,10 +283,10 @@ class JavaClassFileWriter {
 
       case 'RuntimeInvisibleParameterAnnotations':
       case 'RuntimeVisibleParameterAnnotations':
-        this.buf.writeUint8(attribute_info.num_parameters);
+        this.buf.writeUint8(attribute.num_parameters);
 
-        for (var i = 0; i < attribute_info.num_parameters; i++) {
-          const parameter_annotation = attribute_info.parameter_annotations[i];
+        for (var i = 0; i < attribute.num_parameters; i++) {
+          const parameter_annotation = attribute.parameter_annotations[i];
           this.buf.writeUint16(parameter_annotation.num_annotations);
 
           for (var j = 0; j < parameter_annotation.num_annotations; j++) {
@@ -296,10 +296,10 @@ class JavaClassFileWriter {
         break;
 
       case 'BootstrapMethods':
-        this.buf.writeUint16(attribute_info.num_bootstrap_methods);
+        this.buf.writeUint16(attribute.num_bootstrap_methods);
 
-        for (var i = 0; i < attribute_info.num_bootstrap_methods; i++) {
-          const bootstrap_method = attribute_info.bootstrap_methods[i];
+        for (var i = 0; i < attribute.num_bootstrap_methods; i++) {
+          const bootstrap_method = attribute.bootstrap_methods[i];
 
           this.buf.writeUint16(bootstrap_method.bootstrap_method_ref);
           this.buf.writeUint16(bootstrap_method.num_bootstrap_arguments);
@@ -312,37 +312,37 @@ class JavaClassFileWriter {
 
       case 'RuntimeInvisibleTypeAnnotations':
       case 'RuntimeVisibleTypeAnnotations':
-        this.buf.writeUint16(attribute_info.num_annotations);
+        this.buf.writeUint16(attribute.num_annotations);
 
-        for (var i = 0; i < attribute_info.num_annotations; i++) {
-          this._writeTypeAnnotation(attribute_info.annotations[i]);
+        for (var i = 0; i < attribute.num_annotations; i++) {
+          this._writeTypeAnnotation(attribute.annotations[i]);
         }
         break;
 
       case 'SourceDebugExtension':
-        for (var i = 0; i < attribute_info.attribute_length; i++) {
-          this.buf.writeUint8(attribute_info.debug_extension[i]);
+        for (var i = 0; i < attribute.attribute_length; i++) {
+          this.buf.writeUint8(attribute.debug_extension[i]);
         }
         break;
 
       case 'SourceFile':
-        this.buf.writeUint16(attribute_info.sourcefile_index);
+        this.buf.writeUint16(attribute.sourcefile_index);
         break;
 
       case 'EnclosingMethod':
-        this.buf.writeUint16(attribute_info.class_index);
-        this.buf.writeUint16(attribute_info.method_index);
+        this.buf.writeUint16(attribute.class_index);
+        this.buf.writeUint16(attribute.method_index);
         break;
 
       case 'AnnotationDefault':
-        this._writeElementValue(attribute_info.default_value);
+        this._writeElementValue(attribute.default_value);
         break;
 
       case 'MethodParameters':
-        this.buf.writeUint8(attribute_info.parameters_count);
+        this.buf.writeUint8(attribute.parameters_count);
 
-        for (var i = 0; i < attribute_info.parameters_count; i++) {
-          const parameter = attribute_info.parameters[i];
+        for (var i = 0; i < attribute.parameters_count; i++) {
+          const parameter = attribute.parameters[i];
 
           this.buf.writeUint16(parameter.name_index);
           this.buf.writeUint16(parameter.access_flags);
@@ -350,26 +350,26 @@ class JavaClassFileWriter {
         break;
 
       case 'Exceptions':
-        this.buf.writeUint16(attribute_info.number_of_exceptions);
+        this.buf.writeUint16(attribute.number_of_exceptions);
 
-        for (var i = 0; i < attribute_info.number_of_exceptions; i++) {
-          this.buf.writeUint16(attribute_info.exception_index_table[i])
+        for (var i = 0; i < attribute.number_of_exceptions; i++) {
+          this.buf.writeUint16(attribute.exception_index_table[i])
         }
         break;
 
       case 'ConstantValue':
-        this.buf.writeUint16(attribute_info.constantvalue_index);
+        this.buf.writeUint16(attribute.constantvalue_index);
         break;
 
       case 'Signature':
-        this.buf.writeUint16(attribute_info.signature_index);
+        this.buf.writeUint16(attribute.signature_index);
         break;
 
       case 'StackMapTable': {
-        this.buf.writeUint16(attribute_info.number_of_entries);
+        this.buf.writeUint16(attribute.number_of_entries);
 
-        for (var i = 0; i < attribute_info.number_of_entries; i++) {
-          const stack_map_frame = attribute_info.entries[i];
+        for (var i = 0; i < attribute.number_of_entries; i++) {
+          const stack_map_frame = attribute.entries[i];
           const frame_type = stack_map_frame.frame_type;
 
           this.buf.writeUint8(frame_type);
@@ -416,18 +416,18 @@ class JavaClassFileWriter {
       }
 
       case 'Code':
-        this.buf.writeUint16(attribute_info.max_stack);
-        this.buf.writeUint16(attribute_info.max_locals);
-        this.buf.writeUint32(attribute_info.code_length);
+        this.buf.writeUint16(attribute.max_stack);
+        this.buf.writeUint16(attribute.max_locals);
+        this.buf.writeUint32(attribute.code_length);
 
-        for (var i = 0; i < attribute_info.code_length; i++) {
-          this.buf.writeUint8(attribute_info.code[i]);
+        for (var i = 0; i < attribute.code_length; i++) {
+          this.buf.writeUint8(attribute.code[i]);
         }
 
-        this.buf.writeUint16(attribute_info.exception_table_length);
+        this.buf.writeUint16(attribute.exception_table_length);
 
-        for (var i = 0; i < attribute_info.exception_table_length; i++) {
-          const exception_entry = attribute_info.exception_table[i];
+        for (var i = 0; i < attribute.exception_table_length; i++) {
+          const exception_entry = attribute.exception_table[i];
 
           this.buf.writeUint16(exception_entry.start_pc);
           this.buf.writeUint16(exception_entry.end_pc);
@@ -435,15 +435,15 @@ class JavaClassFileWriter {
           this.buf.writeUint16(exception_entry.catch_type);
         }
 
-        this.buf.writeUint16(attribute_info.attributes_count);
-        this._writeAttributeInfoArray(attribute_info.attributes);
+        this.buf.writeUint16(attribute.attributes_count);
+        this._writeAttributeInfoArray(attribute.attributes);
         break;
 
       case 'LineNumberTable':
-        this.buf.writeUint16(attribute_info.line_number_table_length);
+        this.buf.writeUint16(attribute.line_number_table_length);
 
-        for (var i = 0; i < attribute_info.line_number_table_length; i++) {
-          const line_number = attribute_info.line_number_table[i];
+        for (var i = 0; i < attribute.line_number_table_length; i++) {
+          const line_number = attribute.line_number_table[i];
 
           this.buf.writeUint16(line_number.start_pc);
           this.buf.writeUint16(line_number.line_number);
@@ -451,22 +451,22 @@ class JavaClassFileWriter {
         break;
 
       case 'Module': {
-        this.buf.writeUint16(attribute_info.module_name_index);
-        this.buf.writeUint16(attribute_info.module_flags);
-        this.buf.writeUint16(attribute_info.module_version_index);
+        this.buf.writeUint16(attribute.module_name_index);
+        this.buf.writeUint16(attribute.module_flags);
+        this.buf.writeUint16(attribute.module_version_index);
 
-        this.buf.writeUint16(attribute_info.requires_count);
-        for (var i = 0; i < attribute_info.requires_count; i++) {
-          const entry = attribute_info.requires[i];
+        this.buf.writeUint16(attribute.requires_count);
+        for (var i = 0; i < attribute.requires_count; i++) {
+          const entry = attribute.requires[i];
 
           this.buf.writeUint16(entry.requires_index);
           this.buf.writeUint16(entry.requires_flags);
           this.buf.writeUint16(entry.requires_version_index);
         }
 
-        this.buf.writeUint16(attribute_info.exports_count);
-        for (var i = 0; i < attribute_info.exports_count; i++) {
-          const entry = attribute_info.exports[i];
+        this.buf.writeUint16(attribute.exports_count);
+        for (var i = 0; i < attribute.exports_count; i++) {
+          const entry = attribute.exports[i];
 
           this.buf.writeUint16(entry.exports_index);
           this.buf.writeUint16(entry.exports_flags);
@@ -477,9 +477,9 @@ class JavaClassFileWriter {
           }
         }
 
-        this.buf.writeUint16(attribute_info.opens_count);
-        for (var i = 0; i < attribute_info.opens_count; i++) {
-          const entry = attribute_info.opens[i];
+        this.buf.writeUint16(attribute.opens_count);
+        for (var i = 0; i < attribute.opens_count; i++) {
+          const entry = attribute.opens[i];
 
           this.buf.writeUint16(entry.opens_index);
           this.buf.writeUint16(entry.opens_flags);
@@ -490,14 +490,14 @@ class JavaClassFileWriter {
           }
         }
 
-        this.buf.writeUint16(attribute_info.uses_count);
-        for (var i = 0; i < attribute_info.uses_count; i++) {
-          this.buf.writeUint16(attribute_info.uses_index[i]);
+        this.buf.writeUint16(attribute.uses_count);
+        for (var i = 0; i < attribute.uses_count; i++) {
+          this.buf.writeUint16(attribute.uses_index[i]);
         }
 
-        this.buf.writeUint16(attribute_info.provides_count);
-        for (var i = 0; i < attribute_info.provides_count; i++) {
-          const entry = attribute_info.provides[i];
+        this.buf.writeUint16(attribute.provides_count);
+        for (var i = 0; i < attribute.provides_count; i++) {
+          const entry = attribute.provides[i];
 
           this.buf.writeUint16(entry.provides_index);
           this.buf.writeUint16(entry.provides_with_count);
@@ -510,32 +510,32 @@ class JavaClassFileWriter {
       }
 
       case 'ModulePackages':
-        this.buf.writeUint16(attribute_info.package_count);
-        for (var i = 0; i < attribute_info.package_count; i++) {
-          this.buf.writeUint16(attribute_info.package_index[i]);
+        this.buf.writeUint16(attribute.package_count);
+        for (var i = 0; i < attribute.package_count; i++) {
+          this.buf.writeUint16(attribute.package_index[i]);
         }
         break;
 
       case 'ModuleMainClass':
-        this.buf.writeUint16(attribute_info.main_class_index);
+        this.buf.writeUint16(attribute.main_class_index);
         break;
 
       case 'NestHost':
-        this.buf.writeUint16(attribute_info.host_class_index);
+        this.buf.writeUint16(attribute.host_class_index);
         break;
 
       case 'NestMembers':
-        this.buf.writeUint16(attribute_info.number_of_classes);
-        for (let i = 0; i < attribute_info.number_of_classes; i++) {
-           this.buf.writeUint16(attribute_info.classes[i]);
+        this.buf.writeUint16(attribute.number_of_classes);
+        for (let i = 0; i < attribute.number_of_classes; i++) {
+           this.buf.writeUint16(attribute.classes[i]);
         }
         break;
 
       // Unknown attributes
       // See: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.1
       default: {
-        for (var i = 0; i < attribute_info.attribute_length; i++) {
-          this.buf.writeUint8(attribute_info.info[i]);
+        for (var i = 0; i < attribute.attribute_length; i++) {
+          this.buf.writeUint8(attribute.info[i]);
         }
       }
     }
