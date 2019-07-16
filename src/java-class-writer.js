@@ -516,6 +516,10 @@ class JavaClassFileWriter {
         }
         break;
 
+      case 'ModuleMainClass':
+        this.buf.writeUint16(attribute_info.main_class_index);
+        break;
+
       // Unknown attributes
       // See: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.1
       default: {
