@@ -1,12 +1,7 @@
 node_modules/
-cls/
 coverage/
 .vscode/
 lib/
-test/coverage.js
-test/fuzz.js
-test/data/classes/*
-test/data/*.class
-test/perf.js
-test/test-deopts.js
+test/data/**
+test-misc/*
 TODO.txt
