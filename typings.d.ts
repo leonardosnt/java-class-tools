@@ -56,7 +56,7 @@ declare module 'java-class-tools' {
      *
      * So, the entry after a CONSTANT_Long or CONSTANT_Double is always undefined.
      */
-    public constant_pool: ConstantPoolInfo[];
+    public constant_pool: (ConstantPoolInfo | undefined)[];
 
     public access_flags: number;
 
