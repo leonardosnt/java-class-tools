@@ -560,44 +560,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	          attribute.main_class_index = this.buf.readUint16();
 	          break;
 
-	        /* Not specified in JVMS 9 */
-	        // TODO: remove?
-	        case 'ModuleTarget':
-	          attribute.target_platform_index = this.buf.readUint16();
+	        case 'NestHost':
+	          attribute.host_class_index = this.buf.readUint16();
 	          break;
 
-	        case 'ModuleHashes':
-	          {
-	            attribute.algorithm_index = this.buf.readUint16();
-	            attribute.hashes_table_length = this.buf.readUint16();
-	            attribute.hashes_table = [];
-
-	            var hashes_table_length = attribute.hashes_table_length;
-	            while (hashes_table_length-- > 0) {
-	              var entry = {
-	                module_name_index: this.buf.readUint16(),
-	                hash_length: this.buf.readUint16(),
-	                hash: []
-	              };
-
-	              var hash_length = entry.hash_length;
-	              while (hash_length-- > 0) {
-	                entry.hash.push(this.buf.readUint8());
-	              }
-
-	              attribute.hashes_table.push(entry);
-	            }
-	            break;
+	        case 'NestMembers':
+	          attribute.number_of_classes = this.buf.readUint16();
+	          attribute.classes = new Array(attribute.number_of_classes);
+	          for (var _i9 = 0; _i9 < attribute.number_of_classes; _i9++) {
+	            attribute.classes[_i9] = this.buf.readUint16();
 	          }
-	        /* -- */
+	          break;
 
 	        // Unknown attributes
 	        // See: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.1
 	        default:
 	          {
 	            attribute.info = new Array(attribute.attribute_length);
-	            for (var _i9 = 0; _i9 < attribute.attribute_length; _i9++) {
-	              attribute.info[_i9] = this.buf.readUint8();
+	            for (var _i10 = 0; _i10 < attribute.attribute_length; _i10++) {
+	              attribute.info[_i10] = this.buf.readUint8();
 	            }
 	          }
 	      }
@@ -621,8 +602,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      attribute.exception_table = new Array(attribute.exception_table_length);
 
 	      // Reads exception_table
-	      for (var _i10 = 0; _i10 < attribute.exception_table_length; _i10++) {
-	        attribute.exception_table[_i10] = {
+	      for (var _i11 = 0; _i11 < attribute.exception_table_length; _i11++) {
+	        attribute.exception_table[_i11] = {
 	          start_pc: this.buf.readUint16(),
 	          end_pc: this.buf.readUint16(),
 	          handler_pc: this.buf.readUint16(),
@@ -711,15 +692,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	                  stack_map_frame.number_of_locals = this.buf.readUint16();
 	                  stack_map_frame.locals = new Array(stack_map_frame.number_of_locals);
 
-	                  for (var _i11 = 0; _i11 < stack_map_frame.number_of_locals; _i11++) {
-	                    stack_map_frame.locals[_i11] = this._readVerificationTypeInfo();
+	                  for (var _i12 = 0; _i12 < stack_map_frame.number_of_locals; _i12++) {
+	                    stack_map_frame.locals[_i12] = this._readVerificationTypeInfo();
 	                  }
 
 	                  stack_map_frame.number_of_stack_items = this.buf.readUint16();
 	                  stack_map_frame.stack = new Array(stack_map_frame.number_of_stack_items);
 
-	                  for (var _i12 = 0; _i12 < stack_map_frame.number_of_stack_items; _i12++) {
-	                    stack_map_frame.stack[_i12] = this._readVerificationTypeInfo();
+	                  for (var _i13 = 0; _i13 < stack_map_frame.number_of_stack_items; _i13++) {
+	                    stack_map_frame.stack[_i13] = this._readVerificationTypeInfo();
 	                  }
 	                }
 
@@ -771,8 +752,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        stack_map_frame.number_of_stack_items = this.buf.readUint16();
 	        stack_map_frame.stack = new Array(stack_map_frame.number_of_stack_items);
 
-	        for (var _i13 = 0; _i13 < stack_map_frame.number_of_stack_items; _i13++) {
-	          stack_map_frame.stack[_i13] = this._readVerificationTypeInfo();
+	        for (var _i14 = 0; _i14 < stack_map_frame.number_of_stack_items; _i14++) {
+	          stack_map_frame.stack[_i14] = this._readVerificationTypeInfo();
 	        }
 
 	        attribute.entries[entryIndex] = stack_map_frame;
@@ -836,8 +817,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      attribute.uses_count = this.buf.readUint16();
 	      attribute.uses_index = new Array(attribute.uses_count);;
 
-	      for (var _i14 = 0; _i14 < attribute.uses_count; _i14++) {
-	        attribute.uses_index[_i14] = this.buf.readUint16();
+	      for (var _i15 = 0; _i15 < attribute.uses_count; _i15++) {
+	        attribute.uses_index[_i15] = this.buf.readUint16();
 	      }
 
 	      attribute.provides_count = this.buf.readUint16();
@@ -1060,6 +1041,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case _constantType2.default.METHOD_TYPE:
 	          return { tag: tag, descriptor_index: this.buf.readUint16() };
 
+	        case _constantType2.default.DYNAMIC:
 	        case _constantType2.default.INVOKE_DYNAMIC:
 	          return { tag: tag, bootstrap_method_attr_index: this.buf.readUint16(), name_and_type_index: this.buf.readUint16() };
 
@@ -6100,6 +6082,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  NAME_AND_TYPE: 12,
 	  METHOD_HANDLE: 15,
 	  METHOD_TYPE: 16,
+	  DYNAMIC: 17,
 	  INVOKE_DYNAMIC: 18,
 	  MODULE: 19,
 	  PACKAGE: 20
@@ -6359,20 +6342,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: '_writeAttributeInfo',
-	    value: function _writeAttributeInfo(attribute_info) {
-	      this.buf.writeUint16(attribute_info.attribute_name_index);
-	      this.buf.writeUint32(attribute_info.attribute_length);
+	    value: function _writeAttributeInfo(attribute) {
+	      this.buf.writeUint16(attribute.attribute_name_index);
+	      this.buf.writeUint32(attribute.attribute_length);
 
-	      var attributeNameBytes = this.classFile.constant_pool[attribute_info.attribute_name_index].bytes;
+	      var attributeNameBytes = this.classFile.constant_pool[attribute.attribute_name_index].bytes;
 	      var attributeName = String.fromCharCode.apply(null, attributeNameBytes); // TODO: is this safe?
 
 	      switch (attributeName) {
 	        case 'RuntimeInvisibleAnnotations':
 	        case 'RuntimeVisibleAnnotations':
-	          this.buf.writeUint16(attribute_info.num_annotations);
+	          this.buf.writeUint16(attribute.num_annotations);
 
-	          for (var i = 0; i < attribute_info.num_annotations; i++) {
-	            this._writeAttributeAnnotation(attribute_info.annotations[i]);
+	          for (var i = 0; i < attribute.num_annotations; i++) {
+	            this._writeAttributeAnnotation(attribute.annotations[i]);
 	          }
 	          break;
 
@@ -6382,10 +6365,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          break;
 
 	        case 'InnerClasses':
-	          this.buf.writeUint16(attribute_info.number_of_classes);
+	          this.buf.writeUint16(attribute.number_of_classes);
 
-	          for (var i = 0; i < attribute_info.number_of_classes; i++) {
-	            var inner_class = attribute_info.classes[i];
+	          for (var i = 0; i < attribute.number_of_classes; i++) {
+	            var inner_class = attribute.classes[i];
 
 	            this.buf.writeUint16(inner_class.inner_class_info_index);
 	            this.buf.writeUint16(inner_class.outer_class_info_index);
@@ -6395,10 +6378,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          break;
 
 	        case 'LocalVariableTable':
-	          this.buf.writeUint16(attribute_info.local_variable_table_length);
+	          this.buf.writeUint16(attribute.local_variable_table_length);
 
-	          for (var i = 0; i < attribute_info.local_variable_table_length; i++) {
-	            var local_variable = attribute_info.local_variable_table[i];
+	          for (var i = 0; i < attribute.local_variable_table_length; i++) {
+	            var local_variable = attribute.local_variable_table[i];
 
 	            this.buf.writeUint16(local_variable.start_pc);
 	            this.buf.writeUint16(local_variable.length);
@@ -6409,10 +6392,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          break;
 
 	        case 'LocalVariableTypeTable':
-	          this.buf.writeUint16(attribute_info.local_variable_type_table_length);
+	          this.buf.writeUint16(attribute.local_variable_type_table_length);
 
-	          for (var i = 0; i < attribute_info.local_variable_type_table_length; i++) {
-	            var local_variable_type = attribute_info.local_variable_type_table[i];
+	          for (var i = 0; i < attribute.local_variable_type_table_length; i++) {
+	            var local_variable_type = attribute.local_variable_type_table[i];
 
 	            this.buf.writeUint16(local_variable_type.start_pc);
 	            this.buf.writeUint16(local_variable_type.length);
@@ -6424,10 +6407,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        case 'RuntimeInvisibleParameterAnnotations':
 	        case 'RuntimeVisibleParameterAnnotations':
-	          this.buf.writeUint8(attribute_info.num_parameters);
+	          this.buf.writeUint8(attribute.num_parameters);
 
-	          for (var i = 0; i < attribute_info.num_parameters; i++) {
-	            var parameter_annotation = attribute_info.parameter_annotations[i];
+	          for (var i = 0; i < attribute.num_parameters; i++) {
+	            var parameter_annotation = attribute.parameter_annotations[i];
 	            this.buf.writeUint16(parameter_annotation.num_annotations);
 
 	            for (var j = 0; j < parameter_annotation.num_annotations; j++) {
@@ -6437,10 +6420,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          break;
 
 	        case 'BootstrapMethods':
-	          this.buf.writeUint16(attribute_info.num_bootstrap_methods);
+	          this.buf.writeUint16(attribute.num_bootstrap_methods);
 
-	          for (var i = 0; i < attribute_info.num_bootstrap_methods; i++) {
-	            var bootstrap_method = attribute_info.bootstrap_methods[i];
+	          for (var i = 0; i < attribute.num_bootstrap_methods; i++) {
+	            var bootstrap_method = attribute.bootstrap_methods[i];
 
 	            this.buf.writeUint16(bootstrap_method.bootstrap_method_ref);
 	            this.buf.writeUint16(bootstrap_method.num_bootstrap_arguments);
@@ -6453,37 +6436,37 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        case 'RuntimeInvisibleTypeAnnotations':
 	        case 'RuntimeVisibleTypeAnnotations':
-	          this.buf.writeUint16(attribute_info.num_annotations);
+	          this.buf.writeUint16(attribute.num_annotations);
 
-	          for (var i = 0; i < attribute_info.num_annotations; i++) {
-	            this._writeTypeAnnotation(attribute_info.annotations[i]);
+	          for (var i = 0; i < attribute.num_annotations; i++) {
+	            this._writeTypeAnnotation(attribute.annotations[i]);
 	          }
 	          break;
 
 	        case 'SourceDebugExtension':
-	          for (var i = 0; i < attribute_info.attribute_length; i++) {
-	            this.buf.writeUint8(attribute_info.debug_extension[i]);
+	          for (var i = 0; i < attribute.attribute_length; i++) {
+	            this.buf.writeUint8(attribute.debug_extension[i]);
 	          }
 	          break;
 
 	        case 'SourceFile':
-	          this.buf.writeUint16(attribute_info.sourcefile_index);
+	          this.buf.writeUint16(attribute.sourcefile_index);
 	          break;
 
 	        case 'EnclosingMethod':
-	          this.buf.writeUint16(attribute_info.class_index);
-	          this.buf.writeUint16(attribute_info.method_index);
+	          this.buf.writeUint16(attribute.class_index);
+	          this.buf.writeUint16(attribute.method_index);
 	          break;
 
 	        case 'AnnotationDefault':
-	          this._writeElementValue(attribute_info.default_value);
+	          this._writeElementValue(attribute.default_value);
 	          break;
 
 	        case 'MethodParameters':
-	          this.buf.writeUint8(attribute_info.parameters_count);
+	          this.buf.writeUint8(attribute.parameters_count);
 
-	          for (var i = 0; i < attribute_info.parameters_count; i++) {
-	            var parameter = attribute_info.parameters[i];
+	          for (var i = 0; i < attribute.parameters_count; i++) {
+	            var parameter = attribute.parameters[i];
 
 	            this.buf.writeUint16(parameter.name_index);
 	            this.buf.writeUint16(parameter.access_flags);
@@ -6491,27 +6474,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	          break;
 
 	        case 'Exceptions':
-	          this.buf.writeUint16(attribute_info.number_of_exceptions);
+	          this.buf.writeUint16(attribute.number_of_exceptions);
 
-	          for (var i = 0; i < attribute_info.number_of_exceptions; i++) {
-	            this.buf.writeUint16(attribute_info.exception_index_table[i]);
+	          for (var i = 0; i < attribute.number_of_exceptions; i++) {
+	            this.buf.writeUint16(attribute.exception_index_table[i]);
 	          }
 	          break;
 
 	        case 'ConstantValue':
-	          this.buf.writeUint16(attribute_info.constantvalue_index);
+	          this.buf.writeUint16(attribute.constantvalue_index);
 	          break;
 
 	        case 'Signature':
-	          this.buf.writeUint16(attribute_info.signature_index);
+	          this.buf.writeUint16(attribute.signature_index);
 	          break;
 
 	        case 'StackMapTable':
 	          {
-	            this.buf.writeUint16(attribute_info.number_of_entries);
+	            this.buf.writeUint16(attribute.number_of_entries);
 
-	            for (var i = 0; i < attribute_info.number_of_entries; i++) {
-	              var stack_map_frame = attribute_info.entries[i];
+	            for (var i = 0; i < attribute.number_of_entries; i++) {
+	              var stack_map_frame = attribute.entries[i];
 	              var frame_type = stack_map_frame.frame_type;
 
 	              this.buf.writeUint8(frame_type);
@@ -6558,18 +6541,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 
 	        case 'Code':
-	          this.buf.writeUint16(attribute_info.max_stack);
-	          this.buf.writeUint16(attribute_info.max_locals);
-	          this.buf.writeUint32(attribute_info.code_length);
+	          this.buf.writeUint16(attribute.max_stack);
+	          this.buf.writeUint16(attribute.max_locals);
+	          this.buf.writeUint32(attribute.code_length);
 
-	          for (var i = 0; i < attribute_info.code_length; i++) {
-	            this.buf.writeUint8(attribute_info.code[i]);
+	          for (var i = 0; i < attribute.code_length; i++) {
+	            this.buf.writeUint8(attribute.code[i]);
 	          }
 
-	          this.buf.writeUint16(attribute_info.exception_table_length);
+	          this.buf.writeUint16(attribute.exception_table_length);
 
-	          for (var i = 0; i < attribute_info.exception_table_length; i++) {
-	            var exception_entry = attribute_info.exception_table[i];
+	          for (var i = 0; i < attribute.exception_table_length; i++) {
+	            var exception_entry = attribute.exception_table[i];
 
 	            this.buf.writeUint16(exception_entry.start_pc);
 	            this.buf.writeUint16(exception_entry.end_pc);
@@ -6577,15 +6560,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.buf.writeUint16(exception_entry.catch_type);
 	          }
 
-	          this.buf.writeUint16(attribute_info.attributes_count);
-	          this._writeAttributeInfoArray(attribute_info.attributes);
+	          this.buf.writeUint16(attribute.attributes_count);
+	          this._writeAttributeInfoArray(attribute.attributes);
 	          break;
 
 	        case 'LineNumberTable':
-	          this.buf.writeUint16(attribute_info.line_number_table_length);
+	          this.buf.writeUint16(attribute.line_number_table_length);
 
-	          for (var i = 0; i < attribute_info.line_number_table_length; i++) {
-	            var line_number = attribute_info.line_number_table[i];
+	          for (var i = 0; i < attribute.line_number_table_length; i++) {
+	            var line_number = attribute.line_number_table[i];
 
 	            this.buf.writeUint16(line_number.start_pc);
 	            this.buf.writeUint16(line_number.line_number);
@@ -6594,22 +6577,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        case 'Module':
 	          {
-	            this.buf.writeUint16(attribute_info.module_name_index);
-	            this.buf.writeUint16(attribute_info.module_flags);
-	            this.buf.writeUint16(attribute_info.module_version_index);
+	            this.buf.writeUint16(attribute.module_name_index);
+	            this.buf.writeUint16(attribute.module_flags);
+	            this.buf.writeUint16(attribute.module_version_index);
 
-	            this.buf.writeUint16(attribute_info.requires_count);
-	            for (var i = 0; i < attribute_info.requires_count; i++) {
-	              var entry = attribute_info.requires[i];
+	            this.buf.writeUint16(attribute.requires_count);
+	            for (var i = 0; i < attribute.requires_count; i++) {
+	              var entry = attribute.requires[i];
 
 	              this.buf.writeUint16(entry.requires_index);
 	              this.buf.writeUint16(entry.requires_flags);
 	              this.buf.writeUint16(entry.requires_version_index);
 	            }
 
-	            this.buf.writeUint16(attribute_info.exports_count);
-	            for (var i = 0; i < attribute_info.exports_count; i++) {
-	              var _entry = attribute_info.exports[i];
+	            this.buf.writeUint16(attribute.exports_count);
+	            for (var i = 0; i < attribute.exports_count; i++) {
+	              var _entry = attribute.exports[i];
 
 	              this.buf.writeUint16(_entry.exports_index);
 	              this.buf.writeUint16(_entry.exports_flags);
@@ -6620,9 +6603,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	              }
 	            }
 
-	            this.buf.writeUint16(attribute_info.opens_count);
-	            for (var i = 0; i < attribute_info.opens_count; i++) {
-	              var _entry2 = attribute_info.opens[i];
+	            this.buf.writeUint16(attribute.opens_count);
+	            for (var i = 0; i < attribute.opens_count; i++) {
+	              var _entry2 = attribute.opens[i];
 
 	              this.buf.writeUint16(_entry2.opens_index);
 	              this.buf.writeUint16(_entry2.opens_flags);
@@ -6633,14 +6616,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	              }
 	            }
 
-	            this.buf.writeUint16(attribute_info.uses_count);
-	            for (var i = 0; i < attribute_info.uses_count; i++) {
-	              this.buf.writeUint16(attribute_info.uses_index[i]);
+	            this.buf.writeUint16(attribute.uses_count);
+	            for (var i = 0; i < attribute.uses_count; i++) {
+	              this.buf.writeUint16(attribute.uses_index[i]);
 	            }
 
-	            this.buf.writeUint16(attribute_info.provides_count);
-	            for (var i = 0; i < attribute_info.provides_count; i++) {
-	              var _entry3 = attribute_info.provides[i];
+	            this.buf.writeUint16(attribute.provides_count);
+	            for (var i = 0; i < attribute.provides_count; i++) {
+	              var _entry3 = attribute.provides[i];
 
 	              this.buf.writeUint16(_entry3.provides_index);
 	              this.buf.writeUint16(_entry3.provides_with_count);
@@ -6653,41 +6636,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 
 	        case 'ModulePackages':
-	          this.buf.writeUint16(attribute_info.package_count);
-	          for (var i = 0; i < attribute_info.package_count; i++) {
-	            this.buf.writeUint16(attribute_info.package_index[i]);
+	          this.buf.writeUint16(attribute.package_count);
+	          for (var i = 0; i < attribute.package_count; i++) {
+	            this.buf.writeUint16(attribute.package_index[i]);
 	          }
 	          break;
 
-	        /* Not specified in JVMS 9 */
-	        case 'ModuleTarget':
-	          this.buf.writeUint16(attribute_info.target_platform_index);
+	        case 'ModuleMainClass':
+	          this.buf.writeUint16(attribute.main_class_index);
 	          break;
 
-	        case 'ModuleHashes':
-	          {
-	            this.buf.writeUint16(attribute_info.algorithm_index);
-	            this.buf.writeUint16(attribute_info.hashes_table_length);
+	        case 'NestHost':
+	          this.buf.writeUint16(attribute.host_class_index);
+	          break;
 
-	            for (var i = 0; i < attribute_info.hashes_table_length; i++) {
-	              var _entry4 = attribute_info.hashes_table[i];
-	              this.buf.writeUint16(_entry4.module_name_index);
-	              this.buf.writeUint16(_entry4.hash_length);
-
-	              for (var j = 0; j < _entry4.hash_length; j++) {
-	                this.buf.writeUint8(_entry4.hash[j]);
-	              }
-	            }
-	            break;
+	        case 'NestMembers':
+	          this.buf.writeUint16(attribute.number_of_classes);
+	          for (var _i = 0; _i < attribute.number_of_classes; _i++) {
+	            this.buf.writeUint16(attribute.classes[_i]);
 	          }
-	        /* -- */
+	          break;
 
 	        // Unknown attributes
 	        // See: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.1
 	        default:
 	          {
-	            for (var i = 0; i < attribute_info.attribute_length; i++) {
-	              this.buf.writeUint8(attribute_info.info[i]);
+	            for (var i = 0; i < attribute.attribute_length; i++) {
+	              this.buf.writeUint8(attribute.info[i]);
 	            }
 	          }
 	      }
@@ -6778,6 +6753,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this.buf.writeUint16(entry.descriptor_index);
 	          break;
 
+	        case _constantType2.default.DYNAMIC:
 	        case _constantType2.default.INVOKE_DYNAMIC:
 	          this.buf.writeUint16(entry.bootstrap_method_attr_index);
 	          this.buf.writeUint16(entry.name_and_type_index);
@@ -7124,6 +7100,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *
 	     * @param {Instruction[]} instruction - Instructions to convert.
 	     * @see {@link https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5}
+	     * @returns {Number[]}
 	     */
 	    value: function toBytecode(instructions) {
 	      if (!Array.isArray(instructions)) {
@@ -7131,75 +7108,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      var bytecode = [];
-	      var offset = 0;
 
-	      while (offset < instructions.length) {
-	        var current = instructions[offset];
-	        bytecode.push(current.opcode);
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
 
-	        switch (current.opcode) {
-	          case _opcode2.default.TABLESWITCH:
-	          case _opcode2.default.LOOKUPSWITCH:
-	            {
-	              var padding = bytecode.length % 4 ? 4 - bytecode.length % 4 : 0;
+	      try {
+	        for (var _iterator = instructions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var _step$value = _step.value,
+	              opcode = _step$value.opcode,
+	              operands = _step$value.operands;
 
-	              while (padding-- > 0) {
-	                bytecode.push(0);
-	              }
+	          bytecode.push(opcode);
 
-	              bytecode.push.apply(bytecode, _toConsumableArray(current.operands));
-	              break;
+	          if (opcode === _opcode2.default.TABLESWITCH || opcode === _opcode2.default.LOOKUPSWITCH) {
+	            var padding = bytecode.length % 4 ? 4 - bytecode.length % 4 : 0;
+	            while (padding-- > 0) {
+	              bytecode.push(0);
 	            }
+	          }
 
-	          case _opcode2.default.WIDE:
-	            {
-	              var targetOpcode = current.operands[0];
-
-	              switch (targetOpcode) {
-	                case _opcode2.default.ILOAD:
-	                case _opcode2.default.FLOAD:
-	                case _opcode2.default.ALOAD:
-	                case _opcode2.default.LLOAD:
-	                case _opcode2.default.DLOAD:
-	                case _opcode2.default.ISTORE:
-	                case _opcode2.default.FSTORE:
-	                case _opcode2.default.ASTORE:
-	                case _opcode2.default.LSTORE:
-	                case _opcode2.default.DSTORE:
-	                case _opcode2.default.RET:
-	                  bytecode.push(targetOpcode, current.operands[1], current.operands[2]);
-	                  break;
-
-	                case _opcode2.default.IINC:
-	                  bytecode.push(targetOpcode, current.operands[1], current.operands[2], current.operands[3], current.operands[4]);
-	                  break;
-
-	                default:
-	                  throw 'Unexpected wide opcode: ' + targetOpcode;
-	              }
-	              break;
-	            }
-
-	          default:
-	            {
-	              var operandCount = opcodeOperandCount[current.opcode];
-
-	              if (operandCount === undefined) {
-	                throw Error('Unexpected opcode: ' + current);
-	              }
-
-	              if (current.operands.length > operandCount) {
-	                throw Error('The number of operands in instruction: ' + current + ' is greater than the allowed.');
-	              }
-
-	              for (var i = 0; i < operandCount; i++) {
-	                bytecode.push(current.operands[i]);
-	              }
-	              break;
-	            }
+	          // We assume we are given valid operands
+	          bytecode.push.apply(bytecode, _toConsumableArray(operands));
 	        }
-
-	        offset++;
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
 	      }
 
 	      return bytecode;
@@ -7210,6 +7154,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *
 	     * @param {number[]} bytecode - An array of bytes containing the jvm bytecode.
 	     * @see {@link https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5}
+	     * @returns {Instruction[]}
 	     */
 
 	  }, {
@@ -7219,31 +7164,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        throw TypeError('bytecode must be an array of bytes.');
 	      }
 
-	      var parsed = [];
+	      var instructions = [];
 	      var offset = 0;
 
 	      while (offset < bytecode.length) {
-	        var current = bytecode[offset++];
-	        var instruction = new Instruction(current, [], offset - 1);
+	        var bytecodeOffset = offset;
+	        var opcode = bytecode[offset++];
 
-	        switch (current) {
+	        var numOperandBytes = void 0;
+	        switch (opcode) {
 	          // https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.lookupswitch
 	          case _opcode2.default.LOOKUPSWITCH:
 	            {
 	              var padding = offset % 4 ? 4 - offset % 4 : 0;
 	              offset += padding; // Skip padding
 
-	              // default case bytes + npair bytes
-	              for (var i = 0; i < 8; i++) {
-	                instruction.operands.push(bytecode[offset++]);
-	              }
+	              var npairs = bytecode[offset + 4] << 24 | bytecode[offset + 5] << 16 | bytecode[offset + 6] << 8 | bytecode[offset + 7];
 
-	              var npairs = bytecode[offset - 4] << 24 | bytecode[offset - 3] << 16 | bytecode[offset - 2] << 8 | bytecode[offset - 1];
-
-	              // match-offset pairs
-	              for (var _i = 0; _i < npairs * 8; _i++) {
-	                instruction.operands.push(bytecode[offset++]);
-	              }
+	              numOperandBytes = 8 + npairs * 8;
 	              break;
 	            }
 
@@ -7253,69 +7191,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	              var _padding = offset % 4 ? 4 - offset % 4 : 0;
 	              offset += _padding; // Skip padding
 
-	              // default bytes (4) + low bytes (4) + high bytes (4)
-	              for (var _i2 = 0; _i2 < 12; _i2++) {
-	                instruction.operands.push(bytecode[offset++]);
-	              }
-
-	              var low = bytecode[offset - 8] << 24 | bytecode[offset - 7] << 16 | bytecode[offset - 6] << 8 | bytecode[offset - 5];
-	              var high = bytecode[offset - 4] << 24 | bytecode[offset - 3] << 16 | bytecode[offset - 2] << 8 | bytecode[offset - 1];
+	              var low = bytecode[offset + 4] << 24 | bytecode[offset + 5] << 16 | bytecode[offset + 6] << 8 | bytecode[offset + 7];
+	              var high = bytecode[offset + 8] << 24 | bytecode[offset + 9] << 16 | bytecode[offset + 10] << 8 | bytecode[offset + 11];
 	              var numJumpOffsets = high - low + 1;
 
-	              // jump offset's
-	              for (var _i3 = 0; _i3 < numJumpOffsets * 4; _i3++) {
-	                instruction.operands.push(bytecode[offset++]);
-	              }
+	              numOperandBytes = 3 * 4 + numJumpOffsets * 4;
 	              break;
 	            }
 
 	          // https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.wide
 	          case _opcode2.default.WIDE:
-	            {
-	              var targetOpcode = bytecode[offset++];
-	              switch (targetOpcode) {
-	                case _opcode2.default.ILOAD:
-	                case _opcode2.default.FLOAD:
-	                case _opcode2.default.ALOAD:
-	                case _opcode2.default.LLOAD:
-	                case _opcode2.default.DLOAD:
-	                case _opcode2.default.ISTORE:
-	                case _opcode2.default.FSTORE:
-	                case _opcode2.default.ASTORE:
-	                case _opcode2.default.LSTORE:
-	                case _opcode2.default.DSTORE:
-	                case _opcode2.default.RET:
-	                  instruction.operands.push(targetOpcode, bytecode[offset++], bytecode[offset++]);
-	                  break;
-
-	                case _opcode2.default.IINC:
-	                  instruction.operands.push(targetOpcode, bytecode[offset++], bytecode[offset++], bytecode[offset++], bytecode[offset++]);
-	                  break;
-
-	                default:
-	                  throw 'Unexpected wide opcode: ' + targetOpcode;
-	              }
-	              break;
-	            }
+	            numOperandBytes = bytecode[offset] === _opcode2.default.IINC ? 5 : 3;
+	            break;
 
 	          default:
-	            {
-	              var operandCount = opcodeOperandCount[current];
-
-	              if (operandCount === undefined) {
-	                throw Error('Unexpected opcode: ' + current);
-	              }
-
-	              while (operandCount-- > 0) {
-	                instruction.operands.push(bytecode[offset++]);
-	              }
-	              break;
+	            numOperandBytes = opcodeOperandCount[opcode];
+	            if (numOperandBytes === undefined) {
+	              throw Error('Unexpected opcode: ' + opcode);
 	            }
+	            break;
 	        }
 
-	        parsed.push(instruction);
+	        var operands = bytecode.slice(offset, offset + numOperandBytes);
+	        var instruction = new Instruction(opcode, operands, bytecodeOffset);
+
+	        instructions.push(instruction);
+	        offset += numOperandBytes;
 	      }
-	      return parsed;
+	      return instructions;
 	    }
 	  }]);
 
