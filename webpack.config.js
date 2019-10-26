@@ -1,4 +1,4 @@
-var path = require('path');
+const path = require('path')
 
 module.exports = {
   entry: './src/index.js',
@@ -9,16 +9,18 @@ module.exports = {
     library: 'JavaClassTools'
   },
   node: {
-    fs: "empty",
-    process: "empty"
+    fs: 'empty'
   },
   module: {
-    loaders: [
+    rules: [
       {
-        test: /\.js$/,
+        test: /\.m?js$/,
         exclude: /node_modules/,
-        loader: 'babel-loader'
+        use: {
+          loader: 'babel-loader'
+        }
       }
     ]
-  }
-}
+  },
+  mode: 'none'
+};

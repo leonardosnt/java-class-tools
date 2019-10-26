@@ -31,4 +31,4 @@ const Modifier = {
   MODULE: 0x8000
 };
 
-module.exports = Modifier;
+export default Modifier;

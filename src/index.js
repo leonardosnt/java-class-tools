@@ -12,7 +12,7 @@ import Opcode from './opcode';
 import Modifier from './modifier';
 import { InstructionParser, Instruction } from './instruction-parser';
 
-module.exports = {
+export {
   JavaClassFileReader,
   JavaClassFileWriter,
   Opcode,

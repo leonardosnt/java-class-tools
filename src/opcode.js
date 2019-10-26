@@ -213,4 +213,4 @@ const Opcode = {
   IMPDEP2: 0xff
 };
 
-module.exports = Opcode;
+export default Opcode;

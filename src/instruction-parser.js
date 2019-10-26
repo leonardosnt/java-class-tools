@@ -166,7 +166,7 @@ class InstructionParser {
   }
 }
 
-module.exports = {
+export {
   Instruction,
   InstructionParser
 };

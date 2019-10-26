@@ -867,4 +867,4 @@ class JavaClassFileReader {
   }
 }
 
-module.exports = JavaClassFileReader;
+export default JavaClassFileReader;

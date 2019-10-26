@@ -25,4 +25,4 @@ const ConstantType = {
   PACKAGE: 20,
 };
 
-module.exports = ConstantType;
+export default ConstantType;

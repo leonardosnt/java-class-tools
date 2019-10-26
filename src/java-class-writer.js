@@ -634,4 +634,4 @@ class JavaClassFileWriter {
   }
 }
 
-module.exports = JavaClassFileWriter;
+export default JavaClassFileWriter;
