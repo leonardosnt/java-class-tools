@@ -10,8 +10,9 @@ npm install java-class-tools
 ```
 
 ## Examples:
-- [Live example](https://rawgit.com/leonardosnt/java-class-tools/master/examples/browser.html) (List all the methods and fields of a class file)   
-- [Try yourself](https://runkit.com/leonardosnt/java-class-tools-example)  (_RunKit:_ you must login with github to be able to fork it)
+- [Browser usage example](https://rawgit.com/leonardosnt/java-class-tools/master/examples/browser.html) (List all the methods and fields of a class file)
+- [Node usage example](https://repl.it/@leonardosnt/jct-example) (Simple disassembler)
+- [Try yourself](https://runkit.com/leonardosnt/java-class-tools-example)  (_RunKit:_ you must login with GitHub to be able to fork it)
 
 Print all method names (node.js)
 ```javascript
