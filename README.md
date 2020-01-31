@@ -47,17 +47,17 @@ Usage Example (browser): print all method names
   function printAllMethods(classData) {
     const reader = new JavaClassTools.JavaClassFileReader();
     const classFile = reader.read(classData);
+    const textDecoder = new TextDecoder();
 
-    classFile.methods.forEach(md => {
+    classFile.methods.forEach(method => {
       /**
        * Method name in constant-pool.
        * 
        * Points to a CONSTANT_Utf8_info structure: https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.7
        */
-      const nameInConstantPool = classFile.constant_pool[md.name_index];
+      const nameEntry = classFile.constant_pool[method.name_index];
 
-      // To string (hacky)
-      const name = String.fromCharCode.apply(null, nameInConstantPool.bytes);
+      const name = textDecoder.decode(new Uint8Array(nameEntry.bytes));
 
       console.log(name);
     });
@@ -66,6 +66,6 @@ Usage Example (browser): print all method names
 ```
 
 ## License
-Copyright (C) 2017 leonardosnt <<leonrdsnt@gmail.com>>  
+Copyright (C) 2017-2020 leonardosnt <<leonrdsnt@gmail.com>>  
 Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
