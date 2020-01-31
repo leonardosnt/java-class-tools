@@ -38,6 +38,7 @@
         var file = e.target.files[0];
         var reader = new FileReader();
         var classReader = new JavaClassTools.JavaClassFileReader();
+        var textDecoder = new TextDecoder();
 
         reader.onload = function (e) {
           var data = e.target.result;
@@ -65,8 +66,8 @@
               var descriptorCpEntry = classFile.constant_pool[entry.descriptor_index];
 
               // Convert to string
-              var name = String.fromCharCode.apply(null, nameCpEntry.bytes);
-              var descriptor = String.fromCharCode.apply(null, descriptorCpEntry.bytes);
+              var name = textDecoder.decode(new Uint8Array(nameCpEntry.bytes));
+              var descriptor = textDecoder.decode(new Uint8Array(descriptorCpEntry.bytes));
 
               var listEntry = document.createElement('li');
               listEntry.innerText = name + ' ' + descriptor;
