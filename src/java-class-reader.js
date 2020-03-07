@@ -238,7 +238,7 @@ class JavaClassFileReader {
     };
 
     const attributeNameBytes = this.classFile.constant_pool[attribute.attribute_name_index].bytes;
-    const attributeName = String.fromCharCode.apply(null, attributeNameBytes); // TODO: is this safe?
+    const attributeName = String.fromCharCode.apply(null, attributeNameBytes);
 
     switch (attributeName) {
       case 'Deprecated':
@@ -796,7 +796,7 @@ class JavaClassFileReader {
        * All 8-byte constants take up two entries in the constant_pool table of the class file.
        * If a CONSTANT_Long_info or CONSTANT_Double_info structure is the item in the constant_pool table at index n,
        * then the next usable item in the pool is located at index n+2.
-       * The constant_pool index n+ must be valid but is considered unusable.
+       * The constant_pool index n+1 must be valid but is considered unusable.
        */
       if (entry.tag === ConstantType.LONG || entry.tag === ConstantType.DOUBLE) {
         pool[++i] = undefined;

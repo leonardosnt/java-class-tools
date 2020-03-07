@@ -223,7 +223,7 @@ class JavaClassFileWriter {
     this.buf.writeUint32(attribute.attribute_length);
 
     const attributeNameBytes = this.classFile.constant_pool[attribute.attribute_name_index].bytes;
-    const attributeName = String.fromCharCode.apply(null, attributeNameBytes); // TODO: is this safe?
+    const attributeName = String.fromCharCode.apply(null, attributeNameBytes);
 
     switch (attributeName) {
       case 'RuntimeInvisibleAnnotations':
