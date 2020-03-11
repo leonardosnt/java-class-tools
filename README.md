@@ -2,7 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/dwfu9sq51uhofyyv?svg=true)](https://ci.appveyor.com/project/leonardosnt/java-class-tools)
 ---
-All object's structures are based on the [Java Virtual Machine Specification](https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html)
+The structure of the ClassFile object returned by `JavaClassFileReader#read` and its _inner objects_ matches the [Java Virtual Machine Specification](https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html), therefore you can use this specification as a guide on how to understand and change a Class file.
 
 ## Install
 ```
@@ -10,16 +10,18 @@ npm install java-class-tools
 ```
 
 ## Examples:
-- [Browser usage example](https://rawgit.com/leonardosnt/java-class-tools/master/examples/browser.html) (List all the methods and fields of a class file)
+- [Browser usage example](https://rawgit.com/leonardosnt/java-class-tools/master/examples/browser.html) (List all methods and fields of a class file)
 - [Node usage example](https://repl.it/@leonardosnt/jct-example) (Simple disassembler)
 - [Try yourself](https://runkit.com/leonardosnt/java-class-tools-example)  (_RunKit:_ you must login with GitHub to be able to fork it)
 
-Print all method names (node.js)
+Print method names (Node.js):
 ```javascript
 const { JavaClassFileReader } = require('java-class-tools');
+const { TextDecoder } = require('util');
 
 const reader = new JavaClassFileReader();
-const classFile = reader.read('path/to/file.class');
+const classFile = reader.read('./Foo.class');
+const textDecoder = new TextDecoder();
 
 classFile.methods.forEach(md => {
   /**
@@ -29,14 +31,14 @@ classFile.methods.forEach(md => {
    */
   const nameInConstantPool = classFile.constant_pool[md.name_index];
 
-  // To string (hacky)
-  const name = String.fromCharCode.apply(null, nameInConstantPool.bytes);
+  // It is also possible to use the string_decoder builtin module.
+  const name = textDecoder.decode(new Uint8Array(nameInConstantPool.bytes));
 
   console.log(name);
 });
 ```
 
-Usage Example (browser): print all method names
+Print method names (Node.js):
 ```html
 <script src="https://cdn.jsdelivr.net/npm/java-class-tools@latest/dist/java-class-tools.min.js"></script>
 <script>
