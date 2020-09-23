@@ -499,7 +499,9 @@ declare module 'java-class-tools' {
     METHOD_HANDLE = 15,
     METHOD_TYPE = 16,
     DYNAMIC = 17,
-    INVOKE_DYNAMIC = 18
+    INVOKE_DYNAMIC = 18,
+    MODULE = 19,
+    PACKAGE = 20,
   }
 
   export enum Modifier {
