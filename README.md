@@ -1,20 +1,24 @@
 # java-class-tools
 
 [![Build status](https://ci.appveyor.com/api/projects/status/dwfu9sq51uhofyyv?svg=true)](https://ci.appveyor.com/project/leonardosnt/java-class-tools)
+
 ---
 The structure of the ClassFile object returned by `JavaClassFileReader#read` and its _inner objects_ matches the [Java Virtual Machine Specification](https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html), therefore you can use this specification as a guide on how to understand and change a Class file.
 
 ## Install
-```
+
+```bash
 npm install java-class-tools
 ```
 
-## Examples:
+## Examples
+
 - [Browser usage example](https://rawgit.com/leonardosnt/java-class-tools/master/examples/browser.html) (List all methods and fields of a class file)
 - [Node usage example](https://repl.it/@leonardosnt/jct-example) (Simple disassembler)
 - [Try yourself](https://runkit.com/leonardosnt/java-class-tools-example)  (_RunKit:_ you must login with GitHub to be able to fork it)
 
 Print method names (Node.js):
+
 ```javascript
 const { JavaClassFileReader } = require('java-class-tools');
 const { TextDecoder } = require('util');
@@ -38,7 +42,8 @@ classFile.methods.forEach(md => {
 });
 ```
 
-Print method names (Node.js):
+Print method names (Browser):
+
 ```html
 <script src="https://cdn.jsdelivr.net/npm/java-class-tools@latest/dist/java-class-tools.min.js"></script>
 <script>
@@ -68,6 +73,6 @@ Print method names (Node.js):
 ```
 
 ## License
+
 Copyright (C) 2017-2020 leonardosnt <<leonrdsnt@gmail.com>>  
 Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
